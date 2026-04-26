@@ -113,7 +113,7 @@ export function Pricing() {
               <a
   href={
     plan.name === "Pro"
-      ? "https://buy.stripe.com/test_xxx_PRO_LINK"
+      ? "https://buy.stripe.com/60U00kecg9tn8Yz6eY0kE00"
       : "#"}
   }
   target="_blank"
