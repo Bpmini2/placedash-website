@@ -110,16 +110,26 @@ export function Pricing() {
                 </ul>
               </CardContent>
               <CardFooter>
-              <Button
-  className="w-full"
-  onClick={() => {
-    if (plan.name === "Pro") {
-      window.open("https://buy.stripe.com/6oU00kecg9tn8YZ6eY0kE00", "_blank")
-    }
-  }}
+              <a
+  href="https://buy.stripe.com/6oU00kecg9tn8YZ6eY0kE00"
+  target="_blank"
+  rel="noopener noreferrer"
+  style={{ display: "block", width: "100%" }}
 >
-  {plan.cta}
-</Button>  
+  <div
+    style={{
+      background: "#22c55e",
+      color: "black",
+      textAlign: "center",
+      padding: "12px",
+      borderRadius: "8px",
+      fontWeight: "600",
+      cursor: "pointer"
+    }}
+  >
+    {plan.cta}
+  </div>
+</a>  
               </CardFooter>
             </Card>
           ))}
