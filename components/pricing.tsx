@@ -114,7 +114,7 @@ export function Pricing() {
   className="w-full"
   onClick={() => {
     if (plan.name === "Pro") {
-      window.open("https://buy.stripe.com/6uU00kecg9tn8YZ6eY0kE00", "_blank")
+      window.open("https://buy.stripe.com/6oU00kecg9tn8YZ6eY0kE00", "_blank")
     }
   }}
 >
