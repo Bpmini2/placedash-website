@@ -109,28 +109,16 @@ export function Pricing() {
                   ))}
                 </ul>
               </CardContent>
-              <CardFooter>
-              <a
-  href="https://buy.stripe.com/6oU00kecg9tn8YZ6eY0kE00"
-  target="_blank"
-  rel="noopener noreferrer"
-  style={{ display: "block", width: "100%" }}
->
-  <div
-    style={{
-      background: "#22c55e",
-      color: "black",
-      textAlign: "center",
-      padding: "12px",
-      borderRadius: "8px",
-      fontWeight: "600",
-      cursor: "pointer"
+    <CardFooter>
+  <Button
+    className="w-full"
+    onClick={() => {
+      window.location.href = "/dashboard-preview"
     }}
   >
-    {plan.cta}
-  </div>
-</a>  
-              </CardFooter>
+    {plan.name === "Pro" ? "Start Free Trial (Coming Soon)" : "Join Early Access"}
+  </Button>
+</CardFooter>
             </Card>
           ))}
         </div>
