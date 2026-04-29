@@ -1,8 +1,8 @@
 const predictions = [
-  { time: "12:45", track: "Flemington", race: "Race 4", runners: 10, horse: "Silver Command", confidence: "High" },
-  { time: "13:20", track: "Randwick", race: "Race 6", runners: 9, horse: "Eastern Star", confidence: "Medium" },
-  { time: "14:05", track: "Caulfield", race: "Race 3", runners: 11, horse: "Metro Pulse", confidence: "High" },
-  { time: "15:10", track: "Doomben", race: "Race 7", runners: 8, horse: "Bold Runner", confidence: "Medium" },
+  { time: "12:45", track: "Flemington", race: "Race 4", runners: 10, horse: "Silver Command", confidence: "HIGH" },
+  { time: "13:20", track: "Randwick", race: "Race 6", runners: 9, horse: "Eastern Star", confidence: "MEDIUM" },
+  { time: "14:05", track: "Caulfield", race: "Race 3", runners: 11, horse: "Metro Pulse", confidence: "HIGH" },
+  { time: "15:10", track: "Doomben", race: "Race 7", runners: 8, horse: "Bold Runner", confidence: "LOW" },
 ];
 
 const plans = [
