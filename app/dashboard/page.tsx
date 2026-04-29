@@ -1,4 +1,24 @@
+import React, { useEffect, useState } from "react";
 export default function Dashboard() {
+const [races, setRaces] = useState([]);
+useEffect(() => {
+  const options = {
+    method: "GET",
+    headers: {
+      "X-RapidAPI-Key": "PASTE YOUR KEY HERE",
+      "X-RapidAPI-Host": "the-racing-api.p.rapidapi.com"
+    }
+  };
+
+  fetch("https://the-racing-api.p.rapidapi.com/v1/racecards/free?day=today", options)
+    .then(res => res.json())
+    .then(data => {
+      console.log(data);
+      setRaces(data.racecards || []);
+    })
+    .catch(err => console.error(err));
+}, []);
+  
   return (
     <main style={{padding: "40px", maxWidth: "1000px", margin: "0 auto"}}>
       
@@ -6,24 +26,24 @@ export default function Dashboard() {
       <p style={{color:"#94a3b8"}}>Today’s AI-powered place selections</p>
 
       <div style={{marginTop:"30px", display:"grid", gap:"20px"}}>
+{races.slice(0, 3).map((race, index) => (
+  <div key={index} style={{padding:"20px", border:"1px solid rgba(255,255,255,0.1)", borderRadius:"16px"}}>
+    
+    <h3>{race.course} Race {race.race_number}</h3>
 
-        <div style={{padding:"20px", border:"1px solid rgba(255,255,255,0.1)", borderRadius:"16px"}}>
-          <h3>Flemington Race 4</h3>
-<p style={{color:"#94a3b8", marginTop:"6px"}}>Saturday • 12:45 PM • 10 runners</p>
+    <p style={{color:"#94a3b8"}}>
+      {race.off_time} • {race.runners?.length || 0} runners
+    </p>
 
-<p style={{marginTop:"10px"}}>
-  Selection: <strong>Silver Command</strong>
-</p>
+    <p style={{marginTop:"10px"}}>
+      Selection: <strong>{race.runners?.[0]?.horse || "TBD"}</strong>
+    </p>
 
-<span style={{color:"#22c55e"}}>HIGH CONFIDENCE</span>
-        </div>
+    <span style={{color:"#22c55e"}}>HIGH CONFIDENCE</span>
 
-        <div style={{padding:"20px", border:"1px solid rgba(255,255,255,0.1)", borderRadius:"16px"}}>
-          <h3>Randwick Race 6</h3>
-          <p style={{color:"#94a3b8", marginTop:"6px"}}>Saturday • 1:20 PM • 9 runners</p>
-          <p>Selection: <strong>Eastern Star</strong></p>
-          <span style={{color:"#eab308"}}>MEDIUM CONFIDENCE</span>
-        </div>
+  </div>
+))}
+    </div>  
 
         <div style={{padding:"20px", border:"1px solid rgba(255,255,255,0.1)", borderRadius:"16px", opacity:0.5}}>
           <h3>Premium Picks Locked 🔒</h3>
