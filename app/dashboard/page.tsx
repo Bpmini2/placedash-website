@@ -49,19 +49,19 @@ export default function Dashboard() {
   marginTop: "25px",
   display: "grid",
   gap: "15px",
-  filter: "blur(1.2px)",
-  opacity: 0.65,
+  
+  opacity: 0.85,
   pointerEvents: "none"
 }}>
   <div style={{padding:"16px", border:"1px solid rgba(255,255,255,0.1)", borderRadius:"12px"}}>
     <h4>Caulfield Race 3</h4>
-    <p>Selection: Hidden Pick</p>
+    <p>Selection: 🔒 Locked (Upgrade Required)</p>
     <span>HIGH CONFIDENCE</span>
   </div>
 
   <div style={{padding:"16px", border:"1px solid rgba(255,255,255,0.1)", borderRadius:"12px"}}>
     <h4>Doomben Race 7</h4>
-    <p>Selection: Hidden Pick</p>
+    <p>Selection: 🔒 Locked (Upgrade Required)</p>
     <span>MEDIUM CONFIDENCE</span>
   </div>
 </div>
