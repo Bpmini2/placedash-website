@@ -96,7 +96,7 @@ export default function Home() {
     <span>Track Record</span>
     <h2>Proven Results</h2>
     <p>Transparent performance based on recent selections.</p>
-    <p style="margin-top:10px;color:#94a3b8;font-size:12px;">
+    <p className="smallDisclaimer">
 Example results shown for demonstration purposes only. Not indicative of future performance.
 </p>
   </div>
