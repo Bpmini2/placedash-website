@@ -9,12 +9,18 @@ export default function Dashboard() {
 
         <div style={{padding:"20px", border:"1px solid rgba(255,255,255,0.1)", borderRadius:"16px"}}>
           <h3>Flemington Race 4</h3>
-          <p>Selection: <strong>Silver Command</strong></p>
-          <span style={{color:"#22c55e"}}>HIGH CONFIDENCE</span>
+<p style={{color:"#94a3b8", marginTop:"6px"}}>Saturday • 12:45 PM • 10 runners</p>
+
+<p style={{marginTop:"10px"}}>
+  Selection: <strong>Silver Command</strong>
+</p>
+
+<span style={{color:"#22c55e"}}>HIGH CONFIDENCE</span>
         </div>
 
         <div style={{padding:"20px", border:"1px solid rgba(255,255,255,0.1)", borderRadius:"16px"}}>
           <h3>Randwick Race 6</h3>
+          <p style={{color:"#94a3b8", marginTop:"6px"}}>Saturday • 1:20 PM • 9 runners</p>
           <p>Selection: <strong>Eastern Star</strong></p>
           <span style={{color:"#eab308"}}>MEDIUM CONFIDENCE</span>
         </div>
