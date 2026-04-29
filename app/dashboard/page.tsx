@@ -49,8 +49,8 @@ export default function Dashboard() {
   marginTop: "25px",
   display: "grid",
   gap: "15px",
-  filter: "blur(3px)",
-  opacity: 0.45,
+  filter: "blur(1.2px)",
+  opacity: 0.65,
   pointerEvents: "none"
 }}>
   <div style={{padding:"16px", border:"1px solid rgba(255,255,255,0.1)", borderRadius:"12px"}}>
