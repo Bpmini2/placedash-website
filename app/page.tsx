@@ -20,8 +20,8 @@ export default function Home() {
     <main>
       <header className="header">
         <div className="brand"><div className="logo">PD</div><strong>PlaceDash</strong></div>
-        <nav><a href="#dashboard">Predictions</a><a href="#track-record">Track Record</a><a href="#pricing">Pricing</a></nav>
-        <a className="headerButton" href="#dashboard">View Today’s Picks</a>
+        <nav><a href="/dashboard">Predictions</a><a href="#track-record">Track Record</a><a href="#pricing">Pricing</a></nav>
+        <a className="headerButton" href="/dashboard">View Today’s Picks</a>
       </header>
 
       <section className="hero">
@@ -30,7 +30,7 @@ export default function Home() {
           <h1>Daily AI Place Picks for Australian Racing</h1>
           <p>Get daily place betting insights backed by data-driven analysis, strict race filtering...</p>
           <div className="heroButtons">
-            <a className="primaryButton" href="#dashboard">View Today’s Best Picks</a>
+            <a className="primaryButton" href="/dashboard">View Today’s Best Picks</a>
             <a className="secondaryButton" href="#pricing">Unlock Full Access</a>
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function Home() {
               {plan.highlighted && <div className="popularBadge">Most Popular</div>}
               <h3>{plan.name}</h3><p>{plan.description}</p><strong className="price">{plan.price}</strong>
               <ul>{plan.features.map((f) => <li key={f}>• {f}</li>)}</ul>
-              <a className={plan.highlighted ? "primaryButton full" : "secondaryButton full"} href="#dashboard">
+              <a className={plan.highlighted ? "primaryButton full" : "secondaryButton full"} href="/dashboard">
   {plan.highlighted ? "Start Winning" : "View Plan"}
 </a>
             </div>
