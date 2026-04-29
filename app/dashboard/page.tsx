@@ -3,6 +3,21 @@
 import React, { useEffect, useState } from "react";
 
 export default function Dashboard() {
+  function getBestRunner(race) {
+  if (!race.runners || race.runners.length === 0) return null;
+
+  return race.runners
+    .map((runner) => {
+      let score = 0;
+
+      if (runner.form) score += 2;
+      if (runner.draw) score += Math.max(0, 10 - parseInt(runner.draw));
+      if (runner.lbs) score += Math.max(0, 140 - parseInt(runner.lbs)) / 10;
+
+      return { ...runner, score };
+    })
+    .sort((a, b) => b.score - a.score)[0];
+}
   const [races, setRaces] = useState([]);
   const [debug, setDebug] = useState(null);
   
