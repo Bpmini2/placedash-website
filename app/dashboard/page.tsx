@@ -11,12 +11,12 @@ useEffect(() => {
   };
 
   fetch("https://the-racing-api.p.rapidapi.com/v1/racecards/free?day=today", options)
-    .then(res => res.json())
-    .then(data => {
-  console.log(data);
-  setRaces(data.racecards || []);
-})
-.catch(err => console.error(err));
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      setRaces(data.racecards || []);
+    })
+    .catch((err) => console.error(err));
 }, []);
   
   return (
