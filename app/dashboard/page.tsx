@@ -42,7 +42,7 @@ export default function Dashboard() {
               {race.off_time} • {race.runners?.length || 0} runners
             </p>
             <p style={{ marginTop: "10px" }}>
-              Selection: <strong>{race.runners?.[0]?.horse || "TBD"}</strong>
+              Selection: <strong>"🔒 Locked (Upgrade Required)"</strong>
             </p>
             <span style={{ color: "#22c55e" }}>HIGH CONFIDENCE</span>
           </div>
