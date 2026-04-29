@@ -11,11 +11,11 @@ export default function Dashboard() {
       method: "GET",
       headers: {
         "X-RapidAPI-Key": "2cb26d22fcmsh44c3a843555e9fdp1727d5jsnb5263c409eaf",
-        "X-RapidAPI-Host": "the-racing-api.p.rapidapi.com"
+        "X-RapidAPI-Host": "the-racing-api1.p.rapidapi.com"
       }
     };
 
-    fetch("https://the-racing-api.p.rapidapi.com/v1/racecards?day=today", options)
+    fetch("https://the-racing-api1.p.rapidapi.com/v1/racecards/free?day=today", options)
       .then((res) => res.json())
       .then((data) => {
   setDebug(data);
