@@ -27,7 +27,13 @@ export default function Dashboard() {
 
         <div style={{padding:"20px", border:"1px solid rgba(255,255,255,0.1)", borderRadius:"16px", opacity:0.5}}>
           <h3>Premium Picks Locked 🔒</h3>
-          <p>Upgrade to unlock high-confidence selections</p>
+          <p style={{color:"#94a3b8"}}>
+  You're viewing 2 of 5 selections today.
+</p>
+
+<p style={{marginTop:"6px"}}>
+  Upgrade to unlock the remaining high-confidence picks.
+</p>
           <a href="/#pricing" style={{
   display: "inline-block",
   marginTop: "15px",
