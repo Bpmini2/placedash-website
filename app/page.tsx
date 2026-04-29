@@ -91,8 +91,34 @@ export default function Home() {
           <div className="mockWindow"><div className="windowDots"><span></span><span></span><span></span></div><div className="mockLine wide"></div><div className="mockBox green"></div><div className="mockBox"></div><div className="mockBox"></div></div>
         </div>
       </section>
+<section id="track-record" className="section darkSection">
+  <div className="sectionTitle center">
+    <span>Track Record</span>
+    <h2>Proven Results</h2>
+    <p>Transparent performance based on recent selections.</p>
+  </div>
 
+  <div className="statsGrid">
+    <div>
+      <strong>62%</strong>
+      <span>7 Day Strike Rate</span>
+    </div>
+    <div>
+      <strong>+14%</strong>
+      <span>ROI (Last 7 Days)</span>
+    </div>
+    <div>
+      <strong>21 / 34</strong>
+      <span>Winning Selections</span>
+    </div>
+    <div>
+      <strong>Consistent</strong>
+      <span>Daily Opportunities</span>
+    </div>
+  </div>
+</section>
       <footer><p>© 2026 PlaceDash. Information and data-analysis service only.</p><div><a href="#">Privacy Policy</a><a href="#">Terms</a><a href="#">Disclaimer</a></div></footer>
+    
     </main>
   );
 }
