@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-
+const [debug, setDebug] = useState(null);
 export default function Dashboard() {
   const [races, setRaces] = useState([]);
 
@@ -17,15 +17,18 @@ export default function Dashboard() {
     fetch("https://the-racing-api.p.rapidapi.com/v1/racecards/free?day=today", options)
       .then((res) => res.json())
       .then((data) => {
-        setRaces(data.racecards || data.data?.racecards || []);
-      })
+  setDebug(data);
+  setRaces(data.racecards || data.data?.racecards || []);
+})
       .catch((err) => console.error(err));
   }, []);
 
   return (
     <main style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
       <h1>Dashboard Preview</h1>
-    <p>{JSON.stringify(races)}</p>  
+    <pre style={{whiteSpace:"pre-wrap", color:"#94a3b8", fontSize:"12px"}}>
+  {JSON.stringify(debug, null, 2)}
+</pre>  
       <p style={{ color: "#94a3b8" }}>Today’s AI-powered place selections</p>
 
       <div style={{ marginTop: "30px", display: "grid", gap: "20px" }}>
