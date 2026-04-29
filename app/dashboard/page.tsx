@@ -27,14 +27,12 @@ export default function Dashboard() {
   return (
     <main style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
       <h1>Dashboard Preview</h1>
-    <pre style={{whiteSpace:"pre-wrap", color:"#94a3b8", fontSize:"12px"}}>
-  {JSON.stringify(debug, null, 2)}
-</pre>  
+      
       <p style={{ color: "#94a3b8" }}>Today’s AI-powered place selections</p>
 
       <div style={{ marginTop: "30px", display: "grid", gap: "20px" }}>
         {races
-  .filter(race => race.region === "AUS")
+  .filter(race => race.region === "GB")
   .slice(0, 3)
   .map((race, index) => (
           <div key={index} style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px" }}>
