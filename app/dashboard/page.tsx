@@ -15,7 +15,7 @@ export default function Dashboard() {
       }
     };
 
-    fetch("https://the-racing-api.p.rapidapi.com/v1/racecards/free?day=today", options)
+    fetch("https://the-racing-api.p.rapidapi.com/v1/racecards?day=today", options)
       .then((res) => res.json())
       .then((data) => {
   setDebug(data);
