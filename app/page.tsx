@@ -8,7 +8,7 @@ const predictions = [
 const plans = [
   { name: "Starter", price: "Free", description: "Preview PlaceDash and see limited insights.", features: ["Limited predictions", "Basic race view", "Early access updates"], button: "Join Early Access", highlighted: false },
   { name: "Silver", price: "$9.99/month", description: "Unlock daily AI place predictions and confidence ratings.", features: ["Full daily predictions", "Confidence ratings", "Daily race filtering", "Track record view"], button: "Coming Soon", highlighted: true },
-  { name: "Gold", price: "$19.99/month", description: "Full access to all picks, high-confidence selections, and advanced insights.", features: ["Everything in Pro", "Priority high-confidence picks", "Advanced performance tracking", "Future premium insights"], button: "Coming Soon", highlighted: false },
+  { name: "Gold", price: "$19.99/month", description: "Full access to all picks, high-confidence selections, and advanced insights.", features: ["Everything in Silver", "Priority high-confidence picks", "Advanced performance tracking", "Future premium insights"], button: "Coming Soon", highlighted: false },
 ];
 
 function ConfidenceBadge({ level }: { level: string }) {
