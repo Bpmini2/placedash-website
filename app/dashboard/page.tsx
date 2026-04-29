@@ -33,6 +33,7 @@ export default function Dashboard() {
       <div style={{ marginTop: "30px", display: "grid", gap: "20px" }}>
         {races
   .filter(race => race.region === "GB")
+  .filter(race => race.runners.length >= 8 && race.runners.length <= 11)
   .slice(0, 3)
   .map((race, index) => (
           <div key={index} style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px" }}>
