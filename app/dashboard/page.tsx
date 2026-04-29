@@ -14,8 +14,8 @@ useEffect(() => {
     .then(res => res.json())
     .then(data => {
       console.log(data);
-      setRaces(data.racecards || []);
-    })
+     setRaces(data.racecards || []);
+});
     .catch(err => console.error(err));
 }, []);
   
