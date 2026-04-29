@@ -27,8 +27,8 @@ export default function Home() {
       <section className="hero">
         <div>
           <div className="pill">Australian racing only • Place predictions</div>
-          <h1>AI-Powered Place Predictions for Australian Racing</h1>
-          <p>Get daily place betting insights backed by data-driven analysis, strict race filtering, and clear confidence ratings.</p>
+          <h1>Daily AI Place Picks for Australian Racing</h1>
+          <p>Get daily place betting insights backed by data-driven analysis, strict race filtering...</p>
           <div className="heroButtons">
             <a className="primaryButton" href="#predictions">View Today’s Predictions</a>
             <a className="secondaryButton" href="#pricing">Join Early Access</a>
