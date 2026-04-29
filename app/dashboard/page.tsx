@@ -33,7 +33,10 @@ export default function Dashboard() {
       <p style={{ color: "#94a3b8" }}>Today’s AI-powered place selections</p>
 
       <div style={{ marginTop: "30px", display: "grid", gap: "20px" }}>
-        {races.slice(0, 3).map((race, index) => (
+        {races
+  .filter(race => race.region === "AUS")
+  .slice(0, 3)
+  .map((race, index) => (
           <div key={index} style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px" }}>
             <h3>{race.course} Race {race.race_number}</h3>
             <p style={{ color: "#94a3b8" }}>
