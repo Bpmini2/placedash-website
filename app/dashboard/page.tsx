@@ -45,6 +45,9 @@ export default function Dashboard() {
 }}>
   Upgrade to Pro
 </a>
+ <p style={{marginTop:"20px", fontWeight:"600"}}>
+🔥 Today’s Top Rated Picks (Pro Only)
+</p>         
           <div style={{
   marginTop: "25px",
   display: "grid",
