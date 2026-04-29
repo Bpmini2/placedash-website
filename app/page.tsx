@@ -72,14 +72,16 @@ export default function Home() {
       </section>
 
       <section id="pricing" className="section darkSection">
-        <div className="sectionTitle center"><span>Pricing</span><h2>Simple Pricing — Payments Coming Soon</h2><p>Join early access while PlaceDash is being prepared for full launch.</p></div>
+        <div className="sectionTitle center"><span>Pricing</span><h2>Choose Your Edge</h2><p>Start free, upgrade anytime. Built for serious place bettors who want consistency.</p></div>
         <div className="pricingGrid">
           {plans.map((plan) => (
             <div className={plan.highlighted ? "planCard popular" : "planCard"} key={plan.name}>
               {plan.highlighted && <div className="popularBadge">Most Popular</div>}
               <h3>{plan.name}</h3><p>{plan.description}</p><strong className="price">{plan.price}</strong>
               <ul>{plan.features.map((f) => <li key={f}>• {f}</li>)}</ul>
-              <a className={plan.highlighted ? "primaryButton full" : "secondaryButton full"} href="#predictions">{plan.button}</a>
+              <a className={plan.highlighted ? "primaryButton full" : "secondaryButton full"} href="#predictions">
+  {plan.highlighted ? "Start Winning" : "View Plan"}
+</a>
             </div>
           ))}
         </div>
