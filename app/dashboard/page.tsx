@@ -17,7 +17,7 @@ export default function Dashboard() {
     fetch("https://the-racing-api.p.rapidapi.com/v1/racecards/free?day=today", options)
       .then((res) => res.json())
       .then((data) => {
-        setRaces(data.racecards || []);
+        setRaces(data.racecards || data.data?.racecards || []);
       })
       .catch((err) => console.error(err));
   }, []);
