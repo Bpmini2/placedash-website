@@ -62,7 +62,7 @@ export default function Dashboard() {
             borderRadius: "10px",
             fontWeight: "600"
           }}>
-            Upgrade to Pro
+            Upgrade to Silver
           </a>
         </div>
       </div>
