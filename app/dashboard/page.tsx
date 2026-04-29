@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-const [debug, setDebug] = useState(null);
+
 export default function Dashboard() {
   const [races, setRaces] = useState([]);
-
+  const [debug, setDebug] = useState(null);
+  
   useEffect(() => {
     const options = {
       method: "GET",
