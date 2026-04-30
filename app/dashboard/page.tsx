@@ -58,6 +58,10 @@ return { ...runner, score, confidence };
         {races
   .filter(race => race.region === "GB")
   .filter(race => race.runners.length >= 8 && race.runners.length <= 11)
+  .filter(race => {
+  const best = getBestRunner(race);
+  return best && (best.confidence === "HIGH" || best.confidence === "MEDIUM");
+})        
   .slice(0, 3)
   .map((race, index) => {
   const bestRunner = getBestRunner(race);
