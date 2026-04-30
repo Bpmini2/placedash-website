@@ -80,7 +80,7 @@ return { ...runner, score, confidence };
     bestRunner?.confidence === "HIGH"
       ? "#22c55e"
       : bestRunner?.confidence === "MEDIUM"
-      ? "#eab308"
+      ? "#facc15"
       : "#ef4444"
 }}>
   {bestRunner?.confidence || "LOW"} CONFIDENCE
