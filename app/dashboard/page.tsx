@@ -46,6 +46,11 @@ export default function Dashboard() {
       <p style={{ color: "#94a3b8" }}>Today’s AI-powered place selections</p>
 
       <div style={{ marginTop: "30px", display: "grid", gap: "20px" }}>
+    {races.length === 0 && (
+  <div style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px", color: "#94a3b8" }}>
+    Loading today’s race cards...
+  </div>
+)}    
         {races
   .filter(race => race.region === "GB")
   .filter(race => race.runners.length >= 8 && race.runners.length <= 11)
