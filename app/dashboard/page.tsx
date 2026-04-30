@@ -50,8 +50,11 @@ export default function Dashboard() {
   .filter(race => race.region === "GB")
   .filter(race => race.runners.length >= 8 && race.runners.length <= 11)
   .slice(0, 3)
-  .map((race, index) => (
-          <div key={index} style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px" }}>
+  .map((race, index) => {
+  const bestRunner = getBestRunner(race);
+
+  return (
+          <div key={index} data-selection={bestRunner?.horse || "TBD"} style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px" }}>
             <h3>{race.course} Race {race.race_number}</h3>
             <p style={{ color: "#94a3b8" }}>
               {race.off_time} • {race.runners?.length || 0} runners
@@ -61,7 +64,8 @@ export default function Dashboard() {
             </p>
             <span style={{ color: "#22c55e" }}>HIGH CONFIDENCE</span>
           </div>
-        ))}
+        );
+})}
 
         <div style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px", opacity: 0.85 }}>
           <h3>Premium Picks Locked 🔒</h3>
