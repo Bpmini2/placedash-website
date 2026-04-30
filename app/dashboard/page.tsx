@@ -14,7 +14,11 @@ export default function Dashboard() {
       if (runner.draw) score += Math.max(0, 10 - parseInt(runner.draw));
       if (runner.lbs) score += Math.max(0, 140 - parseInt(runner.lbs)) / 10;
 
-      return { ...runner, score };
+      let confidence = "LOW";
+if (score > 6) confidence = "HIGH";
+else if (score > 3) confidence = "MEDIUM";
+
+return { ...runner, score, confidence };
     })
     .sort((a, b) => b.score - a.score)[0];
 }
@@ -67,7 +71,16 @@ export default function Dashboard() {
             <p style={{ marginTop: "10px" }}>
               Selection: <strong>🔒 Locked (Upgrade Required)</strong>
             </p>
-            <span style={{ color: "#22c55e" }}>HIGH CONFIDENCE</span>
+            <span style={{
+  color:
+    bestRunner?.confidence === "HIGH"
+      ? "#22c55e"
+      : bestRunner?.confidence === "MEDIUM"
+      ? "#eab308"
+      : "#ef4444"
+}}>
+  {bestRunner?.confidence || "LOW"} CONFIDENCE
+</span>
           </div>
         );
 })}
