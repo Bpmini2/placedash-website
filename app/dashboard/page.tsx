@@ -15,8 +15,8 @@ export default function Dashboard() {
       if (runner.lbs) score += Math.max(0, 140 - parseInt(runner.lbs)) / 10;
 
       let confidence = "LOW";
-if (score > 6) confidence = "HIGH";
-else if (score > 3) confidence = "MEDIUM";
+if (score >= 12) confidence = "HIGH";
+else if (score >= 6) confidence = "MEDIUM";
 
 return { ...runner, score, confidence };
     })
