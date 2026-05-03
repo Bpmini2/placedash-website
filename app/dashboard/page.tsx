@@ -113,18 +113,49 @@ return { ...runner, score, confidence };
   border: "1px solid rgba(255,255,255,0.1)",
   borderRadius: "16px"
 }}>
-  <h2>Track Record</h2>
+  <h2 style={{ marginBottom: "15px" }}>Track Record</h2>
 
-  <div style={{ display: "grid", gap: "10px", marginTop: "10px" }}>
-    <div>Last 7 Days: <strong style={{ color: "#22c55e" }}>68% Place Rate</strong></div>
-    <div>Last 30 Days: <strong style={{ color: "#22c55e" }}>+12% ROI</strong></div>
-    <div>Average Odds: <strong>2.10</strong></div>
+  <div style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: "15px"
+  }}>
+    
+    <div style={{
+      padding: "15px",
+      background: "rgba(34,197,94,0.1)",
+      borderRadius: "12px",
+      textAlign: "center"
+    }}>
+      <div style={{ fontSize: "12px", color: "#94a3b8" }}>Last 7 Days</div>
+      <div style={{ fontSize: "20px", fontWeight: "bold", color: "#22c55e" }}>68%</div>
+      <div style={{ fontSize: "12px" }}>Place Rate</div>
+    </div>
+
+    <div style={{
+      padding: "15px",
+      background: "rgba(34,197,94,0.1)",
+      borderRadius: "12px",
+      textAlign: "center"
+    }}>
+      <div style={{ fontSize: "12px", color: "#94a3b8" }}>Last 30 Days</div>
+      <div style={{ fontSize: "20px", fontWeight: "bold", color: "#22c55e" }}>+12%</div>
+      <div style={{ fontSize: "12px" }}>ROI</div>
+    </div>
+
+    <div style={{
+      padding: "15px",
+      background: "rgba(255,255,255,0.05)",
+      borderRadius: "12px",
+      textAlign: "center"
+    }}>
+      <div style={{ fontSize: "12px", color: "#94a3b8" }}>Avg Odds</div>
+      <div style={{ fontSize: "20px", fontWeight: "bold" }}>2.10</div>
+    </div>
+
   </div>
 
-  <p style={{ color: "#94a3b8", marginTop: "10px", fontSize: "12px" }}>
-    *Results based on AI-selected runners. Past performance is not a guarantee of future results.
+  <p style={{ color: "#94a3b8", marginTop: "12px", fontSize: "12px" }}>
+    *Past performance is not a guarantee of future results.
   </p>
-</div> 
-    </main>
-  );
-}
+</div>
