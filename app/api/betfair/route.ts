@@ -14,11 +14,12 @@ export async function GET() {
         method: "SportsAPING/v1.0/listMarketCatalogue",
         params: {
           filter: {
-            eventTypeIds: ["7"],
-            marketCountries: ["AU"]
-          },
+  eventTypeIds: ["7"],
+  marketCountries: ["AU"],
+  marketTypeCodes: ["WIN"],
+},
           marketProjection: ["EVENT", "MARKET_START_TIME", "RUNNER_DESCRIPTION"],
-          maxResults: "20"
+          maxResults: "100"
         },
         id: 1
       })
