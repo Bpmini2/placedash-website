@@ -36,9 +36,13 @@ export default function Dashboard() {
       };
 
       try {
-        const res = await fetch("/api/betfair");
+        const res = await fetch(
+  "https://the-racing-api1.p.rapidapi.com/v1/racecards/free?day=today",
+  options
+);
+
 const data = await res.json();
-setRaces(data || []);
+setRaces(data.racecards || data.data?.racecards || []);
       } catch (err) {
         console.error(err);
       }
