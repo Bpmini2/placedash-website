@@ -81,9 +81,28 @@ export default function Dashboard() {
                   Selection: <strong>🔒 Locked (Upgrade Required)</strong>
                 </p>
 
-                <span style={{
-                  color:
-                    bestRunner?.confidence === "HIGH"
+                <div style={{
+  display: "inline-block",
+  marginTop: "10px",
+  padding: "6px 10px",
+  borderRadius: "8px",
+  fontSize: "12px",
+  fontWeight: "600",
+  background:
+    bestRunner?.confidence === "HIGH"
+      ? "rgba(34,197,94,0.15)"
+      : bestRunner?.confidence === "MEDIUM"
+      ? "rgba(250,204,21,0.15)"
+      : "rgba(239,68,68,0.15)",
+  color:
+    bestRunner?.confidence === "HIGH"
+      ? "#22c55e"
+      : bestRunner?.confidence === "MEDIUM"
+      ? "#facc15"
+      : "#ef4444"
+}}>
+  {bestRunner?.confidence || "LOW"} CONFIDENCE
+</div>
                       ? "#22c55e"
                       : bestRunner?.confidence === "MEDIUM"
                       ? "#facc15"
