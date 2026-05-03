@@ -72,7 +72,7 @@ export default function Home() {
       </section>
 
       <section id="pricing" className="section darkSection">
-        <div className="sectionTitle center"><span>Pricing</span><h2>Choose Your Edge</h2><p>Start free, upgrade anytime. Built for serious place bettors who want consistency.</p></div>
+        <div className="sectionTitle center"><span>Pricing</span><h2>Choose Your Edge</h2><p>Start free, upgrade anytime. Built for serious place betters who want consistency.</p></div>
         <div className="pricingGrid">
           {plans.map((plan) => (
             <div className={plan.highlighted ? "planCard popular" : "planCard"} key={plan.name}>
