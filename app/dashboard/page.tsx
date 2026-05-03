@@ -300,23 +300,17 @@ setRaces(data.racecards || data.data?.racecards || []);
   <h2 style={{ marginBottom: "15px" }}>Recent Results</h2>
 
   <div style={{ display: "grid", gap: "10px" }}>
-
-    <div style={{ display: "flex", justifyContent: "space-between" }}>
-      <span>Kempton Race 4</span>
-      <span style={{ color: "#22c55e" }}>Placed</span>
-    </div>
-
-    <div style={{ display: "flex", justifyContent: "space-between" }}>
-      <span>Lingfield Race 6</span>
-      <span style={{ color: "#ef4444" }}>Missed</span>
-    </div>
-
-    <div style={{ display: "flex", justifyContent: "space-between" }}>
-      <span>Hamilton Race 3</span>
-      <span style={{ color: "#22c55e" }}>Placed</span>
-    </div>
-
-  </div>
+  {results.length === 0 ? (
+    <p style={{ color: "#94a3b8" }}>No saved picks yet.</p>
+  ) : (
+    results.map((r, i) => (
+      <div key={i} style={{ display: "flex", justifyContent: "space-between" }}>
+        <span>{r.race} - {r.horse}</span>
+        <span style={{ color: "#facc15" }}>{r.confidence}</span>
+      </div>
+    ))
+  )}
+</div>
 
   <p style={{ color: "#94a3b8", marginTop: "10px", fontSize: "12px" }}>
     Updated daily. Based on AI-selected runners.
