@@ -44,9 +44,15 @@ export async function GET() {
       }))
     }));
 
-    return NextResponse.json(races);
+    return NextResponse.json({
+  raw: data,
+  races
+});
   } catch (error) {
     console.error(error);
-    return NextResponse.json([]);
+    return NextResponse.json({
+  error: "Failed to fetch Betfair data",
+  details: String(error)
+});
   }
 }
