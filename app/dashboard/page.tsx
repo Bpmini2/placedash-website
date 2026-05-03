@@ -59,6 +59,7 @@ export default function Dashboard() {
 }
 
   const [races, setRaces] = useState([]);
+  const [results, setResults] = useState([]);
 
   useEffect(() => {
     async function loadRaces() {
@@ -85,6 +86,30 @@ setRaces(data.racecards || data.data?.racecards || []);
 
     loadRaces();
   }, []);
+  useEffect(() => {
+  if (!races || races.length === 0) return;
+
+  const saved = JSON.parse(localStorage.getItem("results") || "[]");
+
+  const picks = races
+    .filter((race) => race.runners.length >= 8 && race.runners.length <= 11)
+    .slice(0, 3)
+    .map((race) => {
+      const bestRunner = getBestRunner(race);
+
+      return {
+        race: race.course,
+        time: race.off_time,
+        horse: bestRunner?.horse || "Unknown",
+        confidence: bestRunner?.confidence || "LOW",
+        date: new Date().toLocaleDateString("en-AU"),
+      };
+    });
+
+  const updated = [...picks, ...saved].slice(0, 20);
+  localStorage.setItem("results", JSON.stringify(updated));
+  setResults(updated);
+}, [races]);
 
   return (
     <main style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
