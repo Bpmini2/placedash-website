@@ -36,12 +36,9 @@ export default function Dashboard() {
       };
 
       try {
-        const res = await fetch(
-  "https://the-racing-api1.p.rapidapi.com/v1/racecards/free?day=today&region=AU",
-  options
-);
-        const data = await res.json();
-        setRaces(data.racecards || data.data?.racecards || []);
+        const res = await fetch("/api/betfair");
+const data = await res.json();
+setRaces(data || []);
       } catch (err) {
         console.error(err);
       }
