@@ -89,7 +89,19 @@ export default function Dashboard() {
             const bestRunner = getBestRunner(race);
 
             return (
-              <div key={index} data-selection={bestRunner?.horse || "TBD"} style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px" }}>
+              <div
+  key={index}
+  onClick={() => window.location.href = "/#pricing"}
+  style={{
+    padding: "20px",
+    border: "1px solid rgba(255,255,255,0.1)",
+    borderRadius: "16px",
+    cursor: "pointer",
+    transition: "0.2s"
+  }}
+  onMouseEnter={(e) => e.currentTarget.style.borderColor = "#22c55e"}
+  onMouseLeave={(e) => e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"}
+>
                 <h3>{race.course} Race {race.race_number}</h3>
 
                 <p style={{ color: "#94a3b8" }}>
