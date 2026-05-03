@@ -114,7 +114,12 @@ export default function Dashboard() {
         <div style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px", opacity: 0.9 }}>
           <h3>Premium Picks Locked 🔒</h3>
           <p style={{ color: "#94a3b8" }}>You’re viewing limited selections today.</p>
-          <p>Upgrade to unlock the remaining high-confidence picks.</p>
+          <p style={{ color: "#facc15", fontWeight: "600" }}>
+  ⚠ You’re missing today’s HIGH confidence selections
+</p>
+<p style={{ color: "#94a3b8" }}>
+  Upgrade to unlock the strongest AI-rated picks.
+</p>
 
           <a href="/#pricing" style={{
             display: "inline-block",
