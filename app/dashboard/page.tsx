@@ -117,7 +117,7 @@ export default function Dashboard() {
   Selection:{" "}
   <strong>
     {isFreePick
-      ? bestRunner?.name || "No selection"
+      ? bestRunner?.horse || "No selection"
       : "🔒 Upgrade to reveal pick"}
   </strong>
 </p>
