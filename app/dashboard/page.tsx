@@ -70,7 +70,12 @@ export default function Dashboard() {
   ● Updated today · Live race data
 </div>
 
-      <div style={{ marginTop: "30px", display: "grid", gap: "20px" }}>
+      <div style={{
+  marginTop: "30px",
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+  gap: "20px"
+}}>
         {races.length === 0 && (
           <div style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px", color: "#94a3b8" }}>
             Loading today’s race cards...
