@@ -25,7 +25,18 @@ export async function GET() {
       })
     });
 
-    const data = await res.json();
+    const text = await res.text();
+
+let data;
+try {
+  data = JSON.parse(text);
+} catch {
+  return NextResponse.json({
+    status: res.status,
+    contentType: res.headers.get("content-type"),
+    responsePreview: text.slice(0, 500)
+  });
+}
 
     const races = (data.result || []).map((market: any) => ({
       course: market.event?.name || "Australian Race",
