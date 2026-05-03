@@ -180,6 +180,37 @@ export default function Dashboard() {
           *Past performance is not a guarantee of future results.
         </p>
       </div>
+      <div style={{
+  marginTop: "40px",
+  padding: "20px",
+  border: "1px solid rgba(255,255,255,0.1)",
+  borderRadius: "16px"
+}}>
+  <h2 style={{ marginBottom: "15px" }}>Recent Results</h2>
+
+  <div style={{ display: "grid", gap: "10px" }}>
+
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <span>Kempton Race 4</span>
+      <span style={{ color: "#22c55e" }}>Placed</span>
+    </div>
+
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <span>Lingfield Race 6</span>
+      <span style={{ color: "#ef4444" }}>Missed</span>
+    </div>
+
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <span>Hamilton Race 3</span>
+      <span style={{ color: "#22c55e" }}>Placed</span>
+    </div>
+
+  </div>
+
+  <p style={{ color: "#94a3b8", marginTop: "10px", fontSize: "12px" }}>
+    Updated daily. Based on AI-selected runners.
+  </p>
+</div>
     </main>
   );
 }
