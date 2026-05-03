@@ -104,17 +104,9 @@ export default function Dashboard() {
     cursor: "pointer",
     transition: "all 0.2s ease",
   }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.borderColor = "#22c55e";
-    e.currentTarget.style.transform = "translateY(-4px)";
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
-    e.currentTarget.style.transform = "translateY(0)";
-  }}
+  
 >
-  onMouseEnter={(e) => e.currentTarget.style.borderColor = "#22c55e"}
-  onMouseLeave={(e) => e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"}
+ 
 >
                 <h3>{race.course} Race {race.race_number}</h3>
 
