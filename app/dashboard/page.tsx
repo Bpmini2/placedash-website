@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 
 export default function Dashboard() {
-
   function getBestRunner(race) {
     if (!race.runners || race.runners.length === 0) return null;
 
@@ -27,30 +26,36 @@ export default function Dashboard() {
   const [races, setRaces] = useState([]);
 
   useEffect(() => {
-    const options = {
-      method: "GET",
-      headers: {
-        "X-RapidAPI-Key": "2cb26d22fcmsh44c3a843555e9fdp1727d5jsnb5263c409eaf",
-        "X-RapidAPI-Host": "the-racing-api1.p.rapidapi.com"
-      }
-    };
+    async function loadRaces() {
+      const options = {
+        method: "GET",
+        headers: {
+          "X-RapidAPI-Key": "2cb26d22fcmsh44c3a843555e9fdp1727d5jsnb5263c409eaf",
+          "X-RapidAPI-Host": "the-racing-api1.p.rapidapi.com",
+        },
+      };
 
-    fetch("https://the-racing-api.p.rapidapi.com/v1/racecards/free?day=today", options)
-  .then((res) => res.json())
-  .then((data) => {
-    setRaces(data.racecards || data.data?.racecards || []);
-  })
-  .catch((err) => console.error(err));
+      try {
+        const res = await fetch(
+          "https://the-racing-api1.p.rapidapi.com/v1/racecards/free?day=today",
+          options
+        );
+        const data = await res.json();
+        setRaces(data.racecards || data.data?.racecards || []);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadRaces();
   }, []);
 
   return (
     <main style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
-      
       <h1>Dashboard Preview</h1>
       <p style={{ color: "#94a3b8" }}>Today’s AI-powered place selections</p>
 
       <div style={{ marginTop: "30px", display: "grid", gap: "20px" }}>
-
         {races.length === 0 && (
           <div style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px", color: "#94a3b8" }}>
             Loading today’s race cards...
@@ -58,9 +63,9 @@ export default function Dashboard() {
         )}
 
         {races
-          .filter(race => race.region === "GB")
-          .filter(race => race.runners.length >= 8 && race.runners.length <= 11)
-          .filter(race => {
+          .filter((race) => race.region === "GB")
+          .filter((race) => race.runners.length >= 8 && race.runners.length <= 11)
+          .filter((race) => {
             const best = getBestRunner(race);
             return best && (best.confidence === "HIGH" || best.confidence === "MEDIUM");
           })
@@ -69,8 +74,7 @@ export default function Dashboard() {
             const bestRunner = getBestRunner(race);
 
             return (
-              <div key={index} style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px" }}>
-                
+              <div key={index} data-selection={bestRunner?.horse || "TBD"} style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px" }}>
                 <h3>{race.course} Race {race.race_number}</h3>
 
                 <p style={{ color: "#94a3b8" }}>
@@ -82,35 +86,27 @@ export default function Dashboard() {
                 </p>
 
                 <div style={{
-  display: "inline-block",
-  marginTop: "10px",
-  padding: "6px 10px",
-  borderRadius: "8px",
-  fontSize: "12px",
-  fontWeight: "600",
-  background:
-    bestRunner?.confidence === "HIGH"
-      ? "rgba(34,197,94,0.15)"
-      : bestRunner?.confidence === "MEDIUM"
-      ? "rgba(250,204,21,0.15)"
-      : "rgba(239,68,68,0.15)",
-  color:
-    bestRunner?.confidence === "HIGH"
-      ? "#22c55e"
-      : bestRunner?.confidence === "MEDIUM"
-      ? "#facc15"
-      : "#ef4444"
-}}>
-  {bestRunner?.confidence || "LOW"} CONFIDENCE
-</div>
+                  display: "inline-block",
+                  marginTop: "10px",
+                  padding: "6px 10px",
+                  borderRadius: "8px",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  background:
+                    bestRunner?.confidence === "HIGH"
+                      ? "rgba(34,197,94,0.15)"
+                      : bestRunner?.confidence === "MEDIUM"
+                      ? "rgba(250,204,21,0.15)"
+                      : "rgba(239,68,68,0.15)",
+                  color:
+                    bestRunner?.confidence === "HIGH"
                       ? "#22c55e"
                       : bestRunner?.confidence === "MEDIUM"
                       ? "#facc15"
                       : "#ef4444"
                 }}>
                   {bestRunner?.confidence || "LOW"} CONFIDENCE
-                </span>
-
+                </div>
               </div>
             );
           })}
@@ -132,7 +128,6 @@ export default function Dashboard() {
             Upgrade to Silver
           </a>
         </div>
-
       </div>
 
       <div style={{
@@ -148,7 +143,6 @@ export default function Dashboard() {
           gridTemplateColumns: "repeat(3, 1fr)",
           gap: "15px"
         }}>
-          
           <div style={{
             padding: "15px",
             background: "rgba(34,197,94,0.1)",
@@ -180,14 +174,12 @@ export default function Dashboard() {
             <div style={{ fontSize: "12px", color: "#94a3b8" }}>Avg Odds</div>
             <div style={{ fontSize: "20px", fontWeight: "bold" }}>2.10</div>
           </div>
-
         </div>
 
         <p style={{ color: "#94a3b8", marginTop: "12px", fontSize: "12px" }}>
           *Past performance is not a guarantee of future results.
         </p>
       </div>
-
     </main>
   );
 }
