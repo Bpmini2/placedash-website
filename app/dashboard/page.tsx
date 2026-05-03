@@ -91,6 +91,7 @@ export default function Dashboard() {
           })
           .slice(0, 3)
           .map((race, index) => {
+          const isFreePick = index === 0;  
             const bestRunner = getBestRunner(race);
 
             return (
@@ -112,7 +113,14 @@ export default function Dashboard() {
                 </p>
 
                 <p style={{ marginTop: "10px" }}>
-                  Selection: <strong>🔒 Upgrade to reveal pick</strong>
+                  <p style={{ marginTop: "10px" }}>
+  Selection:{" "}
+  <strong>
+    {isFreePick
+      ? bestRunner?.name || "No selection"
+      : "🔒 Upgrade to reveal pick"}
+  </strong>
+</p>
                 <div style={{ color: "#facc15", fontSize: "12px", marginTop: "6px" }}>
   {bestRunner?.confidence === "HIGH"
     ? "🔥 High confidence pick available"
@@ -140,7 +148,9 @@ export default function Dashboard() {
                       ? "#facc15"
                       : "#ef4444"
                 }}>
-                  {bestRunner?.confidence || "LOW"} CONFIDENCE
+                  {isFreePick
+  ? `${bestRunner?.confidence || "LOW"} CONFIDENCE`
+  : "CONFIDENCE LOCKED"}
                 </div>
               </div>
             );
