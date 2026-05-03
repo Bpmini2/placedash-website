@@ -4,24 +4,59 @@ import React, { useEffect, useState } from "react";
 
 export default function Dashboard() {
   function getBestRunner(race) {
-    if (!race.runners || race.runners.length === 0) return null;
+  if (!race.runners || race.runners.length === 0) return null;
 
-    return race.runners
-      .map((runner) => {
-        let score = 0;
-
-        if (runner.form) score += 2;
-        if (runner.draw) score += Math.max(0, 10 - parseInt(runner.draw));
-        if (runner.lbs) score += Math.max(0, 140 - parseInt(runner.lbs)) / 10;
-
-        let confidence = "LOW";
-        if (score >= 12) confidence = "HIGH";
-        else if (score >= 6) confidence = "MEDIUM";
-
-        return { ...runner, score, confidence };
-      })
-      .sort((a, b) => b.score - a.score)[0];
+  function countStarts(form) {
+    if (!form) return 0;
+    return form.replace(/[^0-9]/g, "").length;
   }
+
+  function recentFormScore(form) {
+    if (!form) return 0;
+
+    const results = form
+      .replace(/[^0-9]/g, "")
+      .split("")
+      .map(Number)
+      .filter((n) => n > 0);
+
+    if (results.length === 0) return 0;
+
+    return results.slice(-3).reduce((score, result) => {
+      if (result === 1) return score + 6;
+      if (result === 2) return score + 5;
+      if (result === 3) return score + 4;
+      if (result <= 5) return score + 2;
+      return score;
+    }, 0);
+  }
+
+  return race.runners
+    .filter((runner) => countStarts(runner.form) >= 3)
+    .map((runner) => {
+      let score = 0;
+
+      score += recentFormScore(runner.form);
+
+      if (runner.draw) {
+        score += Math.max(0, 10 - parseInt(runner.draw));
+      }
+
+      if (runner.lbs) {
+        score += Math.max(0, 140 - parseInt(runner.lbs)) / 10;
+      }
+
+      if (runner.jockey) score += 2;
+      if (runner.trainer) score += 2;
+
+      let confidence = "LOW";
+      if (score >= 18) confidence = "HIGH";
+      else if (score >= 10) confidence = "MEDIUM";
+
+      return { ...runner, score, confidence };
+    })
+    .sort((a, b) => b.score - a.score)[0] || null;
+}
 
   const [races, setRaces] = useState([]);
 
