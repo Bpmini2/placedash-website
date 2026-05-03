@@ -53,7 +53,22 @@ export default function Dashboard() {
   return (
     <main style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
       <h1>Dashboard Preview</h1>
-      <p style={{ color: "#94a3b8" }}>Today’s AI-powered place selections</p>
+      <p style={{ color: "#94a3b8" }}>
+  Today’s AI-powered place selections
+</p>
+
+<div style={{
+  display: "inline-block",
+  marginTop: "10px",
+  padding: "6px 10px",
+  borderRadius: "999px",
+  background: "rgba(34,197,94,0.12)",
+  color: "#22c55e",
+  fontSize: "12px",
+  fontWeight: "600"
+}}>
+  ● Updated today · Live race data
+</div>
 
       <div style={{ marginTop: "30px", display: "grid", gap: "20px" }}>
         {races.length === 0 && (
