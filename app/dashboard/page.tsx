@@ -40,8 +40,8 @@ return { ...runner, score, confidence };
   setDebug(data);
   setRaces(data.racecards || data.data?.racecards || []);
 })
-      .catch((err) => console.error(err));
-  }, []);
+.catch((err) => console.error(err));
+}, []);
 
   return (
     <main style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
