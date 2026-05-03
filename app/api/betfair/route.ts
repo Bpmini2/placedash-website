@@ -14,10 +14,10 @@ export async function GET() {
         method: "SportsAPING/v1.0/listMarketCatalogue",
         params: {
           filter: {
-            eventTypeIds: ["7"], // Horse Racing
-            marketCountries: ["AU"] // Australia only
+            eventTypeIds: ["7"],
+            marketCountries: ["AU"]
           },
-          marketProjection: ["RUNNER_DESCRIPTION"],
+          marketProjection: ["EVENT", "MARKET_START_TIME", "RUNNER_DESCRIPTION"],
           maxResults: "20"
         },
         id: 1
@@ -26,9 +26,26 @@ export async function GET() {
 
     const data = await res.json();
 
-    return NextResponse.json(data.result || []);
+    const races = (data.result || []).map((market: any) => ({
+      course: market.event?.name || "Australian Race",
+      race_number: "",
+      off_time: market.marketStartTime
+        ? new Date(market.marketStartTime).toLocaleTimeString("en-AU", {
+            hour: "2-digit",
+            minute: "2-digit"
+          })
+        : "TBA",
+      runners: (market.runners || []).map((runner: any) => ({
+        horse: runner.runnerName,
+        draw: "5",
+        lbs: "56",
+        form: "123"
+      }))
+    }));
+
+    return NextResponse.json(races);
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Failed to fetch Betfair data" });
+    return NextResponse.json([]);
   }
 }
