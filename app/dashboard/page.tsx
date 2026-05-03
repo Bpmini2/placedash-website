@@ -118,7 +118,7 @@ export default function Dashboard() {
 
         <div style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px", opacity: 0.9 }}>
           <h3>Premium Picks Locked 🔒</h3>
-          <p style={{ color: "#94a3b8" }}>You’re viewing limited selections today.</p>
+          <p style={{ color: "#94a3b8" }}>Only 3 of today’s AI picks are visible — more high-confidence selections are locked.</p>
           <p style={{ color: "#facc15", fontWeight: "600" }}>
   ⚠ You’re missing today’s HIGH confidence selections
 </p>
