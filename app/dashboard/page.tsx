@@ -80,7 +80,7 @@ setRaces(data || []);
         )}
 
         {races
-          .filter((race) => race.region === "GB")
+          
           .filter((race) => race.runners.length >= 8 && race.runners.length <= 11)
           .filter((race) => {
             const best = getBestRunner(race);
