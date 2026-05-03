@@ -82,7 +82,12 @@ export default function Dashboard() {
                 </p>
 
                 <p style={{ marginTop: "10px" }}>
-                  Selection: <strong>🔒 Locked (Upgrade Required)</strong>
+                  Selection: <strong>🔒 Upgrade to reveal pick</strong>
+                <div style={{ color: "#facc15", fontSize: "12px", marginTop: "6px" }}>
+  {bestRunner?.confidence === "HIGH"
+    ? "🔥 High confidence pick available"
+    : "AI-rated place selection available"}
+</div>  
                 </p>
 
                 <div style={{
