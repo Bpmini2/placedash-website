@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const res = await fetch("https://api.betfair.com/exchange/betting/json-rpc/v1", {
+    const res = await fetch("https://api-au.betfair.com/exchange/betting/json-rpc/v1", {
       method: "POST",
       headers: {
         "X-Application": process.env.BETFAIR_APP_KEY!,
