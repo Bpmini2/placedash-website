@@ -31,11 +31,11 @@ export default function Dashboard() {
       method: "GET",
       headers: {
         "X-RapidAPI-Key": "2cb26d22fcmsh44c3a843555e9fdp1727d5jsnb5263c409eaf",
-        "X-RapidAPI-Host": "the-racing-api.p.rapidapi.com"
+        "X-RapidAPI-Host": "the-racing-api1.p.rapidapi.com"
       }
     };
 
-    fetch("https://the-racing-api.p.rapidapi.com/v1/racecards/free?day=today", options)
+    fetch("https://the-racing-api1.p.rapidapi.com/v1/racecards/free?day=today", options)
       .then((res) => res.json())
       .then((data) => {
         setRaces(data.racecards || data.data?.racecards || []);
@@ -101,7 +101,7 @@ export default function Dashboard() {
           <p style={{ color: "#94a3b8" }}>You’re viewing limited selections today.</p>
           <p>Upgrade to unlock the remaining high-confidence picks.</p>
 
-          <a href="#pricing" style={{
+          <a href="/#pricing" style={{
             display: "inline-block",
             marginTop: "15px",
             padding: "10px 16px",
