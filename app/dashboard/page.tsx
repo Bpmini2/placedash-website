@@ -106,7 +106,7 @@ export default function Dashboard() {
     transition: "all 0.2s ease",
   }}
  >
-   <h3>Race {race.race_number}</h3>
+   <h3>Race {race.race_number || ""}</h3>
 
                 <p style={{ color: "#94a3b8" }}>
                   {race.off_time} • {race.runners?.length || 0} runners
