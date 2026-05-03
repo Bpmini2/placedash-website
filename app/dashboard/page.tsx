@@ -35,12 +35,12 @@ export default function Dashboard() {
       }
     };
 
-    fetch("https://the-racing-api1.p.rapidapi.com/v1/racecards/free?day=today", options)
-      .then((res) => res.json())
-      .then((data) => {
-        setRaces(data.racecards || data.data?.racecards || []);
-      })
-      .catch((err) => console.error(err));
+    fetch("https://the-racing-api.p.rapidapi.com/v1/racecards/free?day=today", options)
+  .then((res) => res.json())
+  .then((data) => {
+    setRaces(data.racecards || data.data?.racecards || []);
+  })
+  .catch((err) => console.error(err));
   }, []);
 
   return (
