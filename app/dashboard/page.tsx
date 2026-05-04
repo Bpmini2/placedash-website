@@ -331,6 +331,11 @@ if (raceData.length === 0) {
     Updated daily. Based on AI-selected runners.
   </p>
 </div>
+      <div style={{ marginTop: "40px", fontSize: "12px", color: "#94a3b8" }}>
+  <a href="/privacy" style={{ marginRight: "10px" }}>Privacy Policy</a>
+  <a href="/terms" style={{ marginRight: "10px" }}>Terms</a>
+  <a href="/disclaimer">Disclaimer</a>
+</div>
     </main>
   );
 }
