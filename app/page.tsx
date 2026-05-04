@@ -123,9 +123,14 @@ Example results shown for demonstration purposes only. Not indicative of future 
   </div>
 </section>
 
+<footer style={{ padding: "30px 40px", textAlign: "center", color: "#94a3b8" }}>
+  <p>© 2026 PlaceDash. Information and data-analysis service only.</p>
+  <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: "10px" }}>
     <a href="/privacy">Privacy Policy</a>
-<a href="/terms">Terms</a>
-<a href="/disclaimer">Disclaimer</a>
+    <a href="/terms">Terms</a>
+    <a href="/disclaimer">Disclaimer</a>
+  </div>
+</footer>
     </main>
   );
 }
