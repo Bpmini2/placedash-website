@@ -100,8 +100,11 @@ if (raceData.length === 0) {
     }
 
     loadRaces();
-  }, []);
-  useEffect(() => {
+}, []);
+useEffect(() => {
+  if (!races || races.length === 0) return;
+
+if (!races || races.length === 0) return;
   if (!races || races.length === 0) return;
 
   const saved = JSON.parse(localStorage.getItem("results") || "[]");
