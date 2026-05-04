@@ -113,12 +113,14 @@ if (raceData.length === 0) {
       const bestRunner = getBestRunner(race);
 
       return {
-        race: race.course,
-        time: race.off_time,
-        horse: bestRunner?.horse || "Unknown",
-        confidence: bestRunner?.confidence || "LOW",
-        date: new Date().toLocaleDateString("en-AU"),
-      };
+  date: new Date().toLocaleDateString("en-AU"),
+  track: race.course || "Unknown Track",
+  raceNumber: race.race_number || "",
+  time: race.off_time || "TBA",
+  horse: bestRunner?.horse || "Unknown",
+  confidence: bestRunner?.confidence || "LOW",
+  result: "PENDING",
+};
     });
 
   const updated = [...picks, ...saved].slice(0, 20);
@@ -319,10 +321,19 @@ if (raceData.length === 0) {
     <p style={{ color: "#94a3b8" }}>No saved picks yet.</p>
   ) : (
     results.map((r, i) => (
-      <div key={i} style={{ display: "flex", justifyContent: "space-between" }}>
-        <span>{r.race} - {r.horse}</span>
-        <span style={{ color: "#facc15" }}>{r.confidence}</span>
-      </div>
+  <div key={i} style={{ padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+    <div style={{ fontWeight: "600" }}>
+      {r.date} · {r.track} {r.raceNumber ? `Race ${r.raceNumber}` : ""} · {r.time}
+    </div>
+    <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
+      <span>Pick: {r.horse}</span>
+      <span style={{ color: "#facc15", fontWeight: "600" }}>{r.confidence}</span>
+    </div>
+    <div style={{ color: "#94a3b8", fontSize: "12px", marginTop: "4px" }}>
+      Result: {r.result || "PENDING"}
+    </div>
+  </div>
+))
     ))
   )}
 </div>
