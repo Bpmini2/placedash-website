@@ -128,7 +128,7 @@ setRaces(data.racecards || data.data?.racecards || []);
   fontSize: "12px",
   fontWeight: "600"
 }}>
-  ● Updated today · Live race data
+  ● Updated {new Date().toLocaleDateString("en-AU")} · Live race data
 </div>
 
       <div style={{
