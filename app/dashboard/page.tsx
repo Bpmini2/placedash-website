@@ -73,7 +73,7 @@ export default function Dashboard() {
 
       try {
         const res = await fetch(
-  "https://the-racing-api1.p.rapidapi.com/v1/racecards/free?day=today",
+  "https://the-racing-api1.p.rapidapi.com/v1/racecards/free?day=today&region=AU"
   options
 );
 
