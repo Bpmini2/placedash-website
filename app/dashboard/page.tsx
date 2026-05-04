@@ -98,7 +98,7 @@ if (raceData.length === 0) {
         console.error(err);
       }
     }
-
+ 
     loadRaces();
 }, []);
 
