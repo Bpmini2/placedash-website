@@ -104,9 +104,6 @@ if (raceData.length === 0) {
 useEffect(() => {
   if (!races || races.length === 0) return;
 
-if (!races || races.length === 0) return;
-  if (!races || races.length === 0) return;
-
   const saved = JSON.parse(localStorage.getItem("results") || "[]");
 
   const picks = races
