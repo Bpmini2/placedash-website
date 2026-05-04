@@ -122,7 +122,7 @@ Example results shown for demonstration purposes only. Not indicative of future 
     </div>
   </div>
 </section>
-      <footer><p>© 2026 PlaceDash. Information and data-analysis service only.</p><div><a href="#">Privacy Policy</a><a href="#">Terms</a><a href="#">Disclaimer</a></div></footer>
+
     <a href="/privacy">Privacy Policy</a>
 <a href="/terms">Terms</a>
 <a href="/disclaimer">Disclaimer</a>
