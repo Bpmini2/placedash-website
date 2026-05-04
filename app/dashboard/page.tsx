@@ -74,11 +74,26 @@ export default function Dashboard() {
       try {
         const res = await fetch(
   "https://the-racing-api1.p.rapidapi.com/v1/racecards/free?day=today&region=AU",
-options
+  options
 );
 
 const data = await res.json();
-setRaces(data.racecards || data.data?.racecards || []);
+
+const raceData = data.racecards || data.data?.racecards || [];
+
+if (raceData.length === 0) {
+  console.log("No AU races — fallback to all regions");
+
+  const fallbackRes = await fetch(
+    "https://the-racing-api1.p.rapidapi.com/v1/racecards/free?day=today",
+    options
+  );
+
+  const fallbackData = await fallbackRes.json();
+  setRaces(fallbackData.racecards || []);
+} else {
+  setRaces(raceData);
+}
       } catch (err) {
         console.error(err);
       }
