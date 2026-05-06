@@ -26,7 +26,7 @@ export async function GET() {
 
     const meetingsData = await meetingsRes.json();
 
-    const meetings = meetingsData?.data?.meetings || [];
+    const meetings = meetingsData?.meetings || meetingsData?.data?.meetings || [];
 
     const candidateRaces = meetings
       .filter((meeting: any) => meeting.country === "au")
