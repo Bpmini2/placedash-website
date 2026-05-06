@@ -11,11 +11,16 @@ export async function GET() {
 
     const html = await res.text();
 
+    const links = Array.from(html.matchAll(/href="([^"]*\/form\/[^"]*)"/g))
+      .map((match) => match[1])
+      .slice(0, 30);
+
     return NextResponse.json({
       status: res.status,
       ok: res.ok,
-      foundAusNz: html.includes("Horse Racing - Australia & New Zealand"),
-      foundRaceLinks: html.includes("/form/"),
+      foundRaceLinks: links.length > 0,
+      linkCount: links.length,
+      links,
       preview: html.slice(0, 500),
     });
   } catch (error) {
