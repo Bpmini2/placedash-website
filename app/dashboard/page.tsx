@@ -63,37 +63,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function loadRaces() {
-      const options = {
-        method: "GET",
-        headers: {
-          "X-RapidAPI-Key": "2cb26d22fcmsh44c3a843555e9fdp1727d5jsnb5263c409eaf",
-          "X-RapidAPI-Host": "the-racing-api1.p.rapidapi.com",
-        },
-      };
-
       try {
-        const res = await fetch(
-  "https://the-racing-api1.p.rapidapi.com/v1/racecards/free?day=today&region=AU",
-  options
-);
+  const res = await fetch("/api/formfav");
+  const data = await res.json();
 
-const data = await res.json();
-
-const raceData = data.racecards || data.data?.racecards || [];
-
-if (raceData.length === 0) {
-  console.log("No AU races — fallback to all regions");
-
-  const fallbackRes = await fetch(
-    "https://the-racing-api1.p.rapidapi.com/v1/racecards/free?day=today",
-    options
-  );
-
-  const fallbackData = await fallbackRes.json();
-  setRaces(fallbackData.racecards || []);
-} else {
-  setRaces(raceData);
-}
+  setRaces(data.racecards || []);
       } catch (err) {
         console.error(err);
       }
