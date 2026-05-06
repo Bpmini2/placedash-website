@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const res = await fetch("https://ladbrokesform.com.au/", {
+    const res = await fetch("https://www.ladbrokes.com.au/", {
       headers: {
         "User-Agent": "Mozilla/5.0",
       },
