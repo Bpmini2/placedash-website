@@ -308,10 +308,35 @@ setResults(updated);
     <p style={{ color: "#94a3b8" }}>No saved picks yet.</p>
   ) : (
     results.map((r, i) => (
-      <div key={i} style={{ display: "flex", justifyContent: "space-between" }}>
-        <span>{r.race} - {r.horse}</span>
-        <span style={{ color: "#facc15" }}>{r.confidence}</span>
-      </div>
+  <div
+    key={i}
+    style={{
+      padding: "10px 0",
+      borderBottom: "1px solid rgba(255,255,255,0.08)",
+    }}
+  >
+    <div style={{ fontWeight: "700", color: "#ffffff" }}>
+      {r.race} · {r.time || "TBA"}
+    </div>
+
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        marginTop: "4px",
+      }}
+    >
+      <span>Pick: {r.horse}</span>
+      <span style={{ color: "#facc15", fontWeight: "700" }}>
+        {r.confidence}
+      </span>
+    </div>
+
+    <div style={{ color: "#94a3b8", fontSize: "12px", marginTop: "4px" }}>
+      Date: {r.date || "Today"}
+    </div>
+  </div>
+))
     ))
   )}
 </div>
