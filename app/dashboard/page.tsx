@@ -95,9 +95,24 @@ export default function Dashboard() {
       };
     });
 
-  const updated = [...picks, ...saved].slice(0, 20);
-  localStorage.setItem("results", JSON.stringify(updated));
-  setResults(updated);
+  const combined = [...picks, ...saved];
+
+const uniqueResults = combined.filter((item, index, self) => {
+  const key = `${item.date}-${item.race}-${item.time}-${item.horse}`;
+
+  return (
+    index ===
+    self.findIndex((r) => {
+      const compareKey = `${r.date}-${r.race}-${r.time}-${r.horse}`;
+      return compareKey === key;
+    })
+  );
+});
+
+const updated = uniqueResults.slice(0, 20);
+
+localStorage.setItem("results", JSON.stringify(updated));
+setResults(updated);
 }, [races]);
 
   return (
