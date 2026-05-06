@@ -62,30 +62,12 @@ export default function Dashboard() {
   const [results, setResults] = useState([]);
 
   useEffect(() => {
-  async function loadRaces() {
-    const options = {
-      method: "GET",
-      headers: {
-        "X-RapidAPI-Key": "2cb26d22fcmsh44c3a843555e9fdp1727d5jsnb5263c409eaf",
-        "X-RapidAPI-Host": "the-racing-api1.p.rapidapi.com",
-      },
-    };
-
-    try {
-      const res = await fetch(
-        "https://the-racing-api1.p.rapidapi.com/v1/racecards/free?day=today",
-        options
-      );
-
-      const data = await res.json();
-      setRaces(data.racecards || data.data?.racecards || []);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  loadRaces();
-}, []);
+    async function loadRaces() {
+      const options = {
+        method: "GET",
+        headers: {
+          "X-RapidAPI-Key": "2cb26d22fcmsh44c3a843555e9fdp1727d5jsnb5263c409eaf",
+          "X-RapidAPI-Host": "the-racing-api1.p.rapidapi.com",
         },
       };
 
@@ -94,6 +76,55 @@ export default function Dashboard() {
   "https://the-racing-api1.p.rapidapi.com/v1/racecards/free?day=today&region=AU",
   options
 );
+
+const data = await res.json();
+
+const raceData = data.racecards || data.data?.racecards || [];
+
+if (raceData.length === 0) {
+  console.log("No AU races — fallback to all regions");
+
+  const fallbackRes = await fetch(
+    "https://the-racing-api1.p.rapidapi.com/v1/racecards/free?day=today",
+    options
+  );
+
+  const fallbackData = await fallbackRes.json();
+  setRaces(fallbackData.racecards || []);
+} else {
+  setRaces(raceData);
+}
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadRaces();
+  }, []);
+  useEffect(() => {
+  if (!races || races.length === 0) return;
+
+  const saved = JSON.parse(localStorage.getItem("results") || "[]");
+
+  const picks = races
+    .filter((race) => race.runners.length >= 8 && race.runners.length <= 11)
+    .slice(0, 3)
+    .map((race) => {
+      const bestRunner = getBestRunner(race);
+
+      return {
+        race: race.course,
+        time: race.off_time,
+        horse: bestRunner?.horse || "Unknown",
+        confidence: bestRunner?.confidence || "LOW",
+        date: new Date().toLocaleDateString("en-AU"),
+      };
+    });
+
+  const updated = [...picks, ...saved].slice(0, 20);
+  localStorage.setItem("results", JSON.stringify(updated));
+  setResults(updated);
+}, [races]);
 
   return (
     <main style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
@@ -288,19 +319,10 @@ export default function Dashboard() {
     <p style={{ color: "#94a3b8" }}>No saved picks yet.</p>
   ) : (
     results.map((r, i) => (
-  <div key={i} style={{ padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-    <div style={{ fontWeight: "600" }}>
-      {r.date} · {r.track} {r.raceNumber ? `Race ${r.raceNumber}` : ""} · {r.time}
-    </div>
-    <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
-      <span>Pick: {r.horse}</span>
-      <span style={{ color: "#facc15", fontWeight: "600" }}>{r.confidence}</span>
-    </div>
-    <div style={{ color: "#94a3b8", fontSize: "12px", marginTop: "4px" }}>
-      Result: {r.result || "PENDING"}
-    </div>
-  </div>
-))
+      <div key={i} style={{ display: "flex", justifyContent: "space-between" }}>
+        <span>{r.race} - {r.horse}</span>
+        <span style={{ color: "#facc15" }}>{r.confidence}</span>
+      </div>
     ))
   )}
 </div>
