@@ -5,7 +5,7 @@ export async function GET() {
     const today = new Date().toISOString().slice(0, 10);
 
     const res = await fetch(
-      `https://api.formfav.com/v1/form/meetings?date=${today}`,
+      `https://api.formfav.com/v1/form?date=${today}&track=ascot&race=1`
       {
         headers: {
           "X-API-Key": process.env.FORMFAV_API_KEY || "",
