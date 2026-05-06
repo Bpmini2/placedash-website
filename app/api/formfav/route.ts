@@ -29,26 +29,28 @@ export async function GET() {
     const meetings = meetingsData?.data?.meetings || [];
 
     const candidateRaces = meetings
-      .filter((meeting: any) => meeting.country === "au")
-      .flatMap((meeting: any) =>
-        (meeting.races || []).map((race: any) => ({
-          track: meeting.track,
-          slug: meeting.slug,
-          raceNumber: race.raceNumber,
-          raceName: race.raceName,
-          startTime: race.startTime,
-          numberOfRunners: race.numberOfRunners,
-          timezone: race.timezone,
-        }))
-      )
-      .filter(
-        (race: any) =>
-          race.numberOfRunners >= 8 &&
-          race.numberOfRunners <= 11
-      )
-      .slice(0, 6);
+  .filter((meeting: any) => meeting.country === "au")
+  .flatMap((meeting: any) =>
+    (meeting.races || []).map((race: any) => ({
+      track: meeting.track,
+      slug: meeting.slug,
+      country: meeting.country,
+      raceNumber: race.raceNumber,
+      raceName: race.raceName,
+      startTime: race.startTime,
+      numberOfRunners: race.numberOfRunners,
+      timezone: race.timezone,
+    }))
+  );
 
-    const raceCards = await Promise.all(
+return NextResponse.json({
+  status: 200,
+  ok: true,
+  date: today,
+  totalMeetings: meetings.length,
+  candidateRaceCount: candidateRaces.length,
+  candidateRaces,
+});
       candidateRaces.map(async (race: any) => {
         const raceRes = await fetch(
           `https://api.formfav.com/v1/form?date=${today}&track=${encodeURIComponent(
