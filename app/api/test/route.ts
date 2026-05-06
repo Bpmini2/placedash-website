@@ -2,30 +2,29 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const res = await fetch("https://www.ladbrokes.com.au/", {
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-      },
-      cache: "no-store",
-    });
+    const today = new Date().toISOString().slice(0, 10);
 
-    const html = await res.text();
+    const res = await fetch(
+      `https://api.formfav.com/v1/form/meetings?date=${today}`,
+      {
+        headers: {
+          "X-API-Key": process.env.FORMFAV_API_KEY || "",
+        },
+        cache: "no-store",
+      }
+    );
 
-    const links = Array.from(html.matchAll(/href="([^"]*\/form\/[^"]*)"/g))
-      .map((match) => match[1])
-      .slice(0, 30);
+    const data = await res.json();
 
     return NextResponse.json({
       status: res.status,
       ok: res.ok,
-      foundRaceLinks: links.length > 0,
-      linkCount: links.length,
-      links,
-      preview: html.slice(0, 500),
+      date: today,
+      data,
     });
   } catch (error) {
     return NextResponse.json({
-      error: "Failed to fetch LadbrokesForm",
+      error: "Failed to fetch FormFav meetings",
       details: String(error),
     });
   }
