@@ -60,7 +60,7 @@ export default function Dashboard() {
 
   const [races, setRaces] = useState([]);
   const [results, setResults] = useState([]);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     async function loadRaces() {
       try {
@@ -68,8 +68,10 @@ export default function Dashboard() {
   const data = await res.json();
 
   setRaces(data.racecards || []);
+        setLoading(false);
       } catch (err) {
         console.error(err);
+        setLoading(false);
       }
     }
 
@@ -102,12 +104,21 @@ export default function Dashboard() {
   display: "grid",
   gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
   gap: "20px"
-}}>
-        {races.length === 0 && (
-          <div style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px", color: "#94a3b8" }}>
-            Loading today’s race cards...
-          </div>
-        )}
+{loading && (
+  <div style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px", color: "#94a3b8" }}>
+    Loading today’s race cards...
+  </div>
+)}
+
+{!loading && races.length === 0 && (
+  <div style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px", color: "#94a3b8" }}>
+    <strong style={{ color: "#ffffff" }}>No qualifying races found today.</strong>
+    <p style={{ marginTop: "8px" }}>
+      PlaceDash only shows Australian races with 8–11 runners and no first starters.
+      Please check back later when more race data is available.
+    </p>
+  </div>
+)}
 
         {races
           
