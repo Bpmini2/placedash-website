@@ -7,7 +7,20 @@ function getMelbourneDate() {
 }
 
 function formatRaceTime(startTime: string | null, timezone: string | null) {
-  function getStateFromTimezone(timezone: string | null) {
+  if (!startTime) return "TBA";
+
+  try {
+    return new Date(startTime).toLocaleTimeString("en-AU", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: timezone || "Australia/Melbourne",
+    });
+  } catch {
+    return "TBA";
+  }
+}
+
+function getStateFromTimezone(timezone: string | null) {
   if (!timezone) return "";
 
   if (timezone.includes("Perth")) return "WA";
@@ -33,18 +46,6 @@ function getTimezoneLabel(timezone: string | null) {
   if (timezone.includes("Hobart")) return "AEST/AEDT";
 
   return "";
-}
-  if (!startTime) return "TBA";
-
-  try {
-    return new Date(startTime).toLocaleTimeString("en-AU", {
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZone: timezone || "Australia/Melbourne",
-    });
-  } catch {
-    return "TBA";
-  }
 }
 
 export async function GET() {
@@ -109,6 +110,8 @@ export async function GET() {
         const raceData = await raceRes.json();
         const card = raceData?.data || raceData;
 
+        const timezone = card?.timezone || race.timezone || null;
+
         const runners = (card?.runners || []).map((runner: any) => ({
           number: runner.number || "",
           horse: runner.name || "Unknown",
@@ -125,16 +128,18 @@ export async function GET() {
           firstStarter: (runner?.stats?.overall?.starts || 0) === 0,
         }));
 
-        const hasFirstStarter = runners.some((runner: any) => runner.firstStarter);
+        const hasFirstStarter = runners.some(
+          (runner: any) => runner.firstStarter
+        );
 
         return {
           course: card?.track || race.track,
           race_number: card?.raceNumber || race.raceNumber,
           race_name: card?.raceName || race.raceName,
-          off_time: formatRaceTime(card?.startTime || race.startTime, card?.timezone || race.timezone),
+          off_time: formatRaceTime(card?.startTime || race.startTime, timezone),
           start_time: card?.startTime || race.startTime,
-          state: getStateFromTimezone(card?.timezone || race.timezone),
-timezone_label: getTimezoneLabel(card?.timezone || race.timezone),
+          state: getStateFromTimezone(timezone),
+          timezone_label: getTimezoneLabel(timezone),
           runners,
           runner_count: runners.length,
           has_first_starter: hasFirstStarter,
