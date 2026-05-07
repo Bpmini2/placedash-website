@@ -48,6 +48,18 @@ function getTimezoneLabel(timezone: string | null) {
   return "";
 }
 
+function isRaceUpcoming(startTime: string | null) {
+  if (!startTime) return false;
+
+  const raceStart = new Date(startTime).getTime();
+  const now = Date.now();
+
+  // Small buffer so a race does not disappear exactly on the minute it starts.
+  const fiveMinutesAgo = now - 5 * 60 * 1000;
+
+  return raceStart > fiveMinutesAgo;
+}
+
 export async function GET() {
   try {
     const apiKey = process.env.FORMFAV_API_KEY;
@@ -91,7 +103,10 @@ export async function GET() {
       .filter((race: any) => {
         return race.numberOfRunners >= 8 && race.numberOfRunners <= 11;
       })
-      .slice(0, 6);
+      .filter((race: any) => {
+        return isRaceUpcoming(race.startTime);
+      })
+      .slice(0, 8);
 
     const racecards = await Promise.all(
       candidateRaces.map(async (race: any) => {
@@ -111,6 +126,7 @@ export async function GET() {
         const card = raceData?.data || raceData;
 
         const timezone = card?.timezone || race.timezone || null;
+        const startTime = card?.startTime || race.startTime || null;
 
         const runners = (card?.runners || []).map((runner: any) => ({
           number: runner.number || "",
@@ -136,8 +152,8 @@ export async function GET() {
           course: card?.track || race.track,
           race_number: card?.raceNumber || race.raceNumber,
           race_name: card?.raceName || race.raceName,
-          off_time: formatRaceTime(card?.startTime || race.startTime, timezone),
-          start_time: card?.startTime || race.startTime,
+          off_time: formatRaceTime(startTime, timezone),
+          start_time: startTime,
           state: getStateFromTimezone(timezone),
           timezone_label: getTimezoneLabel(timezone),
           runners,
@@ -150,13 +166,16 @@ export async function GET() {
       })
     );
 
-    const cleanRacecards = racecards.filter((race: any) => {
-      return (
-        race.runners.length >= 8 &&
-        race.runners.length <= 11 &&
-        race.has_first_starter === false
-      );
-    });
+    const cleanRacecards = racecards
+      .filter((race: any) => {
+        return (
+          race.runners.length >= 8 &&
+          race.runners.length <= 11 &&
+          race.has_first_starter === false &&
+          isRaceUpcoming(race.start_time)
+        );
+      })
+      .slice(0, 6);
 
     return NextResponse.json({
       ok: true,
@@ -165,6 +184,10 @@ export async function GET() {
       totalMeetings: meetings.length,
       candidateRaceCount: candidateRaces.length,
       racecards: cleanRacecards,
+      message:
+        cleanRacecards.length === 0
+          ? "No qualifying upcoming races found today. PlaceDash only shows Australian races with 8–11 runners, no first starters, and races that have not already started."
+          : "Upcoming qualifying races loaded successfully.",
     });
   } catch (error) {
     return NextResponse.json({
