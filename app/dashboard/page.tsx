@@ -5,91 +5,104 @@ import React, { useEffect, useState } from "react";
 export default function Dashboard() {
   const [races, setRaces] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedRace, setSelectedRace] = useState(null);
+
+  function countStarts(runner) {
+    if (typeof runner.starts === "number") return runner.starts;
+    if (!runner.form) return 0;
+    return runner.form.replace(/[^0-9]/g, "").length;
+  }
+
+  function evaluateRecentForm(form) {
+    if (!form) return 30;
+
+    const results = form
+      .replace(/[^0-9]/g, "")
+      .split("")
+      .map(Number)
+      .filter((n) => n > 0);
+
+    if (results.length === 0) return 30;
+
+    const lastThree = results.slice(-3);
+
+    const score = lastThree.reduce((total, result) => {
+      if (result === 1) return total + 90;
+      if (result === 2) return total + 70;
+      if (result === 3) return total + 55;
+      if (result <= 5) return total + 35;
+      return total + 15;
+    }, 0);
+
+    return Math.round(score / lastThree.length);
+  }
+
+  function scoreRunner(runner) {
+    const starts = countStarts(runner);
+    const wins = Number(runner.wins || 0);
+    const places = Number(runner.places || 0);
+
+    const horsePlacePercent =
+      typeof runner.placePercent === "number"
+        ? runner.placePercent * 100
+        : starts > 0
+        ? ((wins + places) / starts) * 100
+        : 0;
+
+    const horseWinPercent =
+      typeof runner.winPercent === "number"
+        ? runner.winPercent * 100
+        : starts > 0
+        ? (wins / starts) * 100
+        : 0;
+
+    const recentForm = evaluateRecentForm(runner.form);
+
+    let score = 0;
+
+    score += horsePlacePercent * 0.45;
+    score += horseWinPercent * 0.15;
+    score += recentForm * 0.25;
+
+    if (runner.jockey) score += 5;
+    if (runner.trainer) score += 5;
+
+    if (runner.draw) {
+      score += Math.max(0, 10 - parseInt(String(runner.draw))) * 0.5;
+    }
+
+    score = Math.min(100, Math.max(0, score));
+
+    let confidence = "LOW";
+    if (score >= 60) confidence = "HIGH";
+    else if (score >= 40) confidence = "MEDIUM";
+
+    return {
+      ...runner,
+      score: Math.round(score),
+      confidence,
+      starts,
+      displayPlacePercent: Math.round(horsePlacePercent),
+    };
+  }
 
   function getBestRunner(race) {
     if (!race.runners || race.runners.length === 0) return null;
 
-    function countStarts(runner) {
-      if (typeof runner.starts === "number") return runner.starts;
-      if (!runner.form) return 0;
-      return runner.form.replace(/[^0-9]/g, "").length;
-    }
-
-    function evaluateRecentForm(form) {
-      if (!form) return 30;
-
-      const results = form
-        .replace(/[^0-9]/g, "")
-        .split("")
-        .map(Number)
-        .filter((n) => n > 0);
-
-      if (results.length === 0) return 30;
-
-      const lastThree = results.slice(-3);
-
-      const score = lastThree.reduce((total, result) => {
-        if (result === 1) return total + 90;
-        if (result === 2) return total + 70;
-        if (result === 3) return total + 55;
-        if (result <= 5) return total + 35;
-        return total + 15;
-      }, 0);
-
-      return Math.round(score / lastThree.length);
-    }
-
     return (
       race.runners
         .filter((runner) => countStarts(runner) >= 3)
-        .map((runner) => {
-          const starts = countStarts(runner);
-          const wins = Number(runner.wins || 0);
-          const places = Number(runner.places || 0);
-
-          const horsePlacePercent =
-            typeof runner.placePercent === "number"
-              ? runner.placePercent * 100
-              : starts > 0
-              ? ((wins + places) / starts) * 100
-              : 0;
-
-          const horseWinPercent =
-            typeof runner.winPercent === "number"
-              ? runner.winPercent * 100
-              : starts > 0
-              ? (wins / starts) * 100
-              : 0;
-
-          const recentForm = evaluateRecentForm(runner.form);
-
-          let score = 0;
-
-          score += horsePlacePercent * 0.45;
-          score += horseWinPercent * 0.15;
-          score += recentForm * 0.25;
-
-          if (runner.jockey) score += 5;
-          if (runner.trainer) score += 5;
-
-          if (runner.draw) {
-            score += Math.max(0, 10 - parseInt(String(runner.draw))) * 0.5;
-          }
-
-          score = Math.min(100, Math.max(0, score));
-
-          let confidence = "LOW";
-          if (score >= 60) confidence = "HIGH";
-          else if (score >= 40) confidence = "MEDIUM";
-
-          return {
-            ...runner,
-            score: Math.round(score),
-            confidence,
-          };
-        })
+        .map((runner) => scoreRunner(runner))
         .sort((a, b) => b.score - a.score)[0] || null
     );
+  }
+
+  function getScoredRunners(race) {
+    if (!race?.runners || race.runners.length === 0) return [];
+
+    return race.runners
+      .map((runner) => scoreRunner(runner))
+      .sort((a, b) => b.score - a.score);
   }
 
   useEffect(() => {
@@ -138,27 +151,28 @@ export default function Dashboard() {
     };
   });
 
+  const selectedBestRunner = selectedRace ? getBestRunner(selectedRace) : null;
+  const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
+
   return (
     <main
-  style={{
-    padding: "32px 48px",
-    maxWidth: "1400px",
-    width: "100%",
-    margin: "0 auto",
-    minHeight: "100vh",
-    backgroundImage:
-      'linear-gradient(rgba(2,8,18,0.86), rgba(2,8,18,0.91)), url("/racehorse-bg.png")',
-    backgroundRepeat: "no-repeat",
-    backgroundSize: "cover",
-    backgroundPosition: "center top",
-    backgroundAttachment: "fixed",
-  }}
->
+      style={{
+        padding: "32px 48px",
+        maxWidth: "1400px",
+        width: "100%",
+        margin: "0 auto",
+        minHeight: "100vh",
+        backgroundImage:
+          'linear-gradient(rgba(2,8,18,0.86), rgba(2,8,18,0.91)), url("/racehorse-bg.png")',
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+        backgroundPosition: "center top",
+        backgroundAttachment: "fixed",
+      }}
+    >
       <h1>Dashboard Preview</h1>
 
-      <p style={{ color: "#94a3b8" }}>
-        Today’s AI-powered place selections
-      </p>
+      <p style={{ color: "#94a3b8" }}>Today’s AI-powered place selections</p>
 
       <div
         style={{
@@ -213,9 +227,9 @@ export default function Dashboard() {
               No qualifying races found today.
             </strong>
             <p style={{ marginTop: "8px" }}>
-              PlaceDash only shows Australian races with 8–11 runners and no
-              first starters. Please check back later when more race data is
-              available.
+              PlaceDash only shows Australian races with 8–11 runners, no first
+              starters, and races that have not already started. Please check
+              back later when more race data is available.
             </p>
           </div>
         )}
@@ -231,7 +245,13 @@ export default function Dashboard() {
           return (
             <div
               key={`${race.course}-${race.race_number}`}
-              onClick={() => (window.location.href = "/#pricing")}
+              onClick={() => {
+                if (isFreePick) {
+                  setSelectedRace(race);
+                } else {
+                  window.location.href = "/#pricing";
+                }
+              }}
               style={{
                 padding: "20px",
                 border: "1px solid rgba(255,255,255,0.1)",
@@ -264,7 +284,9 @@ export default function Dashboard() {
                   marginTop: "6px",
                 }}
               >
-                AI-rated place selection available
+                {isFreePick
+                  ? "Click to view full race card"
+                  : "AI-rated place selection available"}
               </div>
 
               <div
@@ -336,6 +358,204 @@ export default function Dashboard() {
           </a>
         </div>
       </div>
+
+      {selectedRace && (
+        <div
+          style={{
+            marginTop: "40px",
+            padding: "20px",
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: "16px",
+            background: "rgba(2,8,18,0.72)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: "20px",
+              alignItems: "flex-start",
+              marginBottom: "18px",
+            }}
+          >
+            <div>
+              <h2 style={{ marginBottom: "8px" }}>
+                {selectedRace.course} Race {selectedRace.race_number}
+                {selectedRace.state ? ` (${selectedRace.state})` : ""}
+              </h2>
+
+              <p style={{ color: "#94a3b8", margin: 0 }}>
+                {selectedRace.off_time} {selectedRace.timezone_label || ""} ·{" "}
+                {selectedRace.runners?.length || 0} runners ·{" "}
+                {selectedRace.distance || "Distance TBA"}
+              </p>
+
+              <p style={{ color: "#94a3b8", marginTop: "6px" }}>
+                Condition: {selectedRace.condition || "TBA"} · Weather:{" "}
+                {selectedRace.weather || "TBA"}
+              </p>
+            </div>
+
+            <button
+              onClick={() => setSelectedRace(null)}
+              style={{
+                padding: "8px 12px",
+                borderRadius: "8px",
+                border: "1px solid rgba(255,255,255,0.18)",
+                background: "rgba(255,255,255,0.04)",
+                color: "#ffffff",
+                cursor: "pointer",
+              }}
+            >
+              Close
+            </button>
+          </div>
+
+          <div
+            style={{
+              marginBottom: "14px",
+              padding: "12px",
+              borderRadius: "12px",
+              background: "rgba(34,197,94,0.10)",
+              border: "1px solid rgba(34,197,94,0.18)",
+            }}
+          >
+            <strong style={{ color: "#22c55e" }}>AI Pick: </strong>
+            {selectedBestRunner?.number ? `${selectedBestRunner.number}. ` : ""}
+            {selectedBestRunner?.horse || "No selection"} ·{" "}
+            {selectedBestRunner?.confidence || "LOW"} confidence · Score{" "}
+            {selectedBestRunner?.score || 0}
+          </div>
+
+          <div style={{ overflowX: "auto" }}>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                fontSize: "13px",
+              }}
+            >
+              <thead>
+                <tr style={{ color: "#94a3b8", textAlign: "left" }}>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
+                    No.
+                  </th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
+                    Horse
+                  </th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
+                    Jockey
+                  </th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
+                    Trainer
+                  </th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
+                    Barrier
+                  </th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
+                    Form
+                  </th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
+                    Starts
+                  </th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
+                    Places
+                  </th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
+                    Place %
+                  </th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
+                    AI
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {scoredRunners.map((runner) => {
+                  const isAiPick =
+                    selectedBestRunner &&
+                    runner.horse === selectedBestRunner.horse &&
+                    runner.number === selectedBestRunner.number;
+
+                  return (
+                    <tr
+                      key={`${runner.number}-${runner.horse}`}
+                      style={{
+                        background: isAiPick
+                          ? "rgba(34,197,94,0.12)"
+                          : "transparent",
+                        color: isAiPick ? "#ffffff" : "#cbd5e1",
+                      }}
+                    >
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                        {runner.number || "-"}
+                      </td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontWeight: isAiPick ? "700" : "500" }}>
+                        {runner.horse}
+                        {isAiPick && (
+                          <span style={{ color: "#22c55e", marginLeft: "8px" }}>
+                            AI Pick
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                        {runner.jockey || "-"}
+                      </td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                        {runner.trainer || "-"}
+                      </td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                        {runner.draw || "-"}
+                      </td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                        {runner.form || "-"}
+                      </td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                        {runner.starts || 0}
+                      </td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                        {runner.places || 0}
+                      </td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                        {runner.displayPlacePercent || 0}%
+                      </td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                        <span
+                          style={{
+                            padding: "5px 8px",
+                            borderRadius: "999px",
+                            fontSize: "11px",
+                            fontWeight: "700",
+                            color:
+                              runner.confidence === "HIGH"
+                                ? "#22c55e"
+                                : runner.confidence === "MEDIUM"
+                                ? "#facc15"
+                                : "#ef4444",
+                            background:
+                              runner.confidence === "HIGH"
+                                ? "rgba(34,197,94,0.12)"
+                                : runner.confidence === "MEDIUM"
+                                ? "rgba(250,204,21,0.12)"
+                                : "rgba(239,68,68,0.12)",
+                          }}
+                        >
+                          {runner.confidence} · {runner.score}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "12px" }}>
+            Odds are not shown yet. This table uses available FormFav form data
+            and PlaceDash scoring.
+          </p>
+        </div>
+      )}
 
       <div
         style={{
