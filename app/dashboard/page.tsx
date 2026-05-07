@@ -147,7 +147,7 @@ export default function Dashboard() {
     margin: "0 auto",
     minHeight: "100vh",
     backgroundImage:
-      'linear-gradient(rgba(2,8,18,0.82), rgba(2,8,18,0.88)), url("/racehorse-bg.png")',
+      'linear-gradient(rgba(2,8,18,0.75), rgba(2,8,18,0.86)), url("/racehorse-bg.png")',
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover",
     backgroundPosition: "center top",
