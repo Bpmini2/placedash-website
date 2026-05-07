@@ -158,10 +158,8 @@ export default function Dashboard() {
     <main
       style={{
         padding: "32px 48px",
-        maxWidth: "1400px",
-        width: "100%",
-        margin: "0 auto",
-        minHeight: "100vh",
+                width: "100%",
+                minHeight: "100vh",
         backgroundImage:
           'linear-gradient(rgba(2,8,18,0.86), rgba(2,8,18,0.91)), url("/racehorse-bg.png")',
         backgroundRepeat: "no-repeat",
