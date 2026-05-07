@@ -124,8 +124,12 @@ export default function Dashboard() {
     const bestRunner = getBestRunner(race);
 
     return {
-      race: `${race.course || "Unknown"} Race ${race.race_number || ""}`,
-      time: race.off_time || "TBA",
+      race: `${race.course || "Unknown"} Race ${race.race_number || ""}${
+        race.state ? ` (${race.state})` : ""
+      }`,
+      time: `${race.off_time || "TBA"}${
+        race.timezone_label ? ` ${race.timezone_label}` : ""
+      }`,
       horse: `${bestRunner?.number ? bestRunner.number + ". " : ""}${
         bestRunner?.horse || "No selection"
       }`,
@@ -156,6 +160,10 @@ export default function Dashboard() {
       >
         ● Updated {new Date().toLocaleDateString("en-AU")} · Live race data
       </div>
+
+      <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "8px" }}>
+        Race times are shown in the local track timezone.
+      </p>
 
       <div
         style={{
@@ -220,10 +228,12 @@ export default function Dashboard() {
             >
               <h3>
                 {race.course} Race {race.race_number || ""}
+                {race.state ? ` (${race.state})` : ""}
               </h3>
 
               <p style={{ color: "#94a3b8" }}>
-                {race.off_time} • {race.runners?.length || 0} runners
+                {race.off_time} {race.timezone_label || ""} •{" "}
+                {race.runners?.length || 0} runners
               </p>
 
               <p style={{ marginTop: "10px" }}>
@@ -240,12 +250,12 @@ export default function Dashboard() {
                   marginTop: "6px",
                 }}
               >
-  AI-rated place selection available
-</div>
+                AI-rated place selection available
+              </div>
 
-<div
-  style={{
-    display: "inline-block",
+              <div
+                style={{
+                  display: "inline-block",
                   marginTop: "10px",
                   padding: "6px 10px",
                   borderRadius: "8px",
