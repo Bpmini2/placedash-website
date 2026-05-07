@@ -403,7 +403,7 @@ export default function Dashboard() {
           borderRadius: "16px",
         }}
       >
-        <h2 style={{ marginBottom: "15px" }}>Recent Results</h2>
+        <h2 style={{ marginBottom: "15px" }}>Today’s Race Summary</h2>
 
         <div style={{ display: "grid", gap: "10px" }}>
           {recentPicks.length === 0 ? (
@@ -428,7 +428,9 @@ export default function Dashboard() {
                     marginTop: "4px",
                   }}
                 >
-                  <span>Pick: {r.horse}</span>
+                  <span>
+  Pick: {i === 0 ? r.horse : "🔒 Upgrade to reveal pick"}
+</span>
                   <span style={{ color: "#facc15", fontWeight: "700" }}>
                     {r.confidence}
                   </span>
