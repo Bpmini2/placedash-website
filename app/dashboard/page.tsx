@@ -170,7 +170,15 @@ export default function Dashboard() {
         backgroundAttachment: "fixed",
       }}
     >
-      <h1>Dashboard Preview</h1>
+      <img
+  src="/placedash-logo.png"
+  alt="PlaceDash"
+  style={{
+    width: "420px",
+    maxWidth: "100%",
+    marginBottom: "10px"
+  }}
+/>
 
       <p style={{ color: "#94a3b8" }}>Today’s AI-powered place selections</p>
 
