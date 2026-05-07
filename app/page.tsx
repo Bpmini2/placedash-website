@@ -22,7 +22,13 @@ export default function Home() {
     maxWidth: "1400px",
     width: "100%",
     margin: "0 auto",
-    padding: "0 32px"
+    padding: "0 32px",
+    minHeight: "100vh",
+    backgroundImage:
+      'linear-gradient(rgba(2,8,18,0.82), rgba(2,8,18,0.82)), url("/raceday.png")',
+    backgroundSize: "cover",
+    backgroundPosition: "center top",
+    backgroundAttachment: "fixed"
   }}
 >
       <header className="header">
