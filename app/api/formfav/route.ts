@@ -83,6 +83,7 @@ export async function GET() {
         const card = raceData?.data || raceData;
 
         const runners = (card?.runners || []).map((runner: any) => ({
+          number: runner.number || "",
           horse: runner.name || "Unknown",
           jockey: runner.jockey || "",
           trainer: runner.trainer || "",
