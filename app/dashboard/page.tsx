@@ -145,6 +145,13 @@ export default function Dashboard() {
     maxWidth: "1400px",
     width: "100%",
     margin: "0 auto",
+    minHeight: "100vh",
+    backgroundImage:
+      'linear-gradient(rgba(2,8,18,0.94), rgba(2,8,18,0.94)), url("/racehorse-bg.png")',
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "cover",
+    backgroundPosition: "center top",
+    backgroundAttachment: "fixed",
   }}
 >
       <h1>Dashboard Preview</h1>
