@@ -7,6 +7,33 @@ function getMelbourneDate() {
 }
 
 function formatRaceTime(startTime: string | null, timezone: string | null) {
+  function getStateFromTimezone(timezone: string | null) {
+  if (!timezone) return "";
+
+  if (timezone.includes("Perth")) return "WA";
+  if (timezone.includes("Sydney")) return "NSW";
+  if (timezone.includes("Melbourne")) return "VIC";
+  if (timezone.includes("Brisbane")) return "QLD";
+  if (timezone.includes("Adelaide")) return "SA";
+  if (timezone.includes("Hobart")) return "TAS";
+  if (timezone.includes("Darwin")) return "NT";
+
+  return "";
+}
+
+function getTimezoneLabel(timezone: string | null) {
+  if (!timezone) return "";
+
+  if (timezone.includes("Perth")) return "AWST";
+  if (timezone.includes("Adelaide")) return "ACST";
+  if (timezone.includes("Darwin")) return "ACST";
+  if (timezone.includes("Brisbane")) return "AEST";
+  if (timezone.includes("Sydney")) return "AEST/AEDT";
+  if (timezone.includes("Melbourne")) return "AEST/AEDT";
+  if (timezone.includes("Hobart")) return "AEST/AEDT";
+
+  return "";
+}
   if (!startTime) return "TBA";
 
   try {
@@ -106,6 +133,8 @@ export async function GET() {
           race_name: card?.raceName || race.raceName,
           off_time: formatRaceTime(card?.startTime || race.startTime, card?.timezone || race.timezone),
           start_time: card?.startTime || race.startTime,
+          state: getStateFromTimezone(card?.timezone || race.timezone),
+timezone_label: getTimezoneLabel(card?.timezone || race.timezone),
           runners,
           runner_count: runners.length,
           has_first_starter: hasFirstStarter,
