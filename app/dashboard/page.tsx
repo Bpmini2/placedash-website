@@ -242,8 +242,23 @@ export default function Dashboard() {
               >
                 AI-rated place selection available
               </div>
-
-              <div
+{isFreePick && (
+  <div
+    style={{
+      marginTop: "10px",
+      padding: "10px",
+      borderRadius: "10px",
+      background: "rgba(255,255,255,0.04)",
+      color: "#94a3b8",
+      fontSize: "12px",
+      lineHeight: "1.4",
+    }}
+  >
+    <strong style={{ color: "#ffffff" }}>Why this pick?</strong>
+    <br />
+    Good place record · Recent form support · Meets PlaceDash race filters
+  </div>
+)}
                 style={{
                   display: "inline-block",
                   marginTop: "10px",
