@@ -139,7 +139,14 @@ export default function Dashboard() {
   });
 
   return (
-    <main style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
+    <main
+  style={{
+    padding: "32px 48px",
+    maxWidth: "1400px",
+    width: "100%",
+    margin: "0 auto",
+  }}
+>
       <h1>Dashboard Preview</h1>
 
       <p style={{ color: "#94a3b8" }}>
