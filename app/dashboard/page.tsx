@@ -127,7 +127,7 @@ export default function Dashboard() {
     return {
       race: `${race.course || "Unknown"} Race ${race.race_number || ""}`,
       time: race.off_time || "TBA",
-      horse: bestRunner?.horse || "No selection",
+      horse: `${bestRunner?.number ? bestRunner.number + ". " : ""}${bestRunner?.horse || "No selection"}`,
       confidence: bestRunner?.confidence || "LOW",
       date: new Date().toLocaleDateString("en-AU"),
     };
@@ -223,11 +223,11 @@ export default function Dashboard() {
 
               <p style={{ marginTop: "10px" }}>
                 Selection:{" "}
-                <strong>
-                  {isFreePick
-                    ? bestRunner?.horse || "No selection"
-                    : "🔒 Upgrade to reveal pick"}
-                </strong>
+<strong>
+  {isFreePick
+    ? `${bestRunner?.number ? bestRunner.number + ". " : ""}${bestRunner?.horse || "No selection"}`
+    : "🔒 Upgrade to reveal pick"}
+</strong>
               </p>
 
               <div
