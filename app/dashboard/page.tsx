@@ -65,7 +65,6 @@ export default function Dashboard() {
 
           let score = 0;
 
-          // Manus-style scoring adapted to FormFav data
           score += horsePlacePercent * 0.45;
           score += horseWinPercent * 0.15;
           score += recentForm * 0.25;
@@ -127,7 +126,9 @@ export default function Dashboard() {
     return {
       race: `${race.course || "Unknown"} Race ${race.race_number || ""}`,
       time: race.off_time || "TBA",
-      horse: `${bestRunner?.number ? bestRunner.number + ". " : ""}${bestRunner?.horse || "No selection"}`,
+      horse: `${bestRunner?.number ? bestRunner.number + ". " : ""}${
+        bestRunner?.horse || "No selection"
+      }`,
       confidence: bestRunner?.confidence || "LOW",
       date: new Date().toLocaleDateString("en-AU"),
     };
@@ -201,6 +202,10 @@ export default function Dashboard() {
           const isFreePick = index === 0;
           const bestRunner = getBestRunner(race);
 
+          const visibleHorse = `${bestRunner?.number ? bestRunner.number + ". " : ""}${
+            bestRunner?.horse || "No selection"
+          }`;
+
           return (
             <div
               key={`${race.course}-${race.race_number}`}
@@ -223,11 +228,9 @@ export default function Dashboard() {
 
               <p style={{ marginTop: "10px" }}>
                 Selection:{" "}
-<strong>
-  {isFreePick
-    ? `${bestRunner?.number ? bestRunner.number + ". " : ""}${bestRunner?.horse || "No selection"}`
-    : "🔒 Upgrade to reveal pick"}
-</strong>
+                <strong>
+                  {isFreePick ? visibleHorse : "🔒 Upgrade to reveal pick"}
+                </strong>
               </p>
 
               <div
@@ -237,9 +240,7 @@ export default function Dashboard() {
                   marginTop: "6px",
                 }}
               >
-                {bestRunner?.confidence === "HIGH"
-                  ? "🔥 High confidence pick available"
-                  : "AI-rated place selection available"}
+                AI-rated place selection available
               </div>
 
               <div
@@ -324,30 +325,17 @@ export default function Dashboard() {
 
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "15px",
+            padding: "20px",
+            background: "rgba(255,255,255,0.04)",
+            borderRadius: "12px",
+            marginTop: "15px",
           }}
         >
-          <div
-            style={{
-              padding: "15px",
-              background: "rgba(34,197,94,0.1)",
-              borderRadius: "12px",
-              textAlign: "center",
-            <div
-  style={{
-    padding: "20px",
-    background: "rgba(255,255,255,0.04)",
-    borderRadius: "12px",
-    marginTop: "15px",
-  }}
->
-  <h3 style={{ marginBottom: "8px" }}>Track Record Coming Soon</h3>
-  <p style={{ color: "#94a3b8", margin: 0 }}>
-    Results will appear once PlaceDash starts tracking completed races.
-  </p>
-</div>
+          <h3 style={{ marginBottom: "8px" }}>Track Record Coming Soon</h3>
+          <p style={{ color: "#94a3b8", margin: 0 }}>
+            Results will appear once PlaceDash starts tracking completed races.
+          </p>
+        </div>
       </div>
 
       <div
@@ -384,8 +372,8 @@ export default function Dashboard() {
                   }}
                 >
                   <span>
-  Pick: {i === 0 ? r.horse : "🔒 Upgrade to reveal pick"}
-</span>
+                    Pick: {i === 0 ? r.horse : "🔒 Upgrade to reveal pick"}
+                  </span>
                   <span style={{ color: "#facc15", fontWeight: "700" }}>
                     {r.confidence}
                   </span>
@@ -406,7 +394,7 @@ export default function Dashboard() {
         </div>
 
         <p style={{ color: "#94a3b8", marginTop: "10px", fontSize: "12px" }}>
-          Updated daily. Based on AI-selected runners.
+          Updated daily. Locked selections are available to upgraded members.
         </p>
       </div>
 
