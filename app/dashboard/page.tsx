@@ -15,8 +15,8 @@ export default function Dashboard() {
       return runner.form.replace(/[^0-9]/g, "").length;
     }
 
-    function recentFormScore(form) {
-      if (!form) return 0;
+    function evaluateRecentForm(form) {
+      if (!form) return 30;
 
       const results = form
         .replace(/[^0-9]/g, "")
@@ -24,44 +24,70 @@ export default function Dashboard() {
         .map(Number)
         .filter((n) => n > 0);
 
-      if (results.length === 0) return 0;
+      if (results.length === 0) return 30;
 
-      return results.slice(-3).reduce((score, result) => {
-        if (result === 1) return score + 6;
-        if (result === 2) return score + 5;
-        if (result === 3) return score + 4;
-        if (result <= 5) return score + 2;
-        return score;
+      const lastThree = results.slice(-3);
+
+      const score = lastThree.reduce((total, result) => {
+        if (result === 1) return total + 90;
+        if (result === 2) return total + 70;
+        if (result === 3) return total + 55;
+        if (result <= 5) return total + 35;
+        return total + 15;
       }, 0);
+
+      return Math.round(score / lastThree.length);
     }
 
     return (
       race.runners
         .filter((runner) => countStarts(runner) >= 3)
         .map((runner) => {
+          const starts = countStarts(runner);
+          const wins = Number(runner.wins || 0);
+          const places = Number(runner.places || 0);
+
+          const horsePlacePercent =
+            typeof runner.placePercent === "number"
+              ? runner.placePercent * 100
+              : starts > 0
+              ? ((wins + places) / starts) * 100
+              : 0;
+
+          const horseWinPercent =
+            typeof runner.winPercent === "number"
+              ? runner.winPercent * 100
+              : starts > 0
+              ? (wins / starts) * 100
+              : 0;
+
+          const recentForm = evaluateRecentForm(runner.form);
+
           let score = 0;
 
-          score += recentFormScore(runner.form);
+          // Manus-style scoring adapted to FormFav data
+          score += horsePlacePercent * 0.45;
+          score += horseWinPercent * 0.15;
+          score += recentForm * 0.25;
 
-          if (runner.placePercent) score += runner.placePercent * 20;
-          if (runner.winPercent) score += runner.winPercent * 10;
+          if (runner.jockey) score += 5;
+          if (runner.trainer) score += 5;
 
           if (runner.draw) {
-            score += Math.max(0, 10 - parseInt(String(runner.draw)));
+            score += Math.max(0, 10 - parseInt(String(runner.draw))) * 0.5;
           }
 
-          if (runner.lbs) {
-            score += Math.max(0, 140 - parseFloat(String(runner.lbs))) / 10;
-          }
-
-          if (runner.jockey) score += 2;
-          if (runner.trainer) score += 2;
+          score = Math.min(100, Math.max(0, score));
 
           let confidence = "LOW";
-          if (score >= 18) confidence = "HIGH";
-          else if (score >= 10) confidence = "MEDIUM";
+          if (score >= 60) confidence = "HIGH";
+          else if (score >= 40) confidence = "MEDIUM";
 
-          return { ...runner, score, confidence };
+          return {
+            ...runner,
+            score: Math.round(score),
+            confidence,
+          };
         })
         .sort((a, b) => b.score - a.score)[0] || null
     );
