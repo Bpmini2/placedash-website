@@ -17,7 +17,14 @@ function ConfidenceBadge({ level }: { level: string }) {
 
 export default function Home() {
   return (
-    <main>
+    <main
+  style={{
+    maxWidth: "1400px",
+    width: "100%",
+    margin: "0 auto",
+    padding: "0 32px"
+  }}
+>
       <header className="header">
         <div className="brand">
   <img
