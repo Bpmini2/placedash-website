@@ -19,7 +19,16 @@ export default function Home() {
   return (
     <main>
       <header className="header">
-        <div className="brand"><div className="logo">PD</div><strong>PlaceDash</strong></div>
+        <div className="brand">
+  <img
+    src="/placedash-logo.png"
+    alt="PlaceDash"
+    style={{
+      width: "260px",
+      maxWidth: "100%"
+    }}
+  />
+</div>
         <nav><a href="/dashboard">Predictions</a><a href="#track-record">Track Record</a><a href="#pricing">Pricing</a></nav>
         <a className="headerButton" href="/dashboard">View Today’s Picks</a>
       </header>
