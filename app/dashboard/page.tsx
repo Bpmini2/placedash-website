@@ -3,20 +3,21 @@
 import React, { useEffect, useState } from "react";
 
 export default function Dashboard() {
-  const [races, setRaces] = useState([]);
+  const [races, setRaces] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedRace, setSelectedRace] = useState(null);
+  const [selectedRace, setSelectedRace] = useState<any | null>(null);
 
-  function countStarts(runner) {
+  function countStarts(runner: any) {
     if (typeof runner.starts === "number") return runner.starts;
     if (!runner.form) return 0;
     return runner.form.replace(/[^0-9]/g, "").length;
   }
 
-  function evaluateRecentForm(form) {
-    if (!form) return 30;
+  function evaluateRecentForm(form: string, last20Starts?: string) {
+    const formText = last20Starts || form;
+    if (!formText) return 30;
 
-    const results = form
+    const results = formText
       .replace(/[^0-9]/g, "")
       .split("")
       .map(Number)
@@ -24,30 +25,106 @@ export default function Dashboard() {
 
     if (results.length === 0) return 30;
 
-    const lastThree = results.slice(-3);
+    const recentResults = results.slice(0, 5);
 
-    const score = lastThree.reduce((total, result) => {
-      if (result === 1) return total + 90;
-      if (result === 2) return total + 70;
-      if (result === 3) return total + 55;
-      if (result <= 5) return total + 35;
-      return total + 15;
+    const score = recentResults.reduce((total, result, index) => {
+      const recencyWeight = index === 0 ? 1.25 : index === 1 ? 1.1 : 1;
+
+      if (result === 1) return total + 90 * recencyWeight;
+      if (result === 2) return total + 75 * recencyWeight;
+      if (result === 3) return total + 60 * recencyWeight;
+      if (result <= 5) return total + 38 * recencyWeight;
+      return total + 15 * recencyWeight;
     }, 0);
 
-    return Math.round(score / lastThree.length);
+    return Math.round(score / recentResults.length);
   }
 
-  function getRunnerReasoning(runner) {
-    const reasons = [];
+  function statPlacePercent(stats: any) {
+    if (!stats) return null;
+
+    if (typeof stats.placePercent === "number") {
+      return stats.placePercent * 100;
+    }
+
+    if (stats.starts && stats.places) {
+      return (stats.places / stats.starts) * 100;
+    }
+
+    return null;
+  }
+
+  function evaluateSpecialistStats(runner: any) {
+    let bonus = 0;
+    const notes: string[] = [];
+
+    const trackPlace = statPlacePercent(runner.trackStats);
+    const distancePlace = statPlacePercent(runner.distanceStats);
+    const trackDistancePlace = statPlacePercent(runner.trackDistanceStats);
+    const conditionPlace = statPlacePercent(runner.conditionStats);
+
+    if (trackPlace !== null && trackPlace >= 50) {
+      bonus += 5;
+      notes.push("Track record support");
+    }
+
+    if (distancePlace !== null && distancePlace >= 50) {
+      bonus += 6;
+      notes.push("Distance suitability");
+    }
+
+    if (trackDistancePlace !== null && trackDistancePlace >= 45) {
+      bonus += 7;
+      notes.push("Track/distance profile support");
+    }
+
+    if (conditionPlace !== null && conditionPlace >= 50) {
+      bonus += 5;
+      notes.push("Condition suitability");
+    }
+
+    return { bonus, notes };
+  }
+
+  function evaluateWeight(runner: any) {
+    const weight = Number(runner.lbs || runner.weight || 0);
+    const claim = Number(runner.claim || 0);
+
+    if (!weight) return { bonus: 0, note: "" };
+
+    const adjustedWeight = claim ? weight - claim : weight;
+
+    if (adjustedWeight <= 54) {
+      return { bonus: 4, note: "Light weight profile" };
+    }
+
+    if (adjustedWeight <= 56) {
+      return { bonus: 2, note: "Manageable weight" };
+    }
+
+    if (adjustedWeight >= 60) {
+      return { bonus: -3, note: "Higher weight carried" };
+    }
+
+    return { bonus: 0, note: "" };
+  }
+
+  function getRunnerReasoning(runner: any) {
+    const reasons: string[] = [];
     const starts = Number(runner.starts || 0);
-    const places = Number(runner.places || 0);
     const placePercent = Number(runner.displayPlacePercent || 0);
     const score = Number(runner.score || 0);
 
-    if (placePercent >= 50) {
-      reasons.push("Strong place record");
-    } else if (placePercent >= 35) {
-      reasons.push("Solid place record");
+    if (placePercent >= 55) {
+      reasons.push("Strong overall place record");
+    } else if (placePercent >= 40) {
+      reasons.push("Solid overall place record");
+    }
+
+    if (runner.recentFormScore >= 65) {
+      reasons.push("Strong recent form");
+    } else if (runner.recentFormScore >= 45) {
+      reasons.push("Recent form support");
     }
 
     if (starts >= 10) {
@@ -56,36 +133,36 @@ export default function Dashboard() {
       reasons.push("Meets minimum race experience");
     }
 
-    if (runner.form) {
-      reasons.push("Recent form support");
-    }
-
     if (runner.draw && Number(runner.draw) > 0 && Number(runner.draw) <= 6) {
       reasons.push("Favourable barrier");
     }
 
-    if (runner.jockey) {
-      reasons.push("Jockey data available");
+    if (runner.weightNote) {
+      reasons.push(runner.weightNote);
     }
 
-    if (runner.trainer) {
-      reasons.push("Trainer data available");
+    if (runner.specialistNotes?.length) {
+      reasons.push(...runner.specialistNotes);
     }
 
-    if (score >= 60) {
-      reasons.push("High AI score");
-    } else if (score >= 40) {
-      reasons.push("Medium AI score");
+    if (runner.jockey && runner.trainer) {
+      reasons.push("Jockey and trainer data available");
+    }
+
+    if (score >= 70) {
+      reasons.push("High PlaceDash score");
+    } else if (score >= 50) {
+      reasons.push("Medium PlaceDash score");
     }
 
     if (reasons.length === 0) {
       reasons.push("Limited data available");
     }
 
-    return reasons.slice(0, 4);
+    return [...new Set(reasons)].slice(0, 5);
   }
 
-  function scoreRunner(runner) {
+  function scoreRunner(runner: any) {
     const starts = countStarts(runner);
     const wins = Number(runner.wins || 0);
     const places = Number(runner.places || 0);
@@ -94,7 +171,7 @@ export default function Dashboard() {
       typeof runner.placePercent === "number"
         ? runner.placePercent * 100
         : starts > 0
-        ? ((wins + places) / starts) * 100
+        ? (places / starts) * 100
         : 0;
 
     const horseWinPercent =
@@ -104,33 +181,44 @@ export default function Dashboard() {
         ? (wins / starts) * 100
         : 0;
 
-    const recentForm = evaluateRecentForm(runner.form);
+    const recentForm = evaluateRecentForm(runner.form, runner.last20Starts);
+    const specialist = evaluateSpecialistStats(runner);
+    const weight = evaluateWeight(runner);
 
     let score = 0;
 
-    score += horsePlacePercent * 0.45;
-    score += horseWinPercent * 0.15;
-    score += recentForm * 0.25;
+    score += horsePlacePercent * 0.38;
+    score += horseWinPercent * 0.12;
+    score += recentForm * 0.28;
+    score += specialist.bonus;
+    score += weight.bonus;
 
-    if (runner.jockey) score += 5;
-    if (runner.trainer) score += 5;
+    if (runner.jockey) score += 4;
+    if (runner.trainer) score += 4;
 
     if (runner.draw) {
-      score += Math.max(0, 10 - parseInt(String(runner.draw))) * 0.5;
+      score += Math.max(0, 10 - parseInt(String(runner.draw))) * 0.45;
+    }
+
+    if (runner.scratched) {
+      score = 0;
     }
 
     score = Math.min(100, Math.max(0, score));
 
     let confidence = "LOW";
-    if (score >= 60) confidence = "HIGH";
-    else if (score >= 40) confidence = "MEDIUM";
+    if (score >= 65) confidence = "HIGH";
+    else if (score >= 45) confidence = "MEDIUM";
 
     const scoredRunner = {
       ...runner,
       score: Math.round(score),
       confidence,
       starts,
+      recentFormScore: recentForm,
       displayPlacePercent: Math.round(horsePlacePercent),
+      specialistNotes: specialist.notes,
+      weightNote: weight.note,
     };
 
     return {
@@ -139,23 +227,24 @@ export default function Dashboard() {
     };
   }
 
-  function getBestRunner(race) {
+  function getBestRunner(race: any) {
     if (!race.runners || race.runners.length === 0) return null;
 
     return (
       race.runners
-        .filter((runner) => countStarts(runner) >= 3)
-        .map((runner) => scoreRunner(runner))
-        .sort((a, b) => b.score - a.score)[0] || null
+        .filter((runner: any) => countStarts(runner) >= 3)
+        .filter((runner: any) => !runner.scratched)
+        .map((runner: any) => scoreRunner(runner))
+        .sort((a: any, b: any) => b.score - a.score)[0] || null
     );
   }
 
-  function getScoredRunners(race) {
+  function getScoredRunners(race: any) {
     if (!race?.runners || race.runners.length === 0) return [];
 
     return race.runners
-      .map((runner) => scoreRunner(runner))
-      .sort((a, b) => b.score - a.score);
+      .map((runner: any) => scoreRunner(runner))
+      .sort((a: any, b: any) => b.score - a.score);
   }
 
   useEffect(() => {
@@ -176,17 +265,17 @@ export default function Dashboard() {
   }, []);
 
   const displayRaces = races
-    .filter((race) => {
+    .filter((race: any) => {
       const runnerCount = race.runners?.length || 0;
       return runnerCount >= 8 && runnerCount <= 11;
     })
-    .filter((race) => {
+    .filter((race: any) => {
       const best = getBestRunner(race);
       return best && (best.confidence === "HIGH" || best.confidence === "MEDIUM");
     })
     .slice(0, 3);
 
-  const recentPicks = displayRaces.map((race) => {
+  const recentPicks = displayRaces.map((race: any) => {
     const bestRunner = getBestRunner(race);
 
     return {
@@ -221,486 +310,498 @@ export default function Dashboard() {
         backgroundAttachment: "fixed",
       }}
     >
-      <h1>Dashboard Preview</h1>
+      <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+        <h1>Dashboard Preview</h1>
 
-      <p style={{ color: "#94a3b8" }}>Today’s AI-powered place selections</p>
+        <p style={{ color: "#94a3b8" }}>Today’s AI-powered place selections</p>
 
-      <div
-        style={{
-          display: "inline-block",
-          marginTop: "10px",
-          padding: "6px 10px",
-          borderRadius: "999px",
-          background: "rgba(34,197,94,0.12)",
-          color: "#22c55e",
-          fontSize: "12px",
-          fontWeight: "600",
-        }}
-      >
-        ● Updated {new Date().toLocaleDateString("en-AU")} · Live race data
-      </div>
+        <div
+          style={{
+            display: "inline-block",
+            marginTop: "10px",
+            padding: "6px 10px",
+            borderRadius: "999px",
+            background: "rgba(34,197,94,0.12)",
+            color: "#22c55e",
+            fontSize: "12px",
+            fontWeight: "600",
+          }}
+        >
+          ● Updated {new Date().toLocaleDateString("en-AU")} · Live race data
+        </div>
 
-      <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "8px" }}>
-        Race times are shown in the local track timezone.
-      </p>
+        <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "8px" }}>
+          Race times are shown in the local track timezone.
+        </p>
 
-      <div
-        style={{
-          marginTop: "30px",
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "20px",
-        }}
-      >
-        {loading && (
-          <div
-            style={{
-              padding: "20px",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: "16px",
-              color: "#94a3b8",
-            }}
-          >
-            Loading today’s race cards...
-          </div>
-        )}
-
-        {!loading && displayRaces.length === 0 && (
-          <div
-            style={{
-              padding: "20px",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: "16px",
-              color: "#94a3b8",
-            }}
-          >
-            <strong style={{ color: "#ffffff" }}>
-              No qualifying races found today.
-            </strong>
-            <p style={{ marginTop: "8px" }}>
-              PlaceDash only shows Australian races with 8–11 runners, no first
-              starters, and races that have not already started. Please check
-              back later when more race data is available.
-            </p>
-          </div>
-        )}
-
-        {displayRaces.map((race, index) => {
-          const isFreePick = index === 0;
-          const bestRunner = getBestRunner(race);
-
-          const visibleHorse = `${bestRunner?.number ? bestRunner.number + ". " : ""}${
-            bestRunner?.horse || "No selection"
-          }`;
-
-          return (
+        <div
+          style={{
+            marginTop: "30px",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: "20px",
+          }}
+        >
+          {loading && (
             <div
-              key={`${race.course}-${race.race_number}`}
-              onClick={() => {
-                if (isFreePick) {
-                  setSelectedRace(race);
-                } else {
-                  window.location.href = "/#pricing";
-                }
-              }}
               style={{
                 padding: "20px",
                 border: "1px solid rgba(255,255,255,0.1)",
                 borderRadius: "16px",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
+                color: "#94a3b8",
               }}
             >
-              <h3>
-                {race.course} Race {race.race_number || ""}
-                {race.state ? ` (${race.state})` : ""}
-              </h3>
+              Loading today’s race cards...
+            </div>
+          )}
 
-              <p style={{ color: "#94a3b8" }}>
-                {race.off_time} {race.timezone_label || ""} •{" "}
-                {race.runners?.length || 0} runners
+          {!loading && displayRaces.length === 0 && (
+            <div
+              style={{
+                padding: "20px",
+                border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: "16px",
+                color: "#94a3b8",
+              }}
+            >
+              <strong style={{ color: "#ffffff" }}>
+                No qualifying races found today.
+              </strong>
+              <p style={{ marginTop: "8px" }}>
+                PlaceDash only shows Australian races with 8–11 runners, no first
+                starters, and races that have not already started. Please check
+                back later when more race data is available.
               </p>
+            </div>
+          )}
 
-              <p style={{ marginTop: "10px" }}>
-                Selection:{" "}
-                <strong>
-                  {isFreePick ? visibleHorse : "🔒 Upgrade to reveal pick"}
-                </strong>
-              </p>
+          {displayRaces.map((race: any, index: number) => {
+            const isFreePick = index === 0;
+            const bestRunner = getBestRunner(race);
 
+            const visibleHorse = `${bestRunner?.number ? bestRunner.number + ". " : ""}${
+              bestRunner?.horse || "No selection"
+            }`;
+
+            return (
               <div
+                key={`${race.course}-${race.race_number}`}
+                onClick={() => {
+                  if (isFreePick) {
+                    setSelectedRace(race);
+                  } else {
+                    window.location.href = "/#pricing";
+                  }
+                }}
                 style={{
-                  color: "#facc15",
-                  fontSize: "12px",
-                  marginTop: "6px",
+                  padding: "20px",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "16px",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  background: "rgba(2,8,18,0.45)",
                 }}
               >
-                {isFreePick
-                  ? "Click to view full race card"
-                  : "AI-rated place selection available"}
-              </div>
+                <h3>
+                  {race.course} Race {race.race_number || ""}
+                  {race.state ? ` (${race.state})` : ""}
+                </h3>
 
-              {isFreePick && bestRunner?.reasoning && (
+                <p style={{ color: "#94a3b8" }}>
+                  {race.off_time} {race.timezone_label || ""} •{" "}
+                  {race.runners?.length || 0} runners
+                </p>
+
+                <p style={{ marginTop: "10px" }}>
+                  Selection:{" "}
+                  <strong>
+                    {isFreePick ? visibleHorse : "🔒 Upgrade to reveal pick"}
+                  </strong>
+                </p>
+
                 <div
                   style={{
-                    marginTop: "12px",
-                    padding: "10px",
-                    borderRadius: "10px",
-                    background: "rgba(255,255,255,0.04)",
-                    color: "#94a3b8",
+                    color: "#facc15",
                     fontSize: "12px",
-                    lineHeight: "1.5",
+                    marginTop: "6px",
                   }}
                 >
-                  <strong style={{ color: "#ffffff" }}>AI Reasoning</strong>
-                  <ul style={{ margin: "6px 0 0 16px", padding: 0 }}>
-                    {bestRunner.reasoning.map((reason, reasonIndex) => (
-                      <li key={reasonIndex}>{reason}</li>
+                  {isFreePick
+                    ? "Click to view full race card"
+                    : "AI-rated place selection available"}
+                </div>
+
+                {isFreePick && bestRunner?.reasoning && (
+                  <div
+                    style={{
+                      marginTop: "12px",
+                      padding: "10px",
+                      borderRadius: "10px",
+                      background: "rgba(255,255,255,0.04)",
+                      color: "#94a3b8",
+                      fontSize: "12px",
+                      lineHeight: "1.5",
+                    }}
+                  >
+                    <strong style={{ color: "#ffffff" }}>AI Reasoning</strong>
+                    <ul style={{ margin: "6px 0 0 16px", padding: 0 }}>
+                      {bestRunner.reasoning.map((reason: string, reasonIndex: number) => (
+                        <li key={reasonIndex}>{reason}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div
+                  style={{
+                    display: "inline-block",
+                    marginTop: "10px",
+                    padding: "6px 10px",
+                    borderRadius: "8px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    background:
+                      bestRunner?.confidence === "HIGH"
+                        ? "rgba(34,197,94,0.15)"
+                        : bestRunner?.confidence === "MEDIUM"
+                        ? "rgba(250,204,21,0.15)"
+                        : "rgba(239,68,68,0.15)",
+                    color:
+                      bestRunner?.confidence === "HIGH"
+                        ? "#22c55e"
+                        : bestRunner?.confidence === "MEDIUM"
+                        ? "#facc15"
+                        : "#ef4444",
+                  }}
+                >
+                  {isFreePick
+                    ? `${bestRunner?.confidence || "LOW"} CONFIDENCE`
+                    : "CONFIDENCE LOCKED"}
+                </div>
+              </div>
+            );
+          })}
+
+          <div
+            style={{
+              padding: "20px",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: "16px",
+              opacity: 0.9,
+              background: "rgba(2,8,18,0.45)",
+            }}
+          >
+            <h3>Premium Picks Locked 🔒</h3>
+
+            <p style={{ color: "#94a3b8" }}>
+              Only 3 of today’s AI picks are visible — more high-confidence
+              selections are locked.
+            </p>
+
+            <p style={{ color: "#facc15", fontWeight: "600" }}>
+              ⚠ You’re missing today’s HIGH confidence selections
+            </p>
+
+            <p style={{ color: "#94a3b8" }}>
+              Upgrade to unlock the strongest AI-rated picks.
+            </p>
+
+            <a
+              href="/#pricing"
+              style={{
+                display: "inline-block",
+                marginTop: "15px",
+                padding: "10px 16px",
+                background: "#22c55e",
+                color: "#000",
+                borderRadius: "10px",
+                fontWeight: "600",
+              }}
+            >
+              Upgrade to Silver
+            </a>
+          </div>
+        </div>
+
+        {selectedRace && (
+          <div
+            style={{
+              marginTop: "40px",
+              padding: "20px",
+              border: "1px solid rgba(255,255,255,0.12)",
+              borderRadius: "16px",
+              background: "rgba(2,8,18,0.72)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "20px",
+                alignItems: "flex-start",
+                marginBottom: "18px",
+              }}
+            >
+              <div>
+                <h2 style={{ marginBottom: "8px" }}>
+                  {selectedRace.course} Race {selectedRace.race_number}
+                  {selectedRace.state ? ` (${selectedRace.state})` : ""}
+                </h2>
+
+                <p style={{ color: "#94a3b8", margin: 0 }}>
+                  {selectedRace.off_time} {selectedRace.timezone_label || ""} ·{" "}
+                  {selectedRace.runners?.length || 0} runners ·{" "}
+                  {selectedRace.distance || "Distance TBA"}
+                </p>
+
+                <p style={{ color: "#94a3b8", marginTop: "6px" }}>
+                  Condition: {selectedRace.condition || "TBA"} · Weather:{" "}
+                  {selectedRace.weather || "TBA"}
+                </p>
+              </div>
+
+              <button
+                onClick={() => setSelectedRace(null)}
+                style={{
+                  padding: "8px 12px",
+                  borderRadius: "8px",
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  background: "rgba(255,255,255,0.04)",
+                  color: "#ffffff",
+                  cursor: "pointer",
+                }}
+              >
+                Close
+              </button>
+            </div>
+
+            <div
+              style={{
+                marginBottom: "14px",
+                padding: "12px",
+                borderRadius: "12px",
+                background: "rgba(34,197,94,0.10)",
+                border: "1px solid rgba(34,197,94,0.18)",
+              }}
+            >
+              <strong style={{ color: "#22c55e" }}>Top Rated Selection: </strong>
+              {selectedBestRunner?.number ? `${selectedBestRunner.number}. ` : ""}
+              {selectedBestRunner?.horse || "No selection"} ·{" "}
+              {selectedBestRunner?.confidence || "LOW"} confidence · Score{" "}
+              {selectedBestRunner?.score || 0}
+
+              {selectedBestRunner?.reasoning && (
+                <div style={{ marginTop: "10px", color: "#cbd5e1" }}>
+                  <strong style={{ color: "#ffffff" }}>Why this runner?</strong>
+                  <ul style={{ margin: "6px 0 0 18px", padding: 0 }}>
+                    {selectedBestRunner.reasoning.map((reason: string, index: number) => (
+                      <li key={index}>{reason}</li>
                     ))}
                   </ul>
                 </div>
               )}
+            </div>
 
-              <div
+            <div style={{ overflowX: "auto" }}>
+              <table
                 style={{
-                  display: "inline-block",
-                  marginTop: "10px",
-                  padding: "6px 10px",
-                  borderRadius: "8px",
-                  fontSize: "12px",
-                  fontWeight: "600",
-                  background:
-                    bestRunner?.confidence === "HIGH"
-                      ? "rgba(34,197,94,0.15)"
-                      : bestRunner?.confidence === "MEDIUM"
-                      ? "rgba(250,204,21,0.15)"
-                      : "rgba(239,68,68,0.15)",
-                  color:
-                    bestRunner?.confidence === "HIGH"
-                      ? "#22c55e"
-                      : bestRunner?.confidence === "MEDIUM"
-                      ? "#facc15"
-                      : "#ef4444",
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  fontSize: "13px",
                 }}
               >
-                {isFreePick
-                  ? `${bestRunner?.confidence || "LOW"} CONFIDENCE`
-                  : "CONFIDENCE LOCKED"}
-              </div>
+                <thead>
+                  <tr style={{ color: "#94a3b8", textAlign: "left" }}>
+                    <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Rank</th>
+                    <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>No.</th>
+                    <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Horse</th>
+                    <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Jockey</th>
+                    <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Trainer</th>
+                    <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Barrier</th>
+                    <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Weight</th>
+                    <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Form</th>
+                    <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Starts</th>
+                    <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Place %</th>
+                    <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>AI</th>
+                    <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Reasoning</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {scoredRunners.map((runner: any, index: number) => {
+                    const isAiPick =
+                      selectedBestRunner &&
+                      runner.horse === selectedBestRunner.horse &&
+                      runner.number === selectedBestRunner.number;
+
+                    return (
+                      <tr
+                        key={`${runner.number}-${runner.horse}`}
+                        style={{
+                          background: isAiPick
+                            ? "rgba(34,197,94,0.12)"
+                            : "transparent",
+                          color: isAiPick ? "#ffffff" : "#cbd5e1",
+                        }}
+                      >
+                        <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontWeight: "700" }}>
+                          #{index + 1}
+                        </td>
+                        <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.number || "-"}</td>
+                        <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontWeight: isAiPick ? "700" : "500" }}>
+                          {runner.horse}
+                          {isAiPick && (
+                            <span style={{ color: "#22c55e", marginLeft: "8px" }}>
+                              Top Rated
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.jockey || "-"}</td>
+                        <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.trainer || "-"}</td>
+                        <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.draw || "-"}</td>
+                        <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                          {runner.lbs ? `${runner.lbs}kg` : "-"}
+                          {runner.claim ? ` (${runner.claim}kg claim)` : ""}
+                        </td>
+                        <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.form || "-"}</td>
+                        <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.starts || 0}</td>
+                        <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.displayPlacePercent || 0}%</td>
+                        <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                          <span
+                            style={{
+                              padding: "5px 8px",
+                              borderRadius: "999px",
+                              fontSize: "11px",
+                              fontWeight: "700",
+                              color:
+                                runner.confidence === "HIGH"
+                                  ? "#22c55e"
+                                  : runner.confidence === "MEDIUM"
+                                  ? "#facc15"
+                                  : "#ef4444",
+                              background:
+                                runner.confidence === "HIGH"
+                                  ? "rgba(34,197,94,0.12)"
+                                  : runner.confidence === "MEDIUM"
+                                  ? "rgba(250,204,21,0.12)"
+                                  : "rgba(239,68,68,0.12)",
+                            }}
+                          >
+                            {runner.confidence} · {runner.score}
+                          </span>
+                        </td>
+                        <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)", color: "#94a3b8" }}>
+                          {(runner.reasoning || []).slice(0, 2).join(" · ")}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-          );
-        })}
 
-        <div
-          style={{
-            padding: "20px",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: "16px",
-            opacity: 0.9,
-          }}
-        >
-          <h3>Premium Picks Locked 🔒</h3>
+            <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "12px" }}>
+              Odds are not currently supplied by the FormFav runner object. This table uses available FormFav form data and PlaceDash scoring.
+            </p>
+          </div>
+        )}
 
-          <p style={{ color: "#94a3b8" }}>
-            Only 3 of today’s AI picks are visible — more high-confidence
-            selections are locked.
-          </p>
-
-          <p style={{ color: "#facc15", fontWeight: "600" }}>
-            ⚠ You’re missing today’s HIGH confidence selections
-          </p>
-
-          <p style={{ color: "#94a3b8" }}>
-            Upgrade to unlock the strongest AI-rated picks.
-          </p>
-
-          <a
-            href="/#pricing"
-            style={{
-              display: "inline-block",
-              marginTop: "15px",
-              padding: "10px 16px",
-              background: "#22c55e",
-              color: "#000",
-              borderRadius: "10px",
-              fontWeight: "600",
-            }}
-          >
-            Upgrade to Silver
-          </a>
-        </div>
-      </div>
-
-      {selectedRace && (
         <div
           style={{
             marginTop: "40px",
             padding: "20px",
-            border: "1px solid rgba(255,255,255,0.12)",
+            border: "1px solid rgba(255,255,255,0.1)",
             borderRadius: "16px",
-            background: "rgba(2,8,18,0.72)",
+            background: "rgba(2,8,18,0.45)",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: "20px",
-              alignItems: "flex-start",
-              marginBottom: "18px",
-            }}
-          >
-            <div>
-              <h2 style={{ marginBottom: "8px" }}>
-                {selectedRace.course} Race {selectedRace.race_number}
-                {selectedRace.state ? ` (${selectedRace.state})` : ""}
-              </h2>
-
-              <p style={{ color: "#94a3b8", margin: 0 }}>
-                {selectedRace.off_time} {selectedRace.timezone_label || ""} ·{" "}
-                {selectedRace.runners?.length || 0} runners ·{" "}
-                {selectedRace.distance || "Distance TBA"}
-              </p>
-
-              <p style={{ color: "#94a3b8", marginTop: "6px" }}>
-                Condition: {selectedRace.condition || "TBA"} · Weather:{" "}
-                {selectedRace.weather || "TBA"}
-              </p>
-            </div>
-
-            <button
-              onClick={() => setSelectedRace(null)}
-              style={{
-                padding: "8px 12px",
-                borderRadius: "8px",
-                border: "1px solid rgba(255,255,255,0.18)",
-                background: "rgba(255,255,255,0.04)",
-                color: "#ffffff",
-                cursor: "pointer",
-              }}
-            >
-              Close
-            </button>
-          </div>
+          <h2 style={{ marginBottom: "15px" }}>Demo Track Record</h2>
 
           <div
             style={{
-              marginBottom: "14px",
-              padding: "12px",
+              padding: "20px",
+              background: "rgba(255,255,255,0.04)",
               borderRadius: "12px",
-              background: "rgba(34,197,94,0.10)",
-              border: "1px solid rgba(34,197,94,0.18)",
+              marginTop: "15px",
             }}
           >
-            <strong style={{ color: "#22c55e" }}>AI Pick: </strong>
-            {selectedBestRunner?.number ? `${selectedBestRunner.number}. ` : ""}
-            {selectedBestRunner?.horse || "No selection"} ·{" "}
-            {selectedBestRunner?.confidence || "LOW"} confidence · Score{" "}
-            {selectedBestRunner?.score || 0}
-
-            {selectedBestRunner?.reasoning && (
-              <div style={{ marginTop: "10px", color: "#cbd5e1" }}>
-                <strong style={{ color: "#ffffff" }}>Why this pick?</strong>
-                <ul style={{ margin: "6px 0 0 18px", padding: 0 }}>
-                  {selectedBestRunner.reasoning.map((reason, index) => (
-                    <li key={index}>{reason}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            <h3 style={{ marginBottom: "8px" }}>Track Record Coming Soon</h3>
+            <p style={{ color: "#94a3b8", margin: 0 }}>
+              Results will appear once PlaceDash starts tracking completed races.
+            </p>
           </div>
-
-          <div style={{ overflowX: "auto" }}>
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                fontSize: "13px",
-              }}
-            >
-              <thead>
-                <tr style={{ color: "#94a3b8", textAlign: "left" }}>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>No.</th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Horse</th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Jockey</th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Trainer</th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Barrier</th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Form</th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Starts</th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Places</th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Place %</th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>AI</th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Reasoning</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {scoredRunners.map((runner) => {
-                  const isAiPick =
-                    selectedBestRunner &&
-                    runner.horse === selectedBestRunner.horse &&
-                    runner.number === selectedBestRunner.number;
-
-                  return (
-                    <tr
-                      key={`${runner.number}-${runner.horse}`}
-                      style={{
-                        background: isAiPick
-                          ? "rgba(34,197,94,0.12)"
-                          : "transparent",
-                        color: isAiPick ? "#ffffff" : "#cbd5e1",
-                      }}
-                    >
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.number || "-"}</td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontWeight: isAiPick ? "700" : "500" }}>
-                        {runner.horse}
-                        {isAiPick && (
-                          <span style={{ color: "#22c55e", marginLeft: "8px" }}>
-                            AI Pick
-                          </span>
-                        )}
-                      </td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.jockey || "-"}</td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.trainer || "-"}</td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.draw || "-"}</td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.form || "-"}</td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.starts || 0}</td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.places || 0}</td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.displayPlacePercent || 0}%</td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                        <span
-                          style={{
-                            padding: "5px 8px",
-                            borderRadius: "999px",
-                            fontSize: "11px",
-                            fontWeight: "700",
-                            color:
-                              runner.confidence === "HIGH"
-                                ? "#22c55e"
-                                : runner.confidence === "MEDIUM"
-                                ? "#facc15"
-                                : "#ef4444",
-                            background:
-                              runner.confidence === "HIGH"
-                                ? "rgba(34,197,94,0.12)"
-                                : runner.confidence === "MEDIUM"
-                                ? "rgba(250,204,21,0.12)"
-                                : "rgba(239,68,68,0.12)",
-                          }}
-                        >
-                          {runner.confidence} · {runner.score}
-                        </span>
-                      </td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)", color: "#94a3b8" }}>
-                        {(runner.reasoning || []).slice(0, 2).join(" · ")}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "12px" }}>
-            Odds are not shown yet. This table uses available FormFav form data
-            and PlaceDash scoring.
-          </p>
         </div>
-      )}
-
-      <div
-        style={{
-          marginTop: "40px",
-          padding: "20px",
-          border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: "16px",
-        }}
-      >
-        <h2 style={{ marginBottom: "15px" }}>Demo Track Record</h2>
 
         <div
           style={{
+            marginTop: "40px",
             padding: "20px",
-            background: "rgba(255,255,255,0.04)",
-            borderRadius: "12px",
-            marginTop: "15px",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: "16px",
+            background: "rgba(2,8,18,0.45)",
           }}
         >
-          <h3 style={{ marginBottom: "8px" }}>Track Record Coming Soon</h3>
-          <p style={{ color: "#94a3b8", margin: 0 }}>
-            Results will appear once PlaceDash starts tracking completed races.
+          <h2 style={{ marginBottom: "15px" }}>Today’s Race Summary</h2>
+
+          <div style={{ display: "grid", gap: "10px" }}>
+            {recentPicks.length === 0 ? (
+              <p style={{ color: "#94a3b8" }}>No saved picks yet.</p>
+            ) : (
+              recentPicks.map((r, i) => (
+                <div
+                  key={i}
+                  style={{
+                    padding: "10px 0",
+                    borderBottom: "1px solid rgba(255,255,255,0.08)",
+                  }}
+                >
+                  <div style={{ fontWeight: "700", color: "#ffffff" }}>
+                    {r.race} · {r.time}
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginTop: "4px",
+                    }}
+                  >
+                    <span>
+                      Pick: {i === 0 ? r.horse : "🔒 Upgrade to reveal pick"}
+                    </span>
+                    <span style={{ color: "#facc15", fontWeight: "700" }}>
+                      {r.confidence}
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      color: "#94a3b8",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    Date: {r.date}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          <p style={{ color: "#94a3b8", marginTop: "10px", fontSize: "12px" }}>
+            Updated daily. Locked selections are available to upgraded members.
           </p>
         </div>
-      </div>
 
-      <div
-        style={{
-          marginTop: "40px",
-          padding: "20px",
-          border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: "16px",
-        }}
-      >
-        <h2 style={{ marginBottom: "15px" }}>Today’s Race Summary</h2>
-
-        <div style={{ display: "grid", gap: "10px" }}>
-          {recentPicks.length === 0 ? (
-            <p style={{ color: "#94a3b8" }}>No saved picks yet.</p>
-          ) : (
-            recentPicks.map((r, i) => (
-              <div
-                key={i}
-                style={{
-                  padding: "10px 0",
-                  borderBottom: "1px solid rgba(255,255,255,0.08)",
-                }}
-              >
-                <div style={{ fontWeight: "700", color: "#ffffff" }}>
-                  {r.race} · {r.time}
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginTop: "4px",
-                  }}
-                >
-                  <span>
-                    Pick: {i === 0 ? r.horse : "🔒 Upgrade to reveal pick"}
-                  </span>
-                  <span style={{ color: "#facc15", fontWeight: "700" }}>
-                    {r.confidence}
-                  </span>
-                </div>
-
-                <div
-                  style={{
-                    color: "#94a3b8",
-                    fontSize: "12px",
-                    marginTop: "4px",
-                  }}
-                >
-                  Date: {r.date}
-                </div>
-              </div>
-            ))
-          )}
+        <div style={{ marginTop: "40px", fontSize: "12px", color: "#94a3b8" }}>
+          <a href="/privacy" style={{ marginRight: "10px" }}>
+            Privacy Policy
+          </a>
+          <a href="/terms" style={{ marginRight: "10px" }}>
+            Terms
+          </a>
+          <a href="/disclaimer">Disclaimer</a>
         </div>
-
-        <p style={{ color: "#94a3b8", marginTop: "10px", fontSize: "12px" }}>
-          Updated daily. Locked selections are available to upgraded members.
-        </p>
-      </div>
-
-      <div style={{ marginTop: "40px", fontSize: "12px", color: "#94a3b8" }}>
-        <a href="/privacy" style={{ marginRight: "10px" }}>
-          Privacy Policy
-        </a>
-        <a href="/terms" style={{ marginRight: "10px" }}>
-          Terms
-        </a>
-        <a href="/disclaimer">Disclaimer</a>
       </div>
     </main>
   );
