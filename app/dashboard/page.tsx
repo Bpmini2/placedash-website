@@ -37,6 +37,54 @@ export default function Dashboard() {
     return Math.round(score / lastThree.length);
   }
 
+  function getRunnerReasoning(runner) {
+    const reasons = [];
+    const starts = Number(runner.starts || 0);
+    const places = Number(runner.places || 0);
+    const placePercent = Number(runner.displayPlacePercent || 0);
+    const score = Number(runner.score || 0);
+
+    if (placePercent >= 50) {
+      reasons.push("Strong place record");
+    } else if (placePercent >= 35) {
+      reasons.push("Solid place record");
+    }
+
+    if (starts >= 10) {
+      reasons.push("Experienced runner");
+    } else if (starts >= 3) {
+      reasons.push("Meets minimum race experience");
+    }
+
+    if (runner.form) {
+      reasons.push("Recent form support");
+    }
+
+    if (runner.draw && Number(runner.draw) > 0 && Number(runner.draw) <= 6) {
+      reasons.push("Favourable barrier");
+    }
+
+    if (runner.jockey) {
+      reasons.push("Jockey data available");
+    }
+
+    if (runner.trainer) {
+      reasons.push("Trainer data available");
+    }
+
+    if (score >= 60) {
+      reasons.push("High AI score");
+    } else if (score >= 40) {
+      reasons.push("Medium AI score");
+    }
+
+    if (reasons.length === 0) {
+      reasons.push("Limited data available");
+    }
+
+    return reasons.slice(0, 4);
+  }
+
   function scoreRunner(runner) {
     const starts = countStarts(runner);
     const wins = Number(runner.wins || 0);
@@ -77,12 +125,17 @@ export default function Dashboard() {
     if (score >= 60) confidence = "HIGH";
     else if (score >= 40) confidence = "MEDIUM";
 
-    return {
+    const scoredRunner = {
       ...runner,
       score: Math.round(score),
       confidence,
       starts,
       displayPlacePercent: Math.round(horsePlacePercent),
+    };
+
+    return {
+      ...scoredRunner,
+      reasoning: getRunnerReasoning(scoredRunner),
     };
   }
 
@@ -158,8 +211,8 @@ export default function Dashboard() {
     <main
       style={{
         padding: "32px 48px",
-                width: "100%",
-                minHeight: "100vh",
+        width: "100%",
+        minHeight: "100vh",
         backgroundImage:
           'linear-gradient(rgba(2,8,18,0.86), rgba(2,8,18,0.91)), url("/racehorse-bg.png")',
         backgroundRepeat: "no-repeat",
@@ -286,6 +339,27 @@ export default function Dashboard() {
                   ? "Click to view full race card"
                   : "AI-rated place selection available"}
               </div>
+
+              {isFreePick && bestRunner?.reasoning && (
+                <div
+                  style={{
+                    marginTop: "12px",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    background: "rgba(255,255,255,0.04)",
+                    color: "#94a3b8",
+                    fontSize: "12px",
+                    lineHeight: "1.5",
+                  }}
+                >
+                  <strong style={{ color: "#ffffff" }}>AI Reasoning</strong>
+                  <ul style={{ margin: "6px 0 0 16px", padding: 0 }}>
+                    {bestRunner.reasoning.map((reason, reasonIndex) => (
+                      <li key={reasonIndex}>{reason}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               <div
                 style={{
@@ -423,6 +497,17 @@ export default function Dashboard() {
             {selectedBestRunner?.horse || "No selection"} ·{" "}
             {selectedBestRunner?.confidence || "LOW"} confidence · Score{" "}
             {selectedBestRunner?.score || 0}
+
+            {selectedBestRunner?.reasoning && (
+              <div style={{ marginTop: "10px", color: "#cbd5e1" }}>
+                <strong style={{ color: "#ffffff" }}>Why this pick?</strong>
+                <ul style={{ margin: "6px 0 0 18px", padding: 0 }}>
+                  {selectedBestRunner.reasoning.map((reason, index) => (
+                    <li key={index}>{reason}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
           <div style={{ overflowX: "auto" }}>
@@ -435,36 +520,17 @@ export default function Dashboard() {
             >
               <thead>
                 <tr style={{ color: "#94a3b8", textAlign: "left" }}>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
-                    No.
-                  </th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
-                    Horse
-                  </th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
-                    Jockey
-                  </th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
-                    Trainer
-                  </th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
-                    Barrier
-                  </th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
-                    Form
-                  </th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
-                    Starts
-                  </th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
-                    Places
-                  </th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
-                    Place %
-                  </th>
-                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>
-                    AI
-                  </th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>No.</th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Horse</th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Jockey</th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Trainer</th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Barrier</th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Form</th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Starts</th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Places</th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Place %</th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>AI</th>
+                  <th style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.12)" }}>Reasoning</th>
                 </tr>
               </thead>
 
@@ -485,9 +551,7 @@ export default function Dashboard() {
                         color: isAiPick ? "#ffffff" : "#cbd5e1",
                       }}
                     >
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                        {runner.number || "-"}
-                      </td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.number || "-"}</td>
                       <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)", fontWeight: isAiPick ? "700" : "500" }}>
                         {runner.horse}
                         {isAiPick && (
@@ -496,27 +560,13 @@ export default function Dashboard() {
                           </span>
                         )}
                       </td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                        {runner.jockey || "-"}
-                      </td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                        {runner.trainer || "-"}
-                      </td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                        {runner.draw || "-"}
-                      </td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                        {runner.form || "-"}
-                      </td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                        {runner.starts || 0}
-                      </td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                        {runner.places || 0}
-                      </td>
-                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                        {runner.displayPlacePercent || 0}%
-                      </td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.jockey || "-"}</td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.trainer || "-"}</td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.draw || "-"}</td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.form || "-"}</td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.starts || 0}</td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.places || 0}</td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>{runner.displayPlacePercent || 0}%</td>
                       <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                         <span
                           style={{
@@ -540,6 +590,9 @@ export default function Dashboard() {
                         >
                           {runner.confidence} · {runner.score}
                         </span>
+                      </td>
+                      <td style={{ padding: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)", color: "#94a3b8" }}>
+                        {(runner.reasoning || []).slice(0, 2).join(" · ")}
                       </td>
                     </tr>
                   );
