@@ -22,7 +22,6 @@ function formatRaceTime(startTime: string | null, timezone: string | null) {
 
 function getStateFromTimezone(timezone: string | null) {
   if (!timezone) return "";
-
   if (timezone.includes("Perth")) return "WA";
   if (timezone.includes("Sydney")) return "NSW";
   if (timezone.includes("Melbourne")) return "VIC";
@@ -30,13 +29,11 @@ function getStateFromTimezone(timezone: string | null) {
   if (timezone.includes("Adelaide")) return "SA";
   if (timezone.includes("Hobart")) return "TAS";
   if (timezone.includes("Darwin")) return "NT";
-
   return "";
 }
 
 function getTimezoneLabel(timezone: string | null) {
   if (!timezone) return "";
-
   if (timezone.includes("Perth")) return "AWST";
   if (timezone.includes("Adelaide")) return "ACST";
   if (timezone.includes("Darwin")) return "ACST";
@@ -44,20 +41,205 @@ function getTimezoneLabel(timezone: string | null) {
   if (timezone.includes("Sydney")) return "AEST/AEDT";
   if (timezone.includes("Melbourne")) return "AEST/AEDT";
   if (timezone.includes("Hobart")) return "AEST/AEDT";
-
   return "";
 }
 
 function isRaceUpcoming(startTime: string | null) {
   if (!startTime) return false;
-
   const raceStart = new Date(startTime).getTime();
   const now = Date.now();
-
-  // Small buffer so a race does not disappear exactly on the minute it starts.
   const fiveMinutesAgo = now - 5 * 60 * 1000;
-
   return raceStart > fiveMinutesAgo;
+}
+
+function countStarts(runner: any) {
+  if (typeof runner.starts === "number") return runner.starts;
+  if (!runner.form) return 0;
+  return runner.form.replace(/[^0-9]/g, "").length;
+}
+
+function evaluateRecentForm(form: string, last20Starts?: string) {
+  const formText = last20Starts || form;
+  if (!formText) return 30;
+
+  const results = formText
+    .replace(/[^0-9]/g, "")
+    .split("")
+    .map(Number)
+    .filter((n) => n > 0);
+
+  if (results.length === 0) return 30;
+
+  const recentResults = results.slice(0, 5);
+
+  const score = recentResults.reduce((total, result, index) => {
+    const recencyWeight = index === 0 ? 1.25 : index === 1 ? 1.1 : 1;
+
+    if (result === 1) return total + 90 * recencyWeight;
+    if (result === 2) return total + 75 * recencyWeight;
+    if (result === 3) return total + 60 * recencyWeight;
+    if (result <= 5) return total + 38 * recencyWeight;
+    return total + 15 * recencyWeight;
+  }, 0);
+
+  return Math.round(score / recentResults.length);
+}
+
+function scoreRunner(runner: any) {
+  const starts = countStarts(runner);
+  const wins = Number(runner.wins || 0);
+  const places = Number(runner.places || 0);
+
+  const placePercent =
+    typeof runner.placePercent === "number"
+      ? runner.placePercent * 100
+      : starts > 0
+      ? (places / starts) * 100
+      : 0;
+
+  const winPercent =
+    typeof runner.winPercent === "number"
+      ? runner.winPercent * 100
+      : starts > 0
+      ? (wins / starts) * 100
+      : 0;
+
+  const recentForm = evaluateRecentForm(runner.form, runner.last20Starts);
+
+  let score = 0;
+  score += placePercent * 0.38;
+  score += winPercent * 0.12;
+  score += recentForm * 0.28;
+
+  if (runner.jockey) score += 4;
+  if (runner.trainer) score += 4;
+
+  if (runner.draw) {
+    score += Math.max(0, 10 - parseInt(String(runner.draw))) * 0.45;
+  }
+
+  const weight = Number(runner.lbs || 0);
+  const claim = Number(runner.claim || 0);
+  const adjustedWeight = weight && claim ? weight - claim : weight;
+
+  if (adjustedWeight && adjustedWeight <= 54) score += 4;
+  else if (adjustedWeight && adjustedWeight <= 56) score += 2;
+  else if (adjustedWeight && adjustedWeight >= 60) score -= 3;
+
+  score = Math.min(100, Math.max(0, score));
+
+  let confidence = "LOW";
+  if (score >= 65) confidence = "HIGH";
+  else if (score >= 45) confidence = "MEDIUM";
+
+  const reasoning = [];
+
+  if (placePercent >= 55) reasoning.push("Strong overall place record");
+  else if (placePercent >= 40) reasoning.push("Solid overall place record");
+
+  if (recentForm >= 65) reasoning.push("Strong recent form");
+  else if (recentForm >= 45) reasoning.push("Recent form support");
+
+  if (starts >= 10) reasoning.push("Experienced runner");
+  else if (starts >= 3) reasoning.push("Meets minimum race experience");
+
+  if (runner.draw && Number(runner.draw) > 0 && Number(runner.draw) <= 6) {
+    reasoning.push("Favourable barrier");
+  }
+
+  if (adjustedWeight && adjustedWeight <= 56) {
+    reasoning.push("Manageable weight");
+  }
+
+  if (reasoning.length === 0) reasoning.push("Limited data available");
+
+  return {
+    ...runner,
+    score: Math.round(score),
+    confidence,
+    displayPlacePercent: Math.round(placePercent),
+    reasoning: reasoning.slice(0, 5),
+  };
+}
+
+function getBestRunner(race: any) {
+  if (!race.runners || race.runners.length === 0) return null;
+
+  return (
+    race.runners
+      .filter((runner: any) => countStarts(runner) >= 3)
+      .filter((runner: any) => !runner.scratched)
+      .map((runner: any) => scoreRunner(runner))
+      .sort((a: any, b: any) => b.score - a.score)[0] || null
+  );
+}
+
+async function savePickToSupabase(race: any, bestRunner: any, pickDate: string) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseSecretKey || !bestRunner) {
+    return;
+  }
+
+  const existingRes = await fetch(
+    `${supabaseUrl}/rest/v1/placedash_picks?pick_date=eq.${pickDate}&course=eq.${encodeURIComponent(
+      race.course || ""
+    )}&race_number=eq.${encodeURIComponent(String(race.race_number || ""))}`,
+    {
+      headers: {
+        apikey: supabaseSecretKey,
+        Authorization: `Bearer ${supabaseSecretKey}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  const existing = await existingRes.json();
+
+  if (Array.isArray(existing) && existing.length > 0) {
+    return;
+  }
+
+  await fetch(`${supabaseUrl}/rest/v1/placedash_picks`, {
+    method: "POST",
+    headers: {
+      apikey: supabaseSecretKey,
+      Authorization: `Bearer ${supabaseSecretKey}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify({
+      pick_date: pickDate,
+      source: "FormFav",
+
+      course: race.course || "",
+      race_number: String(race.race_number || ""),
+      race_name: race.race_name || "",
+      state: race.state || "",
+      off_time: race.off_time || "",
+      start_time: race.start_time || null,
+      timezone_label: race.timezone_label || "",
+      distance: race.distance || "",
+      condition: race.condition || "",
+      weather: race.weather || "",
+
+      horse_number: String(bestRunner.number || ""),
+      horse_name: bestRunner.horse || "",
+      jockey: bestRunner.jockey || "",
+      trainer: bestRunner.trainer || "",
+      barrier: String(bestRunner.draw || ""),
+      weight: String(bestRunner.lbs || ""),
+      form: bestRunner.form || "",
+
+      confidence: bestRunner.confidence || "",
+      score: bestRunner.score || 0,
+      place_percent: bestRunner.displayPlacePercent || 0,
+      reasoning: bestRunner.reasoning || [],
+
+      result_status: "pending",
+    }),
+  });
 }
 
 export async function GET() {
@@ -100,12 +282,8 @@ export async function GET() {
           numberOfRunners: race.numberOfRunners,
         }))
       )
-      .filter((race: any) => {
-        return race.numberOfRunners >= 8 && race.numberOfRunners <= 11;
-      })
-      .filter((race: any) => {
-        return isRaceUpcoming(race.startTime);
-      })
+      .filter((race: any) => race.numberOfRunners >= 8 && race.numberOfRunners <= 11)
+      .filter((race: any) => isRaceUpcoming(race.startTime))
       .slice(0, 8);
 
     const racecards = await Promise.all(
@@ -129,44 +307,42 @@ export async function GET() {
         const startTime = card?.startTime || race.startTime || null;
 
         const runners = (card?.runners || []).map((runner: any) => ({
-  number: runner.number || "",
-  horse: runner.name || "Unknown",
-  jockey: runner.jockey || "",
-  trainer: runner.trainer || "",
-  draw: runner.barrier || "",
-  lbs: runner.weight || "",
-  claim: runner.claim || "",
-  age: runner.age || "",
-  sex: runner.sex || "",
-  form: runner.form || "",
-  last20Starts: runner.last20Starts || "",
-  careerPrizeMoney: runner.careerPrizeMoney || "",
-  scratched: runner.scratched || false,
+          number: runner.number || "",
+          horse: runner.name || "Unknown",
+          jockey: runner.jockey || "",
+          trainer: runner.trainer || "",
+          draw: runner.barrier || "",
+          lbs: runner.weight || "",
+          claim: runner.claim || "",
+          age: runner.age || "",
+          sex: runner.sex || "",
+          form: runner.form || "",
+          last20Starts: runner.last20Starts || "",
+          careerPrizeMoney: runner.careerPrizeMoney || "",
+          scratched: runner.scratched || false,
 
-  starts: runner?.stats?.overall?.starts || 0,
-  wins: runner?.stats?.overall?.wins || 0,
-  places: runner?.stats?.overall?.places || 0,
-  seconds: runner?.stats?.overall?.seconds || 0,
-  thirds: runner?.stats?.overall?.thirds || 0,
-  placePercent: runner?.stats?.overall?.placePercent || 0,
-  winPercent: runner?.stats?.overall?.winPercent || 0,
+          starts: runner?.stats?.overall?.starts || 0,
+          wins: runner?.stats?.overall?.wins || 0,
+          places: runner?.stats?.overall?.places || 0,
+          seconds: runner?.stats?.overall?.seconds || 0,
+          thirds: runner?.stats?.overall?.thirds || 0,
+          placePercent: runner?.stats?.overall?.placePercent || 0,
+          winPercent: runner?.stats?.overall?.winPercent || 0,
 
-  trackStats: runner?.stats?.track || null,
-  distanceStats: runner?.stats?.distance || null,
-  trackDistanceStats: runner?.stats?.trackDistance || null,
-  conditionStats: runner?.stats?.condition || null,
+          trackStats: runner?.stats?.track || null,
+          distanceStats: runner?.stats?.distance || null,
+          trackDistanceStats: runner?.stats?.trackDistance || null,
+          conditionStats: runner?.stats?.condition || null,
 
-  speedMap: runner.speedMap || null,
-  classProfile: runner.classProfile || null,
-  raceClassFit: runner.raceClassFit || null,
-  gearChange: runner.gearChange || null,
+          speedMap: runner.speedMap || null,
+          classProfile: runner.classProfile || null,
+          raceClassFit: runner.raceClassFit || null,
+          gearChange: runner.gearChange || null,
 
-  firstStarter: (runner?.stats?.overall?.starts || 0) === 0,
-}));
+          firstStarter: (runner?.stats?.overall?.starts || 0) === 0,
+        }));
 
-        const hasFirstStarter = runners.some(
-          (runner: any) => runner.firstStarter
-        );
+        const hasFirstStarter = runners.some((runner: any) => runner.firstStarter);
 
         return {
           course: card?.track || race.track,
@@ -197,12 +373,26 @@ export async function GET() {
       })
       .slice(0, 6);
 
+    await Promise.all(
+      cleanRacecards.map(async (race: any) => {
+        const bestRunner = getBestRunner(race);
+
+        if (
+          bestRunner &&
+          (bestRunner.confidence === "HIGH" || bestRunner.confidence === "MEDIUM")
+        ) {
+          await savePickToSupabase(race, bestRunner, today);
+        }
+      })
+    );
+
     return NextResponse.json({
       ok: true,
       source: "FormFav",
       date: today,
       totalMeetings: meetings.length,
       candidateRaceCount: candidateRaces.length,
+      savedToSupabase: true,
       racecards: cleanRacecards,
       message:
         cleanRacecards.length === 0
