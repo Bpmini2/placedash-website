@@ -129,20 +129,32 @@ export async function GET() {
         const startTime = card?.startTime || race.startTime || null;
 
         const runners = (card?.runners || []).map((runner: any) => ({
-          number: runner.number || "",
-          horse: runner.name || "Unknown",
-          jockey: runner.jockey || "",
-          trainer: runner.trainer || "",
-          draw: runner.barrier || "",
-          lbs: runner.weight || "",
-          form: runner.form || "",
-          starts: runner?.stats?.overall?.starts || 0,
-          wins: runner?.stats?.overall?.wins || 0,
-          places: runner?.stats?.overall?.places || 0,
-          placePercent: runner?.stats?.overall?.placePercent || 0,
-          winPercent: runner?.stats?.overall?.winPercent || 0,
-          firstStarter: (runner?.stats?.overall?.starts || 0) === 0,
-        }));
+  number: runner.number || "",
+  horse: runner.name || "Unknown",
+  jockey: runner.jockey || "",
+  trainer: runner.trainer || "",
+  draw: runner.barrier || "",
+  lbs: runner.weight || "",
+  form: runner.form || "",
+
+  // TEST ODDS FIELDS
+  odds:
+    runner.odds ||
+    runner.price ||
+    runner.fixedOdds ||
+    runner.winOdds ||
+    runner.market?.odds ||
+    runner.market?.win ||
+    "",
+
+  starts: runner?.stats?.overall?.starts || 0,
+  wins: runner?.stats?.overall?.wins || 0,
+  places: runner?.stats?.overall?.places || 0,
+  placePercent: runner?.stats?.overall?.placePercent || 0,
+  winPercent: runner?.stats?.overall?.winPercent || 0,
+
+  firstStarter: (runner?.stats?.overall?.starts || 0) === 0,
+}));
 
         const hasFirstStarter = runners.some(
           (runner: any) => runner.firstStarter
