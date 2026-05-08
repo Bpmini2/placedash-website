@@ -135,23 +135,31 @@ export async function GET() {
   trainer: runner.trainer || "",
   draw: runner.barrier || "",
   lbs: runner.weight || "",
+  claim: runner.claim || "",
+  age: runner.age || "",
+  sex: runner.sex || "",
   form: runner.form || "",
-
-  // TEST ODDS FIELDS
-  odds:
-    runner.odds ||
-    runner.price ||
-    runner.fixedOdds ||
-    runner.winOdds ||
-    runner.market?.odds ||
-    runner.market?.win ||
-    "",
+  last20Starts: runner.last20Starts || "",
+  careerPrizeMoney: runner.careerPrizeMoney || "",
+  scratched: runner.scratched || false,
 
   starts: runner?.stats?.overall?.starts || 0,
   wins: runner?.stats?.overall?.wins || 0,
   places: runner?.stats?.overall?.places || 0,
+  seconds: runner?.stats?.overall?.seconds || 0,
+  thirds: runner?.stats?.overall?.thirds || 0,
   placePercent: runner?.stats?.overall?.placePercent || 0,
   winPercent: runner?.stats?.overall?.winPercent || 0,
+
+  trackStats: runner?.stats?.track || null,
+  distanceStats: runner?.stats?.distance || null,
+  trackDistanceStats: runner?.stats?.trackDistance || null,
+  conditionStats: runner?.stats?.condition || null,
+
+  speedMap: runner.speedMap || null,
+  classProfile: runner.classProfile || null,
+  raceClassFit: runner.raceClassFit || null,
+  gearChange: runner.gearChange || null,
 
   firstStarter: (runner?.stats?.overall?.starts || 0) === 0,
 }));
