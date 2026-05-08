@@ -159,7 +159,7 @@ export default function Dashboard() {
       reasons.push("Limited data available");
     }
 
-    return [...new Set(reasons)].slice(0, 5);
+    return Array.from(new Set(reasons)).slice(0, 5);
   }
 
   function scoreRunner(runner: any) {
