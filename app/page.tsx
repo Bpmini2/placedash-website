@@ -142,7 +142,63 @@ Example results shown for demonstration purposes only. Not indicative of future 
     </div>
   </div>
 </section>
+<section id="method" className="section">
+  <div className="sectionTitle center">
+    <span>The PlaceDash Method</span>
+    <h2>AI-powered place racing analysis</h2>
+    <p>
+      PlaceDash is designed around a disciplined place betting strategy focused
+      on consistency rather than chasing high-risk long-shot winners.
+    </p>
+  </div>
 
+  <div className="statsGrid">
+    <div>
+      <strong>Top 3</strong>
+      <span>Place bets win if your horse finishes 1st, 2nd or 3rd.</span>
+    </div>
+
+    <div>
+      <strong>10%</strong>
+      <span>Example staking approach based on current bank balance.</span>
+    </div>
+
+    <div>
+      <strong>8–11</strong>
+      <span>Only races with 8 to 11 runners are analysed.</span>
+    </div>
+
+    <div>
+      <strong>3+</strong>
+      <span>Only horses with at least 3 previous starts are considered.</span>
+    </div>
+  </div>
+
+  <div className="dashboardPreview" style={{ marginTop: "30px" }}>
+    <div>
+      <span>How it works</span>
+      <h2>The theory behind PlaceDash</h2>
+      <p>
+        Instead of selecting outright winners, PlaceDash AI analyses Australian
+        horse races to identify runners with stronger probabilities of finishing
+        in the top 3 placings.
+      </p>
+      <p>
+        The model only analyses Australian races that meet strict filtering
+        conditions: 8–11 runners, no first starters, and horses with at least 3
+        previous starts.
+      </p>
+      <p>
+        Each selection receives an AI confidence rating, performance score, and
+        reasoning summary without revealing the proprietary scoring formula.
+      </p>
+      <p className="smallDisclaimer">
+        PlaceDash does not provide gambling advice or guaranteed outcomes. It is
+        designed as an AI-powered racing analysis tool only.
+      </p>
+    </div>
+  </div>
+</section>
 <footer style={{ padding: "30px 40px", textAlign: "center", color: "#94a3b8" }}>
   <p>© 2026 PlaceDash. Information and data-analysis service only.</p>
   <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: "10px" }}>
