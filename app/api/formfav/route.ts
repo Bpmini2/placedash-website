@@ -124,7 +124,7 @@ export async function GET() {
 
         const raceData = await raceRes.json();
         const card = raceData?.data || raceData;
-console.log("FORMFAV SAMPLE RUNNER:", JSON.stringify(card?.runners?.[0], null, 2));
+
         const timezone = card?.timezone || race.timezone || null;
         const startTime = card?.startTime || race.startTime || null;
 
