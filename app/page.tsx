@@ -147,16 +147,45 @@ export default function Home() {
         gap: "18px",
       }}
     >
-      <img
-        src="/placedash-logo.png"
-        alt="PlaceDash"
-        style={{
-          width: "220px",
-          height: "auto",
-          objectFit: "contain",
-          display: "block",
-        }}
-      />
+      <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "16px",
+  }}
+>
+  <div
+    style={{
+      width: "70px",
+      height: "70px",
+      borderRadius: "18px",
+      background: "#20c865",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: "#07111f",
+      fontSize: "30px",
+      fontWeight: 900,
+      fontStyle: "italic",
+      letterSpacing: "-3px",
+      boxShadow: "0 10px 25px rgba(32,200,101,0.35)",
+    }}
+  >
+    123
+  </div>
+
+  <span
+    style={{
+      fontSize: "44px",
+      fontWeight: 900,
+      color: "#07111f",
+      letterSpacing: "-1.5px",
+      lineHeight: 1,
+    }}
+  >
+    PlaceDash
+  </span>
+</div>
     </div>
 
     {/* CENTER MENU */}
