@@ -127,19 +127,19 @@ export default function Home() {
     marginTop: "18px",
     background: "rgba(255,255,255,0.97)",
     borderRadius: "30px",
-    padding: "22px 52px",
+    padding: "22px 48px",
     boxShadow: "0 18px 45px rgba(0,0,0,0.35)",
   }}
 >
   <div
     style={{
-      display: "grid",
-      gridTemplateColumns: "auto 1fr auto",
+      display: "flex",
       alignItems: "center",
-      gap: "48px",
+      justifyContent: "space-between",
       width: "100%",
     }}
   >
+    {/* LEFT SIDE */}
     <div
       style={{
         display: "flex",
@@ -147,55 +147,71 @@ export default function Home() {
         gap: "18px",
       }}
     >
-      <div
+      <img
+        src="/placedash-logo.png"
+        alt="PlaceDash"
         style={{
-          width: "86px",
-          height: "86px",
-          borderRadius: "20px",
-          overflow: "hidden",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          width: "220px",
+          height: "auto",
+          objectFit: "contain",
+          display: "block",
         }}
-      >
-        <img
-  src="/placedash-logo.png"
-  alt="PlaceDash"
-  style={{
-    width: "220px",
-    height: "auto",
-    objectFit: "contain",
-    display: "block",
-  }}
-/>
-      </div>
-
-      <span
-        style={{
-          fontSize: "46px",
-          fontWeight: 800,
-          color: "#07111f",
-          letterSpacing: "-1.5px",
-          lineHeight: 1,
-        }}
-      >
-        PlaceDash
-      </span>
+      />
     </div>
 
+    {/* CENTER MENU */}
     <nav
       style={{
         display: "flex",
-        justifyContent: "center",
-        gap: "48px",
+        gap: "46px",
       }}
     >
-      <a style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }} href="/dashboard">Predictions</a>
-      <a style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }} href="#method">Method</a>
-      <a style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }} href="#track-record">Track Record</a>
-      <a style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }} href="#pricing">Pricing</a>
+      <a
+        href="/dashboard"
+        style={{
+          color: "#07111f",
+          fontWeight: 700,
+          textDecoration: "none",
+        }}
+      >
+        Predictions
+      </a>
+
+      <a
+        href="#method"
+        style={{
+          color: "#07111f",
+          fontWeight: 700,
+          textDecoration: "none",
+        }}
+      >
+        Method
+      </a>
+
+      <a
+        href="#track-record"
+        style={{
+          color: "#07111f",
+          fontWeight: 700,
+          textDecoration: "none",
+        }}
+      >
+        Track Record
+      </a>
+
+      <a
+        href="#pricing"
+        style={{
+          color: "#07111f",
+          fontWeight: 700,
+          textDecoration: "none",
+        }}
+      >
+        Pricing
+      </a>
     </nav>
 
+    {/* BUTTON */}
     <a
       href="/dashboard"
       style={{
