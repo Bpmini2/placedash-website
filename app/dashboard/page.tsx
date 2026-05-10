@@ -297,19 +297,19 @@ export default function Dashboard() {
   const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
 
   return (
-    <main
-      style={{
-        padding: "32px 48px",
-        width: "100%",
-        minHeight: "100vh",
-        backgroundImage:
-          'linear-gradient(rgba(2,8,18,0.86), rgba(2,8,18,0.91)), url("/racehorse-bg.png")',
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-        backgroundPosition: "center top",
-        backgroundAttachment: "fixed",
-      }}
-    >
+  <main
+    style={{
+      padding: "32px 48px",
+      width: "100%",
+      minHeight: "100vh",
+      backgroundImage:
+        'linear-gradient(rgba(2,8,18,0.86), rgba(2,8,18,0.91)), url("/racehorse-bg.png")',
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "cover",
+      backgroundPosition: "center top",
+      backgroundAttachment: "fixed",
+    }}
+  >
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
      <header
   style={{
