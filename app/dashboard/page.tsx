@@ -367,10 +367,10 @@ export default function Dashboard() {
       <a href="/" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
         Home
       </a>
-      <a href="#track-record" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
+      <a href="/#track-record" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
         Track Record
       </a>
-      <a href="#pricing" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
+      <a href="/#pricing" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
         Pricing
       </a>
     </nav>
