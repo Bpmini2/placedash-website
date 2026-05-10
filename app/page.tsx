@@ -122,12 +122,12 @@ export default function Home() {
       <div style={{ maxWidth: "1320px", margin: "0 auto" }}>
         <header
   style={{
-    width: "calc(100vw - 48px)",
-    marginLeft: "calc(50% - 50vw + 24px)",
-    marginTop: "20px",
+    width: "calc(100vw - 44px)",
+    marginLeft: "calc(50% - 50vw + 22px)",
+    marginTop: "18px",
     background: "rgba(255,255,255,0.97)",
-    borderRadius: "28px",
-    padding: "22px 36px",
+    borderRadius: "30px",
+    padding: "22px 52px",
     boxShadow: "0 18px 45px rgba(0,0,0,0.35)",
   }}
 >
@@ -136,46 +136,65 @@ export default function Home() {
       display: "grid",
       gridTemplateColumns: "auto 1fr auto",
       alignItems: "center",
-      gap: "40px",
+      gap: "48px",
       width: "100%",
     }}
   >
-    <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-      <img
-  src="/placedash-logo.png"
-  alt="PlaceDash"
-  style={{
-    width: "220px",
-    maxWidth: "100%",
-    height: "auto",
-    objectFit: "contain",
-    display: "block",
-  }}
-/>
-
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "18px",
+      }}
+    >
       <div
         style={{
-          fontSize: "40px",
+          width: "86px",
+          height: "86px",
+          borderRadius: "20px",
+          overflow: "hidden",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <img
+          src="/placedash-logo.png"
+          alt="PlaceDash"
+          style={{
+            width: "220px",
+            height: "auto",
+            display: "block",
+            objectFit: "contain",
+            transform: "translateX(0px)",
+          }}
+        />
+      </div>
+
+      <span
+        style={{
+          fontSize: "46px",
           fontWeight: 800,
           color: "#07111f",
-          letterSpacing: "-1px",
+          letterSpacing: "-1.5px",
+          lineHeight: 1,
         }}
       >
         PlaceDash
-      </div>
+      </span>
     </div>
 
     <nav
       style={{
         display: "flex",
         justifyContent: "center",
-        gap: "42px",
+        gap: "48px",
       }}
     >
-      <a style={{ color: "#07111f", fontWeight: 600, textDecoration: "none" }} href="/dashboard">Predictions</a>
-      <a style={{ color: "#07111f", fontWeight: 600, textDecoration: "none" }} href="#method">Method</a>
-      <a style={{ color: "#07111f", fontWeight: 600, textDecoration: "none" }} href="#track-record">Track Record</a>
-      <a style={{ color: "#07111f", fontWeight: 600, textDecoration: "none" }} href="#pricing">Pricing</a>
+      <a style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }} href="/dashboard">Predictions</a>
+      <a style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }} href="#method">Method</a>
+      <a style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }} href="#track-record">Track Record</a>
+      <a style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }} href="#pricing">Pricing</a>
     </nav>
 
     <a
@@ -183,11 +202,12 @@ export default function Home() {
       style={{
         background: "#20c865",
         color: "#07111f",
-        padding: "16px 30px",
+        padding: "18px 34px",
         borderRadius: "16px",
         fontWeight: 800,
+        fontSize: "17px",
         textDecoration: "none",
-        boxShadow: "0 14px 35px rgba(32,200,101,0.35)",
+        boxShadow: "0 16px 35px rgba(32,200,101,0.35)",
         whiteSpace: "nowrap",
       }}
     >
