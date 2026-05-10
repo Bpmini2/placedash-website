@@ -92,7 +92,7 @@ export default function Home() {
               race: `Race ${race.race_number || ""}`,
               runners: race.runner_count || runners.length || 0,
               horse: firstRunner?.horse || "View dashboard",
-              confidence: "LIVE",
+              confidence: "PREVIEW",
             };
           }) || [];
 
@@ -311,8 +311,7 @@ export default function Home() {
             ))}
 
             <p className="smallDisclaimer">
-              Example preview only. Live selections are shown inside the
-              dashboard.
+              Preview example only. Official AI selections appear inside the live dashboard.
             </p>
           </div>
         </section>
@@ -396,7 +395,7 @@ export default function Home() {
         <section id="predictions" className="section">
   <div className="sectionTitle center">
     <span>Today’s Predictions</span>
-    <h2>Live qualifying races appear here daily</h2>
+    <h2>Qualifying races appear inside the live dashboard</h2>
 
     <p>
       PlaceDash only displays Australian races that pass the platform filters:
@@ -444,7 +443,7 @@ export default function Home() {
 
       <div style={{ marginTop: "30px" }}>
         <a className="primaryButton" href="/dashboard">
-          Open Live Dashboard
+          View Today’s Dashboard
         </a>
       </div>
     </div>
