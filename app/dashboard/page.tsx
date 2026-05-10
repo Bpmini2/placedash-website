@@ -510,6 +510,12 @@ color: "#b7c5d8",
               <div
   key={`${race.course}-${race.race_number}`}
   onClick={() => {
+    if (isFreePick) {
+  setSelectedRace(race);
+} else {
+  window.location.href = "/#pricing";
+}
+}}
     onMouseEnter={(e) => {
   e.currentTarget.style.transform = "translateY(-6px)";
   e.currentTarget.style.boxShadow =
