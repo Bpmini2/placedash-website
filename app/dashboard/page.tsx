@@ -311,6 +311,88 @@ export default function Dashboard() {
       }}
     >
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+     <header
+  style={{
+    width: "100%",
+    marginBottom: "70px",
+    background: "rgba(255,255,255,0.97)",
+    borderRadius: "30px",
+    padding: "22px 48px",
+    boxShadow: "0 18px 45px rgba(0,0,0,0.35)",
+  }}
+>
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      width: "100%",
+    }}
+  >
+    <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+      <div
+        style={{
+          width: "70px",
+          height: "70px",
+          borderRadius: "18px",
+          background: "#20c865",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#07111f",
+          fontSize: "30px",
+          fontWeight: 900,
+          fontStyle: "italic",
+          letterSpacing: "-3px",
+          boxShadow: "0 10px 25px rgba(32,200,101,0.35)",
+        }}
+      >
+        123
+      </div>
+
+      <span
+        style={{
+          fontSize: "44px",
+          fontWeight: 900,
+          color: "#07111f",
+          letterSpacing: "-1.5px",
+          lineHeight: 1,
+        }}
+      >
+        PlaceDash
+      </span>
+    </div>
+
+    <nav style={{ display: "flex", gap: "46px" }}>
+      <a href="/" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
+        Home
+      </a>
+      <a href="#track-record" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
+        Track Record
+      </a>
+      <a href="#pricing" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
+        Pricing
+      </a>
+    </nav>
+
+    <a
+      href="/"
+      style={{
+        background: "#20c865",
+        color: "#07111f",
+        padding: "18px 34px",
+        borderRadius: "16px",
+        fontWeight: 800,
+        fontSize: "17px",
+        textDecoration: "none",
+        boxShadow: "0 16px 35px rgba(32,200,101,0.35)",
+        whiteSpace: "nowrap",
+      }}
+    >
+      Back to Home
+    </a>
+  </div>
+</header>   
         <h1>Dashboard Preview</h1>
 
         <p style={{ color: "#94a3b8" }}>Today’s AI-powered place selections</p>
