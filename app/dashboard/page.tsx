@@ -393,9 +393,47 @@ export default function Dashboard() {
     </a>
   </div>
 </header>   
-        <h1>Dashboard Preview</h1>
+        <div style={{ marginBottom: "26px" }}>
+  <div
+    style={{
+      display: "inline-block",
+      marginBottom: "14px",
+      padding: "7px 14px",
+      borderRadius: "999px",
+      background: "rgba(34,197,94,0.14)",
+      color: "#22c55e",
+      fontSize: "13px",
+      fontWeight: 800,
+      letterSpacing: "0.08em",
+      textTransform: "uppercase",
+    }}
+  >
+    PlaceDash Live Dashboard
+  </div>
 
-        <p style={{ color: "#94a3b8" }}>Today’s AI-powered place selections</p>
+  <h1
+    style={{
+      margin: 0,
+      fontSize: "58px",
+      lineHeight: "1.02",
+      letterSpacing: "-2px",
+      color: "#ffffff",
+    }}
+  >
+    Today’s AI Dashboard
+  </h1>
+</div>
+
+        <p
+  style={{
+    color: "#b7c5d8",
+    fontSize: "17px",
+    marginTop: "-12px",
+    marginBottom: "18px",
+  }}
+>
+  AI-powered place selections for Australian racing.
+</p>
 
         <div
           style={{
