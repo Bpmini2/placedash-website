@@ -306,41 +306,43 @@ export async function GET() {
         const timezone = card?.timezone || race.timezone || null;
         const startTime = card?.startTime || race.startTime || null;
 
-        const runners = (card?.runners || []).map((runner: any) => ({
-          number: runner.number || "",
-          horse: runner.name || "Unknown",
-          jockey: runner.jockey || "",
-          trainer: runner.trainer || "",
-          draw: runner.barrier || "",
-          lbs: runner.weight || "",
-          claim: runner.claim || "",
-          age: runner.age || "",
-          sex: runner.sex || "",
-          form: runner.form || "",
-          last20Starts: runner.last20Starts || "",
-          careerPrizeMoney: runner.careerPrizeMoney || "",
-          scratched: runner.scratched || false,
+        const runners = (card?.runners || [])
+  .map((runner: any) => ({
+    number: runner.number || "",
+    horse: runner.name || "Unknown",
+    jockey: runner.jockey || "",
+    trainer: runner.trainer || "",
+    draw: runner.barrier || "",
+    lbs: runner.weight || "",
+    claim: runner.claim || "",
+    age: runner.age || "",
+    sex: runner.sex || "",
+    form: runner.form || "",
+    last20Starts: runner.last20Starts || "",
+    careerPrizeMoney: runner.careerPrizeMoney || "",
+    scratched: runner.scratched || false,
 
-          starts: runner?.stats?.overall?.starts || 0,
-          wins: runner?.stats?.overall?.wins || 0,
-          places: runner?.stats?.overall?.places || 0,
-          seconds: runner?.stats?.overall?.seconds || 0,
-          thirds: runner?.stats?.overall?.thirds || 0,
-          placePercent: runner?.stats?.overall?.placePercent || 0,
-          winPercent: runner?.stats?.overall?.winPercent || 0,
+    starts: runner?.stats?.overall?.starts || 0,
+    wins: runner?.stats?.overall?.wins || 0,
+    places: runner?.stats?.overall?.places || 0,
+    seconds: runner?.stats?.overall?.seconds || 0,
+    thirds: runner?.stats?.overall?.thirds || 0,
+    placePercent: runner?.stats?.overall?.placePercent || 0,
+    winPercent: runner?.stats?.overall?.winPercent || 0,
 
-          trackStats: runner?.stats?.track || null,
-          distanceStats: runner?.stats?.distance || null,
-          trackDistanceStats: runner?.stats?.trackDistance || null,
-          conditionStats: runner?.stats?.condition || null,
+    trackStats: runner?.stats?.track || null,
+    distanceStats: runner?.stats?.distance || null,
+    trackDistanceStats: runner?.stats?.trackDistance || null,
+    conditionStats: runner?.stats?.condition || null,
 
-          speedMap: runner.speedMap || null,
-          classProfile: runner.classProfile || null,
-          raceClassFit: runner.raceClassFit || null,
-          gearChange: runner.gearChange || null,
+    speedMap: runner.speedMap || null,
+    classProfile: runner.classProfile || null,
+    raceClassFit: runner.raceClassFit || null,
+    gearChange: runner.gearChange || null,
 
-          firstStarter: (runner?.stats?.overall?.starts || 0) === 0,
-        }));
+    firstStarter: (runner?.stats?.overall?.starts || 0) === 0,
+  }))
+  .filter((runner: any) => runner.scratched === false);
 
         const hasFirstStarter = runners.some((runner: any) => runner.firstStarter);
 
