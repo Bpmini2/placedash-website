@@ -1,111 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-const demoPredictions = [
-  {
-    time: "12:45",
-    track: "Flemington",
-    race: "Race 4",
-    runners: 10,
-    horse: "Silver Command",
-    confidence: "HIGH",
-  },
-  {
-    time: "13:20",
-    track: "Randwick",
-    race: "Race 6",
-    runners: 9,
-    horse: "Eastern Star",
-    confidence: "MEDIUM",
-  },
-  {
-    time: "14:05",
-    track: "Caulfield",
-    race: "Race 3",
-    runners: 11,
-    horse: "Metro Pulse",
-    confidence: "HIGH",
-  },
-];
-
-const plans = [
-  {
-    name: "Starter",
-    price: "Free",
-    description: "Preview PlaceDash with limited daily insights.",
-    features: [
-      "Limited prediction access",
-      "Basic race view",
-      "Early access updates",
-    ],
-    highlighted: false,
-  },
-  {
-    name: "Silver",
-    price: "$9.99/month",
-    description: "Unlock daily AI place analysis and confidence ratings.",
-    features: [
-      "Daily place predictions",
-      "Confidence ratings",
-      "Filtered racecards",
-      "Track record access",
-    ],
-    highlighted: false,
-  },
-  {
-    name: "Gold",
-    price: "$19.99/month",
-    description: "Full access to stronger PlaceDash analysis and priority picks.",
-    features: [
-      "Everything in Silver",
-      "Priority high-confidence selections",
-      "Full racecard analysis",
-      "Advanced performance tracking",
-      "Future premium insights",
-    ],
-    highlighted: true,
-  },
-];
-
-function ConfidenceBadge({ level }: { level: string }) {
-  return <span className={`badge ${level.toLowerCase()}`}>{level}</span>;
-}
-
-export default function Home() {
-   const [predictions, setPredictions] = useState(demoPredictions);
-
-  useEffect(() => {
-    async function loadHomepageRaces() {
-      try {
-        const res = await fetch("/api/formfav");
-        const data = await res.json();
-
-        const livePredictions =
-          data?.racecards?.slice(0, 3).map((race: any) => {
-            const runners = race.runners || [];
-            const firstRunner = runners[0];
-async function loadHomepageRaces() {
-            return {
-              time: race.off_time || "TBA",
-              track: race.course || "Unknown",
-              race: `Race ${race.race_number || ""}`,
-              runners: race.runner_count || runners.length || 0,
-              horse: firstRunner?.horse || "View dashboard",
-              confidence: "PREVIEW",
-            };
-          }) || [];
-
-        if (livePredictions.length > 0) {
-          setPredictions(livePredictions);
-        }
-      } catch (error) {
-        console.error("Homepage live races failed:", error);
-      }
-    }
-useEffect(() => {
-    loadHomepageRaces();
-  }, []); 
+export default function HomePage() {
   return (
     <main
       style={{
@@ -121,568 +16,413 @@ useEffect(() => {
     >
       <div style={{ maxWidth: "1320px", margin: "0 auto" }}>
         <header
-  style={{
-    width: "calc(100vw - 44px)",
-    marginLeft: "calc(50% - 50vw + 22px)",
-    marginTop: "18px",
-    background: "rgba(255,255,255,0.97)",
-    borderRadius: "30px",
-    padding: "22px 48px",
-    boxShadow: "0 18px 45px rgba(0,0,0,0.35)",
-  }}
->
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      width: "100%",
-    }}
-  >
-    {/* LEFT SIDE */}
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "18px",
-      }}
-    >
-      <div
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "16px",
-  }}
->
-  <div
-    style={{
-      width: "70px",
-      height: "70px",
-      borderRadius: "18px",
-      background: "#20c865",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      color: "#07111f",
-      fontSize: "30px",
-      fontWeight: 900,
-      fontStyle: "italic",
-      letterSpacing: "-3px",
-      boxShadow: "0 10px 25px rgba(32,200,101,0.35)",
-    }}
-  >
-    123
-  </div>
+          style={{
+            width: "calc(100vw - 44px)",
+            marginLeft: "calc(50% - 50vw + 22px)",
+            marginTop: "18px",
+            background: "rgba(255,255,255,0.97)",
+            borderRadius: "30px",
+            padding: "22px 48px",
+            boxShadow: "0 18px 45px rgba(0,0,0,0.35)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "16px",
+              }}
+            >
+              <div
+                style={{
+                  width: "70px",
+                  height: "70px",
+                  borderRadius: "18px",
+                  background:
+                    "linear-gradient(135deg, #22c55e, #1aff7a)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#07111f",
+                  fontWeight: 900,
+                  fontSize: "26px",
+                  boxShadow: "0 10px 25px rgba(34,197,94,0.35)",
+                }}
+              >
+                123
+              </div>
 
-  <span
-    style={{
-      fontSize: "44px",
-      fontWeight: 900,
-      color: "#07111f",
-      letterSpacing: "-1.5px",
-      lineHeight: 1,
-    }}
-  >
-    PlaceDash
-  </span>
-</div>
-    </div>
+              <div
+                style={{
+                  fontSize: "58px",
+                  fontWeight: 900,
+                  color: "#07111f",
+                  letterSpacing: "-2px",
+                }}
+              >
+                PlaceDash
+              </div>
+            </div>
 
-    {/* CENTER MENU */}
-    <nav
-      style={{
-        display: "flex",
-        gap: "46px",
-      }}
-    >
-      <a
-        href="/dashboard"
-        style={{
-          color: "#07111f",
-          fontWeight: 700,
-          textDecoration: "none",
-        }}
-      >
-        Predictions
-      </a>
+            <nav
+              style={{
+                display: "flex",
+                gap: "42px",
+                alignItems: "center",
+              }}
+            >
+              <a
+                href="/dashboard"
+                style={{
+                  color: "#07111f",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                }}
+              >
+                Predictions
+              </a>
 
-      <a
-        href="#method"
-        style={{
-          color: "#07111f",
-          fontWeight: 700,
-          textDecoration: "none",
-        }}
-      >
-        Method
-      </a>
+              <a
+                href="#method"
+                style={{
+                  color: "#07111f",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                }}
+              >
+                Method
+              </a>
 
-      <a
-        href="#track-record"
-        style={{
-          color: "#07111f",
-          fontWeight: 700,
-          textDecoration: "none",
-        }}
-      >
-        Track Record
-      </a>
+              <a
+                href="#track-record"
+                style={{
+                  color: "#07111f",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                }}
+              >
+                Track Record
+              </a>
 
-      <a
-        href="#pricing"
-        style={{
-          color: "#07111f",
-          fontWeight: 700,
-          textDecoration: "none",
-        }}
-      >
-        Pricing
-      </a>
-    </nav>
+              <a
+                href="#pricing"
+                style={{
+                  color: "#07111f",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                }}
+              >
+                Pricing
+              </a>
+            </nav>
 
-    {/* BUTTON */}
-    <a
-      href="/dashboard"
-      style={{
-        background: "#20c865",
-        color: "#07111f",
-        padding: "18px 34px",
-        borderRadius: "16px",
-        fontWeight: 800,
-        fontSize: "17px",
-        textDecoration: "none",
-        boxShadow: "0 16px 35px rgba(32,200,101,0.35)",
-        whiteSpace: "nowrap",
-      }}
-    >
-      View Today’s Picks
-    </a>
-  </div>
-</header>
+            <a
+              href="/dashboard"
+              style={{
+                background: "#22c55e",
+                color: "#07111f",
+                padding: "18px 32px",
+                borderRadius: "18px",
+                textDecoration: "none",
+                fontWeight: 900,
+                fontSize: "18px",
+                boxShadow: "0 12px 28px rgba(34,197,94,0.35)",
+              }}
+            >
+              View Today’s Picks
+            </a>
+          </div>
+        </header>
 
-        <section className="hero">
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1.2fr 0.9fr",
+            gap: "48px",
+            alignItems: "center",
+            padding: "90px 0 120px",
+          }}
+        >
           <div>
-            <div className="pill">Australian racing only • Place analysis</div>
+            <div
+              style={{
+                display: "inline-block",
+                padding: "10px 18px",
+                borderRadius: "999px",
+                background: "rgba(34,197,94,0.12)",
+                border: "1px solid rgba(34,197,94,0.35)",
+                color: "#86efac",
+                fontWeight: 700,
+                marginBottom: "24px",
+              }}
+            >
+              Australian racing only • Place analysis
+            </div>
 
-            <h1>Daily AI Place Picks for Australian Racing</h1>
+            <h1
+              style={{
+                fontSize: "92px",
+                lineHeight: "0.96",
+                letterSpacing: "-4px",
+                color: "#ffffff",
+                margin: 0,
+                fontWeight: 900,
+              }}
+            >
+              Daily AI Place
+              <br />
+              Picks for
+              <br />
+              Australian Racing
+            </h1>
 
-            <p>
-              PlaceDash analyses Australian horse races using strict race filters,
-              recent form, place history, field size, and confidence scoring to
-              highlight disciplined place-racing opportunities.
+            <p
+              style={{
+                color: "#dbeafe",
+                fontSize: "20px",
+                lineHeight: 1.7,
+                marginTop: "30px",
+                maxWidth: "760px",
+              }}
+            >
+              PlaceDash analyses Australian horse races using strict race
+              filters, recent form, place history, field size, and confidence
+              scoring to highlight disciplined place-racing opportunities.
             </p>
 
-            <div className="heroButtons">
-              <a className="primaryButton" href="/dashboard">
+            <div
+              style={{
+                display: "flex",
+                gap: "18px",
+                marginTop: "34px",
+              }}
+            >
+              <a
+                href="/dashboard"
+                style={{
+                  background: "#22c55e",
+                  color: "#07111f",
+                  padding: "18px 30px",
+                  borderRadius: "18px",
+                  textDecoration: "none",
+                  fontWeight: 900,
+                  fontSize: "18px",
+                }}
+              >
                 View Today’s Best Picks
               </a>
-              <a className="secondaryButton" href="#method">
+
+              <a
+                href="#method"
+                style={{
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  color: "#ffffff",
+                  padding: "18px 30px",
+                  borderRadius: "18px",
+                  textDecoration: "none",
+                  fontWeight: 800,
+                  fontSize: "18px",
+                  backdropFilter: "blur(10px)",
+                }}
+              >
                 See The PlaceDash Method
               </a>
             </div>
           </div>
 
-          <div className="previewCard">
-            <div className="sectionTop">
-              <div>
-                <span>Today’s Snapshot</span>
-                <h2>Filtered Race Card</h2>
-              </div>
-            </div>
-
-            {predictions.map((p) => (
-              <div className="miniCard" key={`${p.track}-${p.race}`}>
-                <div className="raceHeader">
-                  <div>
-                    <strong>
-                      {p.track} {p.race}
-                    </strong>
-                    <small>
-                      {p.time} • {p.runners} active runners
-                    </small>
-                  </div>
-                  <ConfidenceBadge level={p.confidence} />
-                </div>
-
-                <p>
-                  Top Rated: <b>{p.horse}</b>
-                </p>
-              </div>
-            ))}
-
-            <p className="smallDisclaimer">
-              Preview example only. Official AI selections appear inside the live dashboard.
-            </p>
-          </div>
-        </section>
-
-        <section id="method" className="section darkSection">
-          <div className="sectionTitle center">
-            <span>The PlaceDash Method</span>
-            <h2>Built around disciplined place-racing analysis</h2>
-            <p>
-              PlaceDash is not designed to chase every race or every favourite.
-              It focuses on filtered Australian races where place terms and race
-              structure make sense for analysis.
-            </p>
-          </div>
-
-          <div className="statsGrid">
-            <div>
-              <strong>Top 3</strong>
-              <span>
-                A place result usually means the runner finishes 1st, 2nd or 3rd,
-                depending on active runner numbers.
-              </span>
-            </div>
-
-            <div>
-              <strong>8–11</strong>
-              <span>
-                PlaceDash only analyses races with 8 to 11 active runners.
-              </span>
-            </div>
-
-            <div>
-              <strong>3+</strong>
-              <span>
-                First starters are removed. Runners need at least 3 previous
-                starts.
-              </span>
-            </div>
-
-            <div>
-              <strong>Value</strong>
-              <span>
-                The aim is not just low odds. The aim is disciplined analysis and
-                better decision-making.
-              </span>
-            </div>
-          </div>
-
-          <div className="dashboardPreview" style={{ marginTop: "32px" }}>
-            <div>
-              <span>Common-sense place strategy</span>
-              <h2>Why low odds are not always the best answer</h2>
-
-              <p>
-                A runner paying $1.30 may look safe, but one failed place result
-                can wipe out many small wins. PlaceDash is designed to help users
-                think beyond “safe favourites” and focus on structured analysis.
-              </p>
-
-              <p>
-                A $100 place bet at $1.70 returns $170 total, or $70 profit if
-                the runner places. A larger stake can increase profit, but it also
-                increases the damage when a selection misses.
-              </p>
-
-              <p>
-                Over time, the important question is not only strike rate. The
-                more important measure is whether the selections produce a
-                positive return after many races.
-              </p>
-
-              <p className="smallDisclaimer">
-                PlaceDash provides racing data analysis only. It does not
-                guarantee outcomes, provide financial advice, or recommend that
-                users gamble.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section id="predictions" className="section">
-  <div className="sectionTitle center">
-    <span>Today’s Predictions</span>
-    <h2>Qualifying races appear inside the live dashboard</h2>
-
-    <p>
-      PlaceDash only displays Australian races that pass the platform filters:
-      8–11 active runners, no first starters, and runners with previous race
-      experience.
-    </p>
-  </div>
-
-  {predictions === demoPredictions ? (
-    <div
-      style={{
-        maxWidth: "900px",
-        margin: "0 auto",
-        textAlign: "center",
-        padding: "40px",
-        borderRadius: "28px",
-        background: "rgba(255,255,255,0.04)",
-        border: "1px solid rgba(255,255,255,0.08)",
-      }}
-    >
-      <h3 style={{ marginTop: 0 }}>
-        No live qualifying races available right now
-      </h3>
-
-      <p
-        style={{
-          color: "#cbd5e1",
-          lineHeight: 1.7,
-        }}
-      >
-        Live racecards automatically appear here when qualifying Australian
-        races become available during the day.
-      </p>
-
-      <p
-        style={{
-          color: "#94a3b8",
-          fontSize: "14px",
-          marginTop: "20px",
-        }}
-      >
-        The live dashboard still contains full AI analysis, race filtering,
-        confidence ratings, and premium selections.
-      </p>
-
-      <div style={{ marginTop: "30px" }}>
-        <a className="primaryButton" href="/dashboard">
-          View Today’s Dashboard
-        </a>
-      </div>
-    </div>
-  ) : (
-    <>
-      <div className="predictionGrid">
-        {predictions.map((p) => (
-          <div className="predictionCard" key={`${p.track}-${p.race}`}>
-            <div className="raceHeader">
-              <div>
-                <h3>
-                  {p.track} {p.race}
-                </h3>
-
-                <small>
-                  {p.time} • {p.runners} active runners
-                </small>
-              </div>
-
-              <ConfidenceBadge level={p.confidence} />
-            </div>
-
-            <div className="selectionBox">
-              <small>Top Rated Selection</small>
-              <strong>{p.horse}</strong>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div style={{ textAlign: "center", marginTop: "28px" }}>
-        <a className="primaryButton" href="/dashboard">
-          Open Live Dashboard
-        </a>
-      </div>
-    </>
-  )}
-<section
-  id="predictions"
-  style={{
-    padding: "90px 24px 110px",
-    textAlign: "center",
-    backgroundImage:
-      'linear-gradient(rgba(2,8,18,0.84), rgba(2,8,18,0.9)), url("/raceday.png")',
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    borderTop: "1px solid rgba(255,255,255,0.08)",
-  }}
->
-  <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-    <div
-      style={{
-        color: "#22c55e",
-        fontSize: "14px",
-        fontWeight: 900,
-        letterSpacing: "0.14em",
-        marginBottom: "18px",
-      }}
-    >
-      TODAY&apos;S PREDICTIONS
-    </div>
-
-    <h2
-      style={{
-        margin: 0,
-        color: "#ffffff",
-        fontSize: "48px",
-        lineHeight: 1.08,
-        letterSpacing: "-1.5px",
-      }}
-    >
-      Qualifying races appear inside the live dashboard
-    </h2>
-
-    <p
-      style={{
-        maxWidth: "850px",
-        margin: "22px auto 0",
-        color: "#dbeafe",
-        fontSize: "18px",
-        lineHeight: 1.7,
-      }}
-    >
-      PlaceDash only displays Australian races that pass the platform filters:
-      8–11 active runners, no first starters, and runners with previous race
-      experience.
-    </p>
-
-    <a
-      href="/dashboard"
-      style={{
-        display: "inline-block",
-        marginTop: "28px",
-        background: "#20c865",
-        color: "#07111f",
-        padding: "18px 34px",
-        borderRadius: "16px",
-        fontWeight: 900,
-        fontSize: "18px",
-        textDecoration: "none",
-        boxShadow: "0 16px 35px rgba(32,200,101,0.35)",
-      }}
-    >
-      Open Live Dashboard
-    </a>
-  </div>
-</section>
-            <span>Track Record</span>
-            <h2>Transparent performance tracking</h2>
-            <p>
-              PlaceDash will track selections over time so users can review
-              results, strike rate, and return performance.
-            </p>
-            <p className="smallDisclaimer">
-              Example results shown for demonstration only. Not indicative of
-              future performance.
-            </p>
-          </div>
-
-          <div className="statsGrid">
-            <div>
-              <strong>62%</strong>
-              <span>Example 7 day strike rate</span>
-            </div>
-            <div>
-              <strong>+14%</strong>
-              <span>Example ROI</span>
-            </div>
-            <div>
-              <strong>21 / 34</strong>
-              <span>Example placed selections</span>
-            </div>
-            <div>
-              <strong>Pending</strong>
-              <span>Live historical tracking coming soon</span>
-            </div>
-          </div>
-        </section>
-
-        <section id="pricing" className="section">
-          <div className="sectionTitle center">
-            <span>Pricing</span>
-            <h2>Choose Your Access</h2>
-            <p>
-              Start free, upgrade later. Built for disciplined racing analysis and
-              structured decision-making.
-            </p>
-          </div>
-
-          <div className="pricingGrid">
-            {plans.map((plan) => (
-              <div
-                className={plan.highlighted ? "planCard popular" : "planCard"}
-                key={plan.name}
-              >
-                {plan.highlighted && (
-                  <div className="popularBadge">Most Popular</div>
-                )}
-
-                <h3>{plan.name}</h3>
-                <p>{plan.description}</p>
-                <strong className="price">{plan.price}</strong>
-
-                <ul>
-                  {plan.features.map((f) => (
-                    <li key={f}>• {f}</li>
-                  ))}
-                </ul>
-
-                <a
-                  className={
-                    plan.highlighted ? "primaryButton full" : "secondaryButton full"
-                  }
-                  href="/dashboard"
-                >
-                  {plan.highlighted ? "Unlock Gold Access" : "View Plan"}
-                </a>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="section darkSection">
-          <div className="dashboardPreview">
-            <div>
-              <span>Dashboard Preview</span>
-              <h2>Built for quick daily decisions</h2>
-              <p>
-                Users can view filtered races, confidence ratings, full racecard
-                analysis, AI reasoning summaries, and locked premium selections in
-                one clean dashboard.
-              </p>
-
-              <div className="heroButtons">
-                <a className="primaryButton" href="/dashboard">
-                  View Dashboard
-                </a>
-                <a className="secondaryButton" href="#pricing">
-                  Compare Plans
-                </a>
-              </div>
-            </div>
-
-            <div className="mockWindow">
-              <div className="windowDots">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-              <div className="mockLine wide"></div>
-              <div className="mockBox green"></div>
-              <div className="mockBox"></div>
-              <div className="mockBox"></div>
-            </div>
-          </div>
-        </section>
-
-        <footer
-          style={{
-            padding: "30px 40px",
-            textAlign: "center",
-            color: "#94a3b8",
-          }}
-        >
-          <p>© 2026 PlaceDash. Information and data-analysis service only.</p>
-
           <div
             style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "16px",
-              marginTop: "10px",
+              background: "rgba(15,23,42,0.58)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: "30px",
+              padding: "34px",
+              backdropFilter: "blur(14px)",
             }}
           >
-            <a href="/privacy">Privacy Policy</a>
-            <a href="/terms">Terms</a>
-            <a href="/disclaimer">Disclaimer</a>
+            <div
+              style={{
+                color: "#22c55e",
+                fontWeight: 900,
+                letterSpacing: "0.14em",
+                marginBottom: "18px",
+              }}
+            >
+              TODAY’S SNAPSHOT
+            </div>
+
+            <h2
+              style={{
+                color: "#ffffff",
+                fontSize: "44px",
+                margin: 0,
+                marginBottom: "26px",
+              }}
+            >
+              Filtered Race Card
+            </h2>
+
+            <div
+              style={{
+                background: "rgba(2,8,18,0.55)",
+                borderRadius: "22px",
+                padding: "24px",
+                border: "1px solid rgba(255,255,255,0.08)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      color: "#ffffff",
+                      fontWeight: 800,
+                      fontSize: "28px",
+                    }}
+                  >
+                    Quirindi Race 1
+                  </div>
+
+                  <div
+                    style={{
+                      color: "#cbd5e1",
+                      marginTop: "8px",
+                    }}
+                  >
+                    12:50 pm • 10 active runners
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    padding: "10px 16px",
+                    borderRadius: "999px",
+                    border: "1px solid rgba(255,255,255,0.4)",
+                    color: "#ffffff",
+                    fontWeight: 800,
+                  }}
+                >
+                  PREVIEW
+                </div>
+              </div>
+
+              <div
+                style={{
+                  marginTop: "26px",
+                  color: "#dbeafe",
+                  fontSize: "18px",
+                }}
+              >
+                Top Rated:
+              </div>
+
+              <div
+                style={{
+                  marginTop: "8px",
+                  color: "#86efac",
+                  fontWeight: 900,
+                  fontSize: "42px",
+                }}
+              >
+                Devilish Sun
+              </div>
+            </div>
+
+            <div
+              style={{
+                marginTop: "22px",
+                color: "#cbd5e1",
+                lineHeight: 1.6,
+                fontSize: "18px",
+              }}
+            >
+              Preview example only. Official AI selections appear inside the
+              live dashboard.
+            </div>
           </div>
-        </footer>
+        </section>
+
+        <section
+          style={{
+            padding: "90px 24px 110px",
+            textAlign: "center",
+            backgroundImage:
+              'linear-gradient(rgba(2,8,18,0.84), rgba(2,8,18,0.9)), url("/raceday.png")',
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            borderTop: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+            <div
+              style={{
+                color: "#22c55e",
+                fontSize: "14px",
+                fontWeight: 900,
+                letterSpacing: "0.14em",
+                marginBottom: "18px",
+              }}
+            >
+              TODAY&apos;S PREDICTIONS
+            </div>
+
+            <h2
+              style={{
+                margin: 0,
+                color: "#ffffff",
+                fontSize: "48px",
+                lineHeight: 1.08,
+                letterSpacing: "-1.5px",
+              }}
+            >
+              Qualifying races appear inside the live dashboard
+            </h2>
+
+            <p
+              style={{
+                maxWidth: "850px",
+                margin: "22px auto 0",
+                color: "#dbeafe",
+                fontSize: "18px",
+                lineHeight: 1.7,
+              }}
+            >
+              PlaceDash only displays Australian races that pass the platform
+              filters: 8–11 active runners, no first starters, and runners with
+              previous race experience.
+            </p>
+
+            <a
+              href="/dashboard"
+              style={{
+                display: "inline-block",
+                marginTop: "28px",
+                background: "#20c865",
+                color: "#07111f",
+                padding: "18px 34px",
+                borderRadius: "16px",
+                fontWeight: 900,
+                fontSize: "18px",
+                textDecoration: "none",
+                boxShadow: "0 16px 35px rgba(32,200,101,0.35)",
+              }}
+            >
+              Open Live Dashboard
+            </a>
+          </div>
+        </section>
       </div>
     </main>
   );
