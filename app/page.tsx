@@ -1,14 +1,67 @@
 const predictions = [
-  { time: "12:45", track: "Flemington", race: "Race 4", runners: 10, horse: "Silver Command", confidence: "HIGH" },
-  { time: "13:20", track: "Randwick", race: "Race 6", runners: 9, horse: "Eastern Star", confidence: "MEDIUM" },
-  { time: "14:05", track: "Caulfield", race: "Race 3", runners: 11, horse: "Metro Pulse", confidence: "HIGH" },
-  { time: "15:10", track: "Doomben", race: "Race 7", runners: 8, horse: "Bold Runner", confidence: "LOW" },
+  {
+    time: "12:45",
+    track: "Flemington",
+    race: "Race 4",
+    runners: 10,
+    horse: "Silver Command",
+    confidence: "HIGH",
+  },
+  {
+    time: "13:20",
+    track: "Randwick",
+    race: "Race 6",
+    runners: 9,
+    horse: "Eastern Star",
+    confidence: "MEDIUM",
+  },
+  {
+    time: "14:05",
+    track: "Caulfield",
+    race: "Race 3",
+    runners: 11,
+    horse: "Metro Pulse",
+    confidence: "HIGH",
+  },
 ];
 
 const plans = [
-  { name: "Starter", price: "Free", description: "Preview PlaceDash and see limited insights.", features: ["Limited predictions", "Basic race view", "Early access updates"], button: "Join Early Access", highlighted: false },
-  { name: "Silver", price: "$9.99/month", description: "Unlock daily AI predictions with confidence ratings.", features: ["Daily place predictions", "Confidence ratings (High / Medium / Low)", "Filtered racecards (8–11 runners)", "Track record access"], button: "Upgrade Now", highlighted: false },
-  { name: "Gold", price: "$19.99/month", description: "Full access to all AI place predictions with priority high-confidence selections.", features: ["Everything in Silver", "Priority HIGH confidence picks", "Best runner selection unlocked", "Daily AI-filtered racecards", "Advanced performance tracking", "Future premium insights"], button: "Start Winning", highlighted: true },
+  {
+    name: "Starter",
+    price: "Free",
+    description: "Preview PlaceDash with limited daily insights.",
+    features: [
+      "Limited prediction access",
+      "Basic race view",
+      "Early access updates",
+    ],
+    highlighted: false,
+  },
+  {
+    name: "Silver",
+    price: "$9.99/month",
+    description: "Unlock daily AI place analysis and confidence ratings.",
+    features: [
+      "Daily place predictions",
+      "Confidence ratings",
+      "Filtered racecards",
+      "Track record access",
+    ],
+    highlighted: false,
+  },
+  {
+    name: "Gold",
+    price: "$19.99/month",
+    description: "Full access to stronger PlaceDash analysis and priority picks.",
+    features: [
+      "Everything in Silver",
+      "Priority high-confidence selections",
+      "Full racecard analysis",
+      "Advanced performance tracking",
+      "Future premium insights",
+    ],
+    highlighted: true,
+  },
 ];
 
 function ConfidenceBadge({ level }: { level: string }) {
@@ -18,195 +71,348 @@ function ConfidenceBadge({ level }: { level: string }) {
 export default function Home() {
   return (
     <main
-  style={{    
-    width: "100%",
-       padding: "0 32px",
-    minHeight: "100vh",
-    backgroundImage:
-      'linear-gradient(rgba(2,8,18,0.82), rgba(2,8,18,0.82)), url("/raceday.png")',
-    backgroundSize: "cover",
-    backgroundPosition: "center top",
-    backgroundAttachment: "fixed"
-  }}
->
-      <header className="header">
-        <div className="brand">
-  <img
-    src="/placedash-logo.png"
-    alt="PlaceDash"
-    style={{
-      width: "260px",
-      maxWidth: "100%"
-    }}
-  />
-</div>
-        <nav><a href="/dashboard">Predictions</a><a href="#track-record">Track Record</a><a href="#pricing">Pricing</a></nav>
-        <a className="headerButton" href="/dashboard">View Today’s Picks</a>
-      </header>
-
-      <section className="hero">
-        <div>
-          <div className="pill">Australian racing only • Place predictions</div>
-          <h1>Daily AI Place Picks for Australian Racing</h1>
-          <p>Get daily place betting insights backed by data-driven analysis, strict race filtering...</p>
-          <div className="heroButtons">
-            <a className="primaryButton" href="/dashboard">View Today’s Best Picks</a>
-            <a className="secondaryButton" href="#pricing">Unlock Full Access</a>
+      style={{
+        width: "100%",
+        minHeight: "100vh",
+        padding: "0 32px",
+        backgroundImage:
+          'linear-gradient(rgba(2,8,18,0.82), rgba(2,8,18,0.86)), url("/raceday.png")',
+        backgroundSize: "cover",
+        backgroundPosition: "center top",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      <div style={{ maxWidth: "1320px", margin: "0 auto" }}>
+        <header className="header">
+          <div className="brand">
+            <img
+              src="/placedash-logo.png"
+              alt="PlaceDash"
+              style={{ width: "260px", maxWidth: "100%" }}
+            />
           </div>
-        </div>
-        <div className="previewCard">
-          <div className="sectionTop"><div><span>Today’s Snapshot</span><h2>Filtered Race Card</h2></div></div>
-          {predictions.slice(0, 3).map((p) => (
-            <div className="miniCard" key={`${p.track}-${p.race}`}>
-              <div className="raceHeader"><div><strong>{p.track} {p.race}</strong><small>{p.time} • {p.runners} runners</small></div><ConfidenceBadge level={p.confidence} /></div>
-              <p>Selection: <b>{p.horse}</b></p>
+
+          <nav>
+            <a href="/dashboard">Predictions</a>
+            <a href="#method">Method</a>
+            <a href="#track-record">Track Record</a>
+            <a href="#pricing">Pricing</a>
+          </nav>
+
+          <a className="headerButton" href="/dashboard">
+            View Today’s Picks
+          </a>
+        </header>
+
+        <section className="hero">
+          <div>
+            <div className="pill">Australian racing only • Place analysis</div>
+
+            <h1>Daily AI Place Picks for Australian Racing</h1>
+
+            <p>
+              PlaceDash analyses Australian horse races using strict race filters,
+              recent form, place history, field size, and confidence scoring to
+              highlight disciplined place-racing opportunities.
+            </p>
+
+            <div className="heroButtons">
+              <a className="primaryButton" href="/dashboard">
+                View Today’s Best Picks
+              </a>
+              <a className="secondaryButton" href="#method">
+                See The PlaceDash Method
+              </a>
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
 
-      <section id="predictions" className="section darkSection">
-        <div className="sectionTitle"><span>Today’s Predictions</span><h2>Daily Place Predictions</h2><p>Only races matching PlaceDash criteria are shown: Australian races, 8–11 runners, no first starters, and horses with 3+ previous starts.</p></div>
-        <div className="predictionGrid">
-          {predictions.map((p) => (
-            <div className="predictionCard" key={`${p.track}-${p.race}`}>
-              <div className="raceHeader"><div><h3>{p.track} {p.race}</h3><small>{p.time} • {p.runners} runners</small></div><ConfidenceBadge level={p.confidence} /></div>
-              <div className="selectionBox"><small>Place Selection</small><strong>{p.horse}</strong></div>
+          <div className="previewCard">
+            <div className="sectionTop">
+              <div>
+                <span>Today’s Snapshot</span>
+                <h2>Filtered Race Card</h2>
+              </div>
             </div>
-          ))}
-        </div>
-      </section>
 
-      <section id="rules" className="section">
-        <div className="sectionTitle"><span>Race Filtering Logic</span><h2>Strict selection rules</h2></div>
-        <div className="rulesGrid">
-          <div>Australian races only</div><div>Field size between 8 and 11 runners</div><div>No first starters</div><div>Horses must have 3+ previous starts</div><div>Jockey and trainer performance considered</div><div>Confidence rating shown for each selection</div>
-        </div>
-      </section>
+            {predictions.map((p) => (
+              <div className="miniCard" key={`${p.track}-${p.race}`}>
+                <div className="raceHeader">
+                  <div>
+                    <strong>
+                      {p.track} {p.race}
+                    </strong>
+                    <small>
+                      {p.time} • {p.runners} active runners
+                    </small>
+                  </div>
+                  <ConfidenceBadge level={p.confidence} />
+                </div>
 
-      <section id="track-record" className="section">
-        <div className="sectionTitle"><span>Track Record</span><h2>Transparent Performance Tracking</h2></div>
-        <div className="statsGrid">
-          <div><strong>18</strong><span>Races analysed today</span></div><div><strong>12</strong><span>Selections made</span></div><div><strong>8</strong><span>Successful place finishes</span></div><div><strong>66%</strong><span>Example place strike rate</span></div>
-        </div>
-      </section>
+                <p>
+                  Top Rated: <b>{p.horse}</b>
+                </p>
+              </div>
+            ))}
 
-      <section id="pricing" className="section darkSection">
-        <div className="sectionTitle center"><span>Pricing</span><h2>Choose Your Edge</h2><p>Start free, upgrade anytime. Built for serious place betters who want consistency.</p></div>
-        <div className="pricingGrid">
-          {plans.map((plan) => (
-            <div className={plan.highlighted ? "planCard popular" : "planCard"} key={plan.name}>
-              {plan.highlighted && <div className="popularBadge">Most Popular</div>}
-              <h3>{plan.name}</h3><p>{plan.description}</p><strong className="price">{plan.price}</strong>
-              <ul>{plan.features.map((f) => <li key={f}>• {f}</li>)}</ul>
-              <a className={plan.highlighted ? "primaryButton full" : "secondaryButton full"} href="/dashboard">
-  {plan.highlighted ? "Start Winning" : "View Plan"}
-</a>
+            <p className="smallDisclaimer">
+              Example preview only. Live selections are shown inside the
+              dashboard.
+            </p>
+          </div>
+        </section>
+
+        <section id="method" className="section darkSection">
+          <div className="sectionTitle center">
+            <span>The PlaceDash Method</span>
+            <h2>Built around disciplined place-racing analysis</h2>
+            <p>
+              PlaceDash is not designed to chase every race or every favourite.
+              It focuses on filtered Australian races where place terms and race
+              structure make sense for analysis.
+            </p>
+          </div>
+
+          <div className="statsGrid">
+            <div>
+              <strong>Top 3</strong>
+              <span>
+                A place result usually means the runner finishes 1st, 2nd or 3rd,
+                depending on active runner numbers.
+              </span>
             </div>
-          ))}
-        </div>
-      </section>
 
-      <section className="section">
-        <div className="dashboardPreview">
-          <div><span>Dashboard Preview</span><h2>Built for quick daily decisions</h2><p>Users will see filtered races, place selections, confidence ratings, and performance tracking in one clean dashboard.</p></div>
-          <div className="mockWindow"><div className="windowDots"><span></span><span></span><span></span></div><div className="mockLine wide"></div><div className="mockBox green"></div><div className="mockBox"></div><div className="mockBox"></div></div>
-        </div>
-      </section>
-<section id="track-record" className="section darkSection">
-  <div className="sectionTitle center">
-    <span>Track Record</span>
-    <h2>Proven Results</h2>
-    <p>Transparent performance based on recent selections.</p>
-    <p className="smallDisclaimer">
-Example results shown for demonstration purposes only. Not indicative of future performance.
-</p>
-  </div>
+            <div>
+              <strong>8–11</strong>
+              <span>
+                PlaceDash only analyses races with 8 to 11 active runners.
+              </span>
+            </div>
 
-  <div className="statsGrid">
-    <div>
-      <strong>62%</strong>
-      <span>7 Day Strike Rate</span>
-    </div>
-    <div>
-      <strong>+14%</strong>
-      <span>ROI (Last 7 Days)</span>
-    </div>
-    <div>
-      <strong>21 / 34</strong>
-      <span>Winning Selections</span>
-    </div>
-    <div>
-      <strong>Consistent</strong>
-      <span>Daily Opportunities</span>
-    </div>
-  </div>
-</section>
-<section id="method" className="section">
-  <div className="sectionTitle center">
-    <span>The PlaceDash Method</span>
-    <h2>AI-powered place racing analysis</h2>
-    <p>
-      PlaceDash is designed around a disciplined place betting strategy focused
-      on consistency rather than chasing high-risk long-shot winners.
-    </p>
-  </div>
+            <div>
+              <strong>3+</strong>
+              <span>
+                First starters are removed. Runners need at least 3 previous
+                starts.
+              </span>
+            </div>
 
-  <div className="statsGrid">
-    <div>
-      <strong>Top 3</strong>
-      <span>Place bets win if your horse finishes 1st, 2nd or 3rd.</span>
-    </div>
+            <div>
+              <strong>Value</strong>
+              <span>
+                The aim is not just low odds. The aim is disciplined analysis and
+                better decision-making.
+              </span>
+            </div>
+          </div>
 
-    <div>
-      <strong>10%</strong>
-      <span>Example staking approach based on current bank balance.</span>
-    </div>
+          <div className="dashboardPreview" style={{ marginTop: "32px" }}>
+            <div>
+              <span>Common-sense place strategy</span>
+              <h2>Why low odds are not always the best answer</h2>
 
-    <div>
-      <strong>8–11</strong>
-      <span>Only races with 8 to 11 runners are analysed.</span>
-    </div>
+              <p>
+                A runner paying $1.30 may look safe, but one failed place result
+                can wipe out many small wins. PlaceDash is designed to help users
+                think beyond “safe favourites” and focus on structured analysis.
+              </p>
 
-    <div>
-      <strong>3+</strong>
-      <span>Only horses with at least 3 previous starts are considered.</span>
-    </div>
-  </div>
+              <p>
+                A $100 place bet at $1.70 returns $170 total, or $70 profit if
+                the runner places. A larger stake can increase profit, but it also
+                increases the damage when a selection misses.
+              </p>
 
-  <div className="dashboardPreview" style={{ marginTop: "30px" }}>
-    <div>
-      <span>How it works</span>
-      <h2>The theory behind PlaceDash</h2>
-      <p>
-        Instead of selecting outright winners, PlaceDash AI analyses Australian
-        horse races to identify runners with stronger probabilities of finishing
-        in the top 3 placings.
-      </p>
-      <p>
-        The model only analyses Australian races that meet strict filtering
-        conditions: 8–11 runners, no first starters, and horses with at least 3
-        previous starts.
-      </p>
-      <p>
-        Each selection receives an AI confidence rating, performance score, and
-        reasoning summary without revealing the proprietary scoring formula.
-      </p>
-      <p className="smallDisclaimer">
-        PlaceDash does not provide gambling advice or guaranteed outcomes. It is
-        designed as an AI-powered racing analysis tool only.
-      </p>
-    </div>
-  </div>
-</section>
-<footer style={{ padding: "30px 40px", textAlign: "center", color: "#94a3b8" }}>
-  <p>© 2026 PlaceDash. Information and data-analysis service only.</p>
-  <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: "10px" }}>
-    <a href="/privacy">Privacy Policy</a>
-    <a href="/terms">Terms</a>
-    <a href="/disclaimer">Disclaimer</a>
-  </div>
-</footer>
+              <p>
+                Over time, the important question is not only strike rate. The
+                more important measure is whether the selections produce a
+                positive return after many races.
+              </p>
+
+              <p className="smallDisclaimer">
+                PlaceDash provides racing data analysis only. It does not
+                guarantee outcomes, provide financial advice, or recommend that
+                users gamble.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="predictions" className="section">
+          <div className="sectionTitle center">
+            <span>Today’s Predictions</span>
+            <h2>Filtered racecards, not every race</h2>
+            <p>
+              Only races matching the PlaceDash rules are shown: Australian races,
+              8–11 active runners, no first starters, and runners with 3+
+              previous starts.
+            </p>
+          </div>
+
+          <div className="predictionGrid">
+            {predictions.map((p) => (
+              <div className="predictionCard" key={`${p.track}-${p.race}`}>
+                <div className="raceHeader">
+                  <div>
+                    <h3>
+                      {p.track} {p.race}
+                    </h3>
+                    <small>
+                      {p.time} • {p.runners} active runners
+                    </small>
+                  </div>
+                  <ConfidenceBadge level={p.confidence} />
+                </div>
+
+                <div className="selectionBox">
+                  <small>Top Rated Selection</small>
+                  <strong>{p.horse}</strong>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ textAlign: "center", marginTop: "28px" }}>
+            <a className="primaryButton" href="/dashboard">
+              Open Live Dashboard
+            </a>
+          </div>
+        </section>
+
+        <section id="track-record" className="section darkSection">
+          <div className="sectionTitle center">
+            <span>Track Record</span>
+            <h2>Transparent performance tracking</h2>
+            <p>
+              PlaceDash will track selections over time so users can review
+              results, strike rate, and return performance.
+            </p>
+            <p className="smallDisclaimer">
+              Example results shown for demonstration only. Not indicative of
+              future performance.
+            </p>
+          </div>
+
+          <div className="statsGrid">
+            <div>
+              <strong>62%</strong>
+              <span>Example 7 day strike rate</span>
+            </div>
+            <div>
+              <strong>+14%</strong>
+              <span>Example ROI</span>
+            </div>
+            <div>
+              <strong>21 / 34</strong>
+              <span>Example placed selections</span>
+            </div>
+            <div>
+              <strong>Pending</strong>
+              <span>Live historical tracking coming soon</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="pricing" className="section">
+          <div className="sectionTitle center">
+            <span>Pricing</span>
+            <h2>Choose Your Access</h2>
+            <p>
+              Start free, upgrade later. Built for disciplined racing analysis and
+              structured decision-making.
+            </p>
+          </div>
+
+          <div className="pricingGrid">
+            {plans.map((plan) => (
+              <div
+                className={plan.highlighted ? "planCard popular" : "planCard"}
+                key={plan.name}
+              >
+                {plan.highlighted && (
+                  <div className="popularBadge">Most Popular</div>
+                )}
+
+                <h3>{plan.name}</h3>
+                <p>{plan.description}</p>
+                <strong className="price">{plan.price}</strong>
+
+                <ul>
+                  {plan.features.map((f) => (
+                    <li key={f}>• {f}</li>
+                  ))}
+                </ul>
+
+                <a
+                  className={
+                    plan.highlighted ? "primaryButton full" : "secondaryButton full"
+                  }
+                  href="/dashboard"
+                >
+                  {plan.highlighted ? "Unlock Gold Access" : "View Plan"}
+                </a>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="section darkSection">
+          <div className="dashboardPreview">
+            <div>
+              <span>Dashboard Preview</span>
+              <h2>Built for quick daily decisions</h2>
+              <p>
+                Users can view filtered races, confidence ratings, full racecard
+                analysis, AI reasoning summaries, and locked premium selections in
+                one clean dashboard.
+              </p>
+
+              <div className="heroButtons">
+                <a className="primaryButton" href="/dashboard">
+                  View Dashboard
+                </a>
+                <a className="secondaryButton" href="#pricing">
+                  Compare Plans
+                </a>
+              </div>
+            </div>
+
+            <div className="mockWindow">
+              <div className="windowDots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <div className="mockLine wide"></div>
+              <div className="mockBox green"></div>
+              <div className="mockBox"></div>
+              <div className="mockBox"></div>
+            </div>
+          </div>
+        </section>
+
+        <footer
+          style={{
+            padding: "30px 40px",
+            textAlign: "center",
+            color: "#94a3b8",
+          }}
+        >
+          <p>© 2026 PlaceDash. Information and data-analysis service only.</p>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "16px",
+              marginTop: "10px",
+            }}
+          >
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms</a>
+            <a href="/disclaimer">Disclaimer</a>
+          </div>
+        </footer>
+      </div>
     </main>
   );
 }
