@@ -456,10 +456,10 @@ export default function Dashboard() {
 
         <div
           style={{
-            marginTop: "30px",
+            marginTop: "28px",
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-            gap: "20px",
+            gap: "28px",
           }}
         >
           {loading && (
@@ -478,10 +478,13 @@ export default function Dashboard() {
           {!loading && displayRaces.length === 0 && (
             <div
               style={{
-                padding: "20px",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: "16px",
-                color: "#94a3b8",
+                padding: "26px",
+background: "rgba(15,23,42,0.58)",
+border: "1px solid rgba(255,255,255,0.16)",
+borderRadius: "22px",
+boxShadow: "0 18px 45px rgba(0,0,0,0.28)",
+backdropFilter: "blur(14px)",
+color: "#b7c5d8",
               }}
             >
               <strong style={{ color: "#ffffff" }}>
