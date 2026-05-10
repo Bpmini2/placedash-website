@@ -508,24 +508,25 @@ color: "#b7c5d8",
 
             return (
               <div
-                key={`${race.course}-${race.race_number}`}
-                onClick={() => {
-                  if (isFreePick) {
-                    setSelectedRace(race);
-                  } else {
-                    window.location.href = "/#pricing";
-                  }
-                }}
-                padding: "26px",
-border: "1px solid rgba(255,255,255,0.16)",
-borderRadius: "24px",
-cursor: "pointer",
-transition: "all 0.25s ease",
-background: "rgba(15,23,42,0.58)",
-backdropFilter: "blur(14px)",
-boxShadow: "0 18px 45px rgba(0,0,0,0.28)"
-                }}
-              >
+  key={`${race.course}-${race.race_number}`}
+  onClick={() => {
+    if (isFreePick) {
+      setSelectedRace(race);
+    } else {
+      window.location.href = "/#pricing";
+    }
+  }}
+  style={{
+    padding: "26px",
+    border: "1px solid rgba(255,255,255,0.16)",
+    borderRadius: "24px",
+    cursor: "pointer",
+    transition: "all 0.25s ease",
+    background: "rgba(15,23,42,0.58)",
+    backdropFilter: "blur(14px)",
+    boxShadow: "0 18px 45px rgba(0,0,0,0.28)",
+  }}
+>
                 <h3>
                   {race.course} Race {race.race_number || ""}
                   {race.state ? ` (${race.state})` : ""}
