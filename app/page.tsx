@@ -481,10 +481,76 @@ export default function Home() {
       </div>
     </>
   )}
-</section>
+<section
+  id="predictions"
+  style={{
+    padding: "90px 24px 110px",
+    textAlign: "center",
+    backgroundImage:
+      'linear-gradient(rgba(2,8,18,0.84), rgba(2,8,18,0.9)), url("/raceday.png")',
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    borderTop: "1px solid rgba(255,255,255,0.08)",
+  }}
+>
+  <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+    <div
+      style={{
+        color: "#22c55e",
+        fontSize: "14px",
+        fontWeight: 900,
+        letterSpacing: "0.14em",
+        marginBottom: "18px",
+      }}
+    >
+      TODAY&apos;S PREDICTIONS
+    </div>
 
-        <section id="track-record" className="section darkSection">
-          <div className="sectionTitle center">
+    <h2
+      style={{
+        margin: 0,
+        color: "#ffffff",
+        fontSize: "48px",
+        lineHeight: 1.08,
+        letterSpacing: "-1.5px",
+      }}
+    >
+      Qualifying races appear inside the live dashboard
+    </h2>
+
+    <p
+      style={{
+        maxWidth: "850px",
+        margin: "22px auto 0",
+        color: "#dbeafe",
+        fontSize: "18px",
+        lineHeight: 1.7,
+      }}
+    >
+      PlaceDash only displays Australian races that pass the platform filters:
+      8–11 active runners, no first starters, and runners with previous race
+      experience.
+    </p>
+
+    <a
+      href="/dashboard"
+      style={{
+        display: "inline-block",
+        marginTop: "28px",
+        background: "#20c865",
+        color: "#07111f",
+        padding: "18px 34px",
+        borderRadius: "16px",
+        fontWeight: 900,
+        fontSize: "18px",
+        textDecoration: "none",
+        boxShadow: "0 16px 35px rgba(32,200,101,0.35)",
+      }}
+    >
+      Open Live Dashboard
+    </a>
+  </div>
+</section>
             <span>Track Record</span>
             <h2>Transparent performance tracking</h2>
             <p>
