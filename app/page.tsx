@@ -142,14 +142,16 @@ export default function Home() {
   >
     <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
       <img
-        src="/placedash-logo.png"
-        alt="PlaceDash"
-        style={{
-          width: "64px",
-          height: "64px",
-          objectFit: "contain",
-        }}
-      />
+  src="/placedash-logo.png"
+  alt="PlaceDash"
+  style={{
+    width: "220px",
+    maxWidth: "100%",
+    height: "auto",
+    objectFit: "contain",
+    display: "block",
+  }}
+/>
 
       <div
         style={{
