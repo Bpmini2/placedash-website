@@ -1,4 +1,8 @@
-const predictions = [
+"use client";
+
+import { useEffect, useState } from "react";
+
+const demoPredictions = [
   {
     time: "12:45",
     track: "Flemington",
@@ -69,6 +73,39 @@ function ConfidenceBadge({ level }: { level: string }) {
 }
 
 export default function Home() {
+   const [predictions, setPredictions] = useState(demoPredictions);
+
+  useEffect(() => {
+    async function loadHomepageRaces() {
+      try {
+        const res = await fetch("/api/formfav");
+        const data = await res.json();
+
+        const livePredictions =
+          data?.racecards?.slice(0, 3).map((race: any) => {
+            const runners = race.runners || [];
+            const firstRunner = runners[0];
+
+            return {
+              time: race.off_time || "TBA",
+              track: race.course || "Unknown",
+              race: `Race ${race.race_number || ""}`,
+              runners: race.runner_count || runners.length || 0,
+              horse: firstRunner?.horse || "View dashboard",
+              confidence: "LIVE",
+            };
+          }) || [];
+
+        if (livePredictions.length > 0) {
+          setPredictions(livePredictions);
+        }
+      } catch (error) {
+        console.error("Homepage live races failed:", error);
+      }
+    }
+
+    loadHomepageRaces();
+  }, []); 
   return (
     <main
       style={{
