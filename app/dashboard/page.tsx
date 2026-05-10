@@ -516,13 +516,14 @@ color: "#b7c5d8",
                     window.location.href = "/#pricing";
                   }
                 }}
-                style={{
-                  padding: "20px",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  borderRadius: "16px",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  background: "rgba(2,8,18,0.45)",
+                padding: "26px",
+border: "1px solid rgba(255,255,255,0.16)",
+borderRadius: "24px",
+cursor: "pointer",
+transition: "all 0.25s ease",
+background: "rgba(15,23,42,0.58)",
+backdropFilter: "blur(14px)",
+boxShadow: "0 18px 45px rgba(0,0,0,0.28)"
                 }}
               >
                 <h3>
@@ -545,8 +546,10 @@ color: "#b7c5d8",
                 <div
                   style={{
                     color: "#facc15",
-                    fontSize: "12px",
-                    marginTop: "6px",
+fontSize: "13px",
+marginTop: "8px",
+fontWeight: "700",
+letterSpacing: "0.02em",
                   }}
                 >
                   {isFreePick
@@ -557,13 +560,15 @@ color: "#b7c5d8",
                 {isFreePick && bestRunner?.reasoning && (
                   <div
                     style={{
-                      marginTop: "12px",
-                      padding: "10px",
-                      borderRadius: "10px",
-                      background: "rgba(255,255,255,0.04)",
-                      color: "#94a3b8",
-                      fontSize: "12px",
-                      lineHeight: "1.5",
+                      marginTop: "14px",
+padding: "14px",
+borderRadius: "16px",
+background: "rgba(255,255,255,0.05)",
+border: "1px solid rgba(255,255,255,0.08)",
+color: "#cbd5e1",
+fontSize: "13px",
+lineHeight: "1.6",
+backdropFilter: "blur(10px)",
                     }}
                   >
                     <strong style={{ color: "#ffffff" }}>AI Reasoning</strong>
