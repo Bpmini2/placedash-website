@@ -85,7 +85,7 @@ export default function Home() {
           data?.racecards?.slice(0, 3).map((race: any) => {
             const runners = race.runners || [];
             const firstRunner = runners[0];
-
+async function loadHomepageRaces() {
             return {
               time: race.off_time || "TBA",
               track: race.course || "Unknown",
