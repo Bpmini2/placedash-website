@@ -121,49 +121,39 @@ export default function Home() {
     >
       <div style={{ maxWidth: "1320px", margin: "0 auto" }}>
         <header
-  className="header"
   style={{
-    width: "calc(100vw - 40px)",
-    marginLeft: "calc(50% - 50vw + 20px)",
+    width: "calc(100vw - 48px)",
+    marginLeft: "calc(50% - 50vw + 24px)",
     marginTop: "20px",
-    background: "rgba(255,255,255,0.96)",
-    backdropFilter: "blur(14px)",
-    borderRadius: "30px",
-    padding: "22px 72px",
-    boxShadow: "0 18px 50px rgba(0,0,0,0.35)",
-    border: "1px solid rgba(255,255,255,0.7)",
+    background: "rgba(255,255,255,0.97)",
+    borderRadius: "28px",
+    padding: "22px 36px",
+    boxShadow: "0 18px 45px rgba(0,0,0,0.35)",
   }}
 >
   <div
     style={{
-      display: "flex",
+      display: "grid",
+      gridTemplateColumns: "auto 1fr auto",
       alignItems: "center",
-      justifyContent: "space-between",
       gap: "40px",
+      width: "100%",
     }}
   >
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "18px",
-      }}
-    >
+    <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
       <img
         src="/placedash-logo.png"
         alt="PlaceDash"
         style={{
           width: "64px",
           height: "64px",
-          borderRadius: "16px",
-          objectFit: "cover",
-          objectPosition: "left center",
+          objectFit: "contain",
         }}
       />
 
       <div
         style={{
-          fontSize: "38px",
+          fontSize: "40px",
           fontWeight: 800,
           color: "#07111f",
           letterSpacing: "-1px",
@@ -176,7 +166,7 @@ export default function Home() {
     <nav
       style={{
         display: "flex",
-        alignItems: "center",
+        justifyContent: "center",
         gap: "42px",
       }}
     >
@@ -196,6 +186,7 @@ export default function Home() {
         fontWeight: 800,
         textDecoration: "none",
         boxShadow: "0 14px 35px rgba(32,200,101,0.35)",
+        whiteSpace: "nowrap",
       }}
     >
       View Today’s Picks
