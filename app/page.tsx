@@ -103,7 +103,7 @@ export default function Home() {
         console.error("Homepage live races failed:", error);
       }
     }
-
+useEffect(() => {
     loadHomepageRaces();
   }, []); 
   return (
