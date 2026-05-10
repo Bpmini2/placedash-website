@@ -159,16 +159,15 @@ export default function Home() {
         }}
       >
         <img
-          src="/placedash-logo.png"
-          alt="PlaceDash"
-          style={{
-            width: "220px",
-            height: "auto",
-            display: "block",
-            objectFit: "contain",
-            transform: "translateX(0px)",
-          }}
-        />
+  src="/placedash-logo.png"
+  alt="PlaceDash"
+  style={{
+    width: "220px",
+    height: "auto",
+    objectFit: "contain",
+    display: "block",
+  }}
+/>
       </div>
 
       <span
