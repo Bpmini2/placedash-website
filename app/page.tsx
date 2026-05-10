@@ -123,54 +123,84 @@ export default function Home() {
         <header
   className="header"
   style={{
-    background: "rgba(255,255,255,0.96)",
-    backdropFilter: "blur(10px)",
-    borderRadius: "28px",
-    padding: "18px 32px",
+    width: "calc(100vw - 40px)",
+    marginLeft: "calc(50% - 50vw + 20px)",
     marginTop: "20px",
-    boxShadow: "0 10px 35px rgba(0,0,0,0.35)",
-    border: "1px solid rgba(255,255,255,0.25)"
+    background: "rgba(255,255,255,0.96)",
+    backdropFilter: "blur(14px)",
+    borderRadius: "30px",
+    padding: "22px 72px",
+    boxShadow: "0 18px 50px rgba(0,0,0,0.35)",
+    border: "1px solid rgba(255,255,255,0.7)",
   }}
 >
   <div
-    className="brand"
     style={{
       display: "flex",
       alignItems: "center",
-      gap: "14px"
+      justifyContent: "space-between",
+      gap: "40px",
     }}
   >
-    <img
-      src="/placedash-logo.png"
-      alt="PlaceDash"
-      style={{
-        width: "72px",
-        height: "72px",
-        objectFit: "contain"
-      }}
-    />
-
     <div
       style={{
-        fontSize: "2.2rem",
-        fontWeight: 800,
-        color: "#08111b"
+        display: "flex",
+        alignItems: "center",
+        gap: "18px",
       }}
     >
-      PlaceDash
+      <img
+        src="/placedash-logo.png"
+        alt="PlaceDash"
+        style={{
+          width: "64px",
+          height: "64px",
+          borderRadius: "16px",
+          objectFit: "cover",
+          objectPosition: "left center",
+        }}
+      />
+
+      <div
+        style={{
+          fontSize: "38px",
+          fontWeight: 800,
+          color: "#07111f",
+          letterSpacing: "-1px",
+        }}
+      >
+        PlaceDash
+      </div>
     </div>
+
+    <nav
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "42px",
+      }}
+    >
+      <a style={{ color: "#07111f", fontWeight: 600, textDecoration: "none" }} href="/dashboard">Predictions</a>
+      <a style={{ color: "#07111f", fontWeight: 600, textDecoration: "none" }} href="#method">Method</a>
+      <a style={{ color: "#07111f", fontWeight: 600, textDecoration: "none" }} href="#track-record">Track Record</a>
+      <a style={{ color: "#07111f", fontWeight: 600, textDecoration: "none" }} href="#pricing">Pricing</a>
+    </nav>
+
+    <a
+      href="/dashboard"
+      style={{
+        background: "#20c865",
+        color: "#07111f",
+        padding: "16px 30px",
+        borderRadius: "16px",
+        fontWeight: 800,
+        textDecoration: "none",
+        boxShadow: "0 14px 35px rgba(32,200,101,0.35)",
+      }}
+    >
+      View Today’s Picks
+    </a>
   </div>
-
-  <nav>
-    <a href="/dashboard">Predictions</a>
-    <a href="#method">Method</a>
-    <a href="#track-record">Track Record</a>
-    <a href="#pricing">Pricing</a>
-  </nav>
-
-  <a className="headerButton" href="/dashboard">
-    View Today’s Picks
-  </a>
 </header>
 
         <section className="hero">
