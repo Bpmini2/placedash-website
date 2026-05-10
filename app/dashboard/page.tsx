@@ -510,21 +510,27 @@ color: "#b7c5d8",
               <div
   key={`${race.course}-${race.race_number}`}
   onClick={() => {
-    if (isFreePick) {
-      setSelectedRace(race);
-    } else {
-      window.location.href = "/#pricing";
-    }
-  }}
+    onMouseEnter={(e) => {
+  e.currentTarget.style.transform = "translateY(-6px)";
+  e.currentTarget.style.boxShadow =
+    "0 24px 55px rgba(34,197,94,0.22)";
+}}
+
+onMouseLeave={(e) => {
+  e.currentTarget.style.transform = "translateY(0px)";
+  e.currentTarget.style.boxShadow =
+    "0 18px 45px rgba(0,0,0,0.28)";
+}}
   style={{
     padding: "26px",
     border: "1px solid rgba(255,255,255,0.16)",
     borderRadius: "24px",
     cursor: "pointer",
-    transition: "all 0.25s ease",
+    transition: "all 0.28s cubic-bezier(0.4, 0, 0.2, 1)",
     background: "rgba(15,23,42,0.58)",
     backdropFilter: "blur(14px)",
     boxShadow: "0 18px 45px rgba(0,0,0,0.28)",
+    transform: "translateY(0px)",
   }}
 >
                 <h3>
