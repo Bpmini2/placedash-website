@@ -275,45 +275,95 @@ export default function Home() {
         </section>
 
         <section id="predictions" className="section">
-          <div className="sectionTitle center">
-            <span>Today’s Predictions</span>
-            <h2>Filtered racecards, not every race</h2>
-            <p>
-              Only races matching the PlaceDash rules are shown: Australian races,
-              8–11 active runners, no first starters, and runners with 3+
-              previous starts.
-            </p>
-          </div>
+  <div className="sectionTitle center">
+    <span>Today’s Predictions</span>
+    <h2>Live qualifying races appear here daily</h2>
 
-          <div className="predictionGrid">
-            {predictions.map((p) => (
-              <div className="predictionCard" key={`${p.track}-${p.race}`}>
-                <div className="raceHeader">
-                  <div>
-                    <h3>
-                      {p.track} {p.race}
-                    </h3>
-                    <small>
-                      {p.time} • {p.runners} active runners
-                    </small>
-                  </div>
-                  <ConfidenceBadge level={p.confidence} />
-                </div>
+    <p>
+      PlaceDash only displays Australian races that pass the platform filters:
+      8–11 active runners, no first starters, and runners with previous race
+      experience.
+    </p>
+  </div>
 
-                <div className="selectionBox">
-                  <small>Top Rated Selection</small>
-                  <strong>{p.horse}</strong>
-                </div>
+  {predictions === demoPredictions ? (
+    <div
+      style={{
+        maxWidth: "900px",
+        margin: "0 auto",
+        textAlign: "center",
+        padding: "40px",
+        borderRadius: "28px",
+        background: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(255,255,255,0.08)",
+      }}
+    >
+      <h3 style={{ marginTop: 0 }}>
+        No live qualifying races available right now
+      </h3>
+
+      <p
+        style={{
+          color: "#cbd5e1",
+          lineHeight: 1.7,
+        }}
+      >
+        Live racecards automatically appear here when qualifying Australian
+        races become available during the day.
+      </p>
+
+      <p
+        style={{
+          color: "#94a3b8",
+          fontSize: "14px",
+          marginTop: "20px",
+        }}
+      >
+        The live dashboard still contains full AI analysis, race filtering,
+        confidence ratings, and premium selections.
+      </p>
+
+      <div style={{ marginTop: "30px" }}>
+        <a className="primaryButton" href="/dashboard">
+          Open Live Dashboard
+        </a>
+      </div>
+    </div>
+  ) : (
+    <>
+      <div className="predictionGrid">
+        {predictions.map((p) => (
+          <div className="predictionCard" key={`${p.track}-${p.race}`}>
+            <div className="raceHeader">
+              <div>
+                <h3>
+                  {p.track} {p.race}
+                </h3>
+
+                <small>
+                  {p.time} • {p.runners} active runners
+                </small>
               </div>
-            ))}
-          </div>
 
-          <div style={{ textAlign: "center", marginTop: "28px" }}>
-            <a className="primaryButton" href="/dashboard">
-              Open Live Dashboard
-            </a>
+              <ConfidenceBadge level={p.confidence} />
+            </div>
+
+            <div className="selectionBox">
+              <small>Top Rated Selection</small>
+              <strong>{p.horse}</strong>
+            </div>
           </div>
-        </section>
+        ))}
+      </div>
+
+      <div style={{ textAlign: "center", marginTop: "28px" }}>
+        <a className="primaryButton" href="/dashboard">
+          Open Live Dashboard
+        </a>
+      </div>
+    </>
+  )}
+</section>
 
         <section id="track-record" className="section darkSection">
           <div className="sectionTitle center">
