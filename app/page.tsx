@@ -120,26 +120,58 @@ export default function Home() {
       }}
     >
       <div style={{ maxWidth: "1320px", margin: "0 auto" }}>
-        <header className="header">
-          <div className="brand">
-            <img
-              src="/placedash-logo.png"
-              alt="PlaceDash"
-              style={{ width: "260px", maxWidth: "100%" }}
-            />
-          </div>
+        <header
+  className="header"
+  style={{
+    background: "rgba(255,255,255,0.96)",
+    backdropFilter: "blur(10px)",
+    borderRadius: "28px",
+    padding: "18px 32px",
+    marginTop: "20px",
+    boxShadow: "0 10px 35px rgba(0,0,0,0.35)",
+    border: "1px solid rgba(255,255,255,0.25)"
+  }}
+>
+  <div
+    className="brand"
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "14px"
+    }}
+  >
+    <img
+      src="/placedash-logo.png"
+      alt="PlaceDash"
+      style={{
+        width: "72px",
+        height: "72px",
+        objectFit: "contain"
+      }}
+    />
 
-          <nav>
-            <a href="/dashboard">Predictions</a>
-            <a href="#method">Method</a>
-            <a href="#track-record">Track Record</a>
-            <a href="#pricing">Pricing</a>
-          </nav>
+    <div
+      style={{
+        fontSize: "2.2rem",
+        fontWeight: 800,
+        color: "#08111b"
+      }}
+    >
+      PlaceDash
+    </div>
+  </div>
 
-          <a className="headerButton" href="/dashboard">
-            View Today’s Picks
-          </a>
-        </header>
+  <nav>
+    <a href="/dashboard">Predictions</a>
+    <a href="#method">Method</a>
+    <a href="#track-record">Track Record</a>
+    <a href="#pricing">Pricing</a>
+  </nav>
+
+  <a className="headerButton" href="/dashboard">
+    View Today’s Picks
+  </a>
+</header>
 
         <section className="hero">
           <div>
