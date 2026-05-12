@@ -369,10 +369,10 @@ useEffect(() => {
   width: "100%",
   marginBottom: "50px",
   background: "rgba(5,10,20,0.78)",
-  border: "1px solid rgba(255,255,255,0.16)",
+  border: "1px solid rgba(255,255,255,0.28)",
   borderRadius: "26px",
   padding: "20px 34px",
-  boxShadow: "0 18px 45px rgba(0,0,0,0.35)",
+  boxShadow: "0 8px 40px rgba(255,255,255,0.08)",
   backdropFilter: "blur(14px)",
 }}
 >
