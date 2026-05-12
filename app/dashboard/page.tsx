@@ -366,14 +366,14 @@ useEffect(() => {
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
      <header
   style={{
-  width: "100%",
-  marginBottom: "50px",
-  background: "#f3f4f6",
-border: "1px solid rgba(255,255,255,0.95)",
-  padding: "20px 34px",
-  boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
-  backdropFilter: "blur(14px)",
-}}
+    width: "100%",
+    marginBottom: "50px",
+    background: "#f3f4f6",
+    border: "1px solid rgba(255,255,255,0.95)",
+    borderRadius: "26px",
+    padding: "20px 34px",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
+  }}
 >
   <div
     style={{
@@ -407,9 +407,9 @@ border: "1px solid rgba(255,255,255,0.95)",
       <span
         style={{
           fontSize: "44px",
-fontWeight: 900,
-color: "#ffffff",
-lineHeight: 1,
+          fontWeight: 900,
+          color: "#07111f",
+          lineHeight: 1,
         }}
       >
         PlaceDash
@@ -417,13 +417,13 @@ lineHeight: 1,
     </div>
 
     <nav style={{ display: "flex", gap: "46px" }}>
-      <a href="/" style={{ color: "#ffffff", fontWeight: 700, textDecoration: "none" }}>
+      <a href="/" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
         Home
       </a>
-      <a href="/#track-record" style={{ color: "#ffffff", fontWeight: 700, textDecoration: "none" }}>
+      <a href="/#track-record" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
         Track Record
       </a>
-      <a href="/#pricing" style={{ color: "#ffffff", fontWeight: 700, textDecoration: "none" }}>
+      <a href="/#pricing" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
         Pricing
       </a>
     </nav>
