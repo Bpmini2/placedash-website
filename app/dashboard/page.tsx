@@ -368,11 +368,11 @@ useEffect(() => {
   style={{
   width: "100%",
   marginBottom: "50px",
-  background: "rgba(5,10,20,0.78)",
-  border: "1px solid rgba(255,255,255,0.28)",
-  borderRadius: "26px",
+  background: "#f3f4f6",
+background: "#f3f4f6",
+border: "1px solid rgba(255,255,255,0.95)",
   padding: "20px 34px",
-  boxShadow: "0 8px 40px rgba(255,255,255,0.08)",
+  boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
   backdropFilter: "blur(14px)",
 }}
 >
