@@ -366,13 +366,15 @@ useEffect(() => {
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
      <header
   style={{
-    width: "100%",
-    marginBottom: "70px",
-    background: "rgba(255,255,255,0.97)",
-    borderRadius: "30px",
-    padding: "22px 48px",
-    boxShadow: "0 18px 45px rgba(0,0,0,0.35)",
-  }}
+  width: "100%",
+  marginBottom: "50px",
+  background: "rgba(2,8,18,0.72)",
+  border: "1px solid rgba(255,255,255,0.10)",
+  borderRadius: "26px",
+  padding: "20px 34px",
+  boxShadow: "0 18px 45px rgba(0,0,0,0.35)",
+  backdropFilter: "blur(14px)",
+}}
 >
   <div
     style={{
@@ -407,7 +409,7 @@ useEffect(() => {
         style={{
           fontSize: "44px",
           fontWeight: 900,
-          color: "#07111f",
+          color: "#ffffff",
           letterSpacing: "-1.5px",
           lineHeight: 1,
         }}
@@ -417,13 +419,13 @@ useEffect(() => {
     </div>
 
     <nav style={{ display: "flex", gap: "46px" }}>
-      <a href="/" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
+      <a href="/" style={{ color: "#ffffff", fontWeight: 700, textDecoration: "none" }}>
         Home
       </a>
-      <a href="/#track-record" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
+      <a href="/#track-record" style={{ color: "#ffffff", fontWeight: 700, textDecoration: "none" }}>
         Track Record
       </a>
-      <a href="/#pricing" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
+      <a href="/#pricing" style={{ color: "#ffffff", fontWeight: 700, textDecoration: "none" }}>
         Pricing
       </a>
     </nav>
