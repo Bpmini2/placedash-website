@@ -395,7 +395,7 @@ useEffect(() => {
           alignItems: "center",
           justifyContent: "center",
           color: "#07111f",
-          fontSize: "30px",
+          fontSize: "34px",
           fontWeight: 900,
           fontStyle: "italic",
           letterSpacing: "-3px",
@@ -408,9 +408,9 @@ useEffect(() => {
       <span
         style={{
           fontSize: "52px",
-          fontWeight: 900,
+          fontWeight: 800,
           color: "#ffffff",
-          letterSpacing: "-1.5px",
+          letterSpacing: "-2px",
           lineHeight: 1,
         }}
       >
