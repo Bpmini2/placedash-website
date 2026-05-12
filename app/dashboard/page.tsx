@@ -249,7 +249,13 @@ return total - 12 * recencyWeight;
       .map((runner: any) => scoreRunner(runner))
       .sort((a: any, b: any) => b.score - a.score);
   }
+useEffect(() => {
+  const existingPicks = JSON.parse(
+    localStorage.getItem("placedashSavedPicks") || "[]"
+  );
 
+  setSavedPicks(existingPicks);
+}, []);
   useEffect(() => {
     async function loadRaces() {
       try {
