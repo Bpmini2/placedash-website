@@ -368,8 +368,8 @@ useEffect(() => {
   style={{
   width: "100%",
   marginBottom: "50px",
-  background: "rgba(2,8,18,0.72)",
-  border: "1px solid rgba(255,255,255,0.10)",
+  background: "rgba(5,10,20,0.78)",
+  border: "1px solid rgba(255,255,255,0.16)",
   borderRadius: "26px",
   padding: "20px 34px",
   boxShadow: "0 18px 45px rgba(0,0,0,0.35)",
@@ -407,7 +407,7 @@ useEffect(() => {
 
       <span
         style={{
-          fontSize: "44px",
+          fontSize: "52px",
           fontWeight: 900,
           color: "#ffffff",
           letterSpacing: "-1.5px",
