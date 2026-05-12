@@ -542,14 +542,18 @@ backdropFilter: "blur(14px)",
 color: "#b7c5d8",
               }}
             >
-              <strong style={{ color: "#ffffff" }}>
-                No qualifying races found today.
-              </strong>
-              <p style={{ marginTop: "8px" }}>
-                PlaceDash only shows Australian races with 8–11 runners, no first
-                starters, and races that have not already started. Please check
-                back later when more race data is available.
-              </p>
+              <strong style={{ color: "#ffffff", fontSize: "18px" }}>
+  No qualifying races found right now.
+</strong>
+
+<p style={{ marginTop: "10px", lineHeight: 1.6 }}>
+  PlaceDash only shows Australian races with 8–11 active runners, no first
+  starters, and races that have not already started.
+</p>
+
+<p style={{ marginTop: "10px", color: "#94a3b8", lineHeight: 1.6 }}>
+  Live qualifying races will appear automatically when available.
+</p>
             </div>
           )}
 
