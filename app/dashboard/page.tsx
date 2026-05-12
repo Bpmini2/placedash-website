@@ -31,10 +31,12 @@ export default function Dashboard() {
       const recencyWeight = index === 0 ? 1.25 : index === 1 ? 1.1 : 1;
 
       if (result === 1) return total + 90 * recencyWeight;
-      if (result === 2) return total + 75 * recencyWeight;
-      if (result === 3) return total + 60 * recencyWeight;
-      if (result <= 5) return total + 38 * recencyWeight;
-      return total + 15 * recencyWeight;
+if (result === 2) return total + 72 * recencyWeight;
+if (result === 3) return total + 58 * recencyWeight;
+if (result <= 5) return total + 32 * recencyWeight;
+if (result <= 7) return total + 10 * recencyWeight;
+
+return total - 12 * recencyWeight;
     }, 0);
 
     return Math.round(score / recentResults.length);
