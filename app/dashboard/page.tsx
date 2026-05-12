@@ -297,6 +297,49 @@ return total - 12 * recencyWeight;
 
   const selectedBestRunner = selectedRace ? getBestRunner(selectedRace) : null;
   const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
+    useEffect(() => {
+    if (!displayRaces.length) return;
+
+    const savedPicks = JSON.parse(
+      localStorage.getItem("placedashSavedPicks") || "[]"
+    );
+
+    const newPicks = displayRaces.map((race: any) => {
+      const bestRunner = getBestRunner(race);
+
+      return {
+        id: `${new Date().toLocaleDateString("en-AU")}-${race.course}-${race.race_number}`,
+        date: new Date().toLocaleDateString("en-AU"),
+        course: race.course || "Unknown",
+        raceNumber: race.race_number || "",
+        raceTime: race.off_time || "TBA",
+        distance: race.distance || "TBA",
+        condition: race.condition || "TBA",
+        runnerCount: race.runners?.length || 0,
+        horseNumber: bestRunner?.number || "",
+        horseName: bestRunner?.horse || "No selection",
+        confidence: bestRunner?.confidence || "LOW",
+        score: bestRunner?.score || 0,
+        reasoning: bestRunner?.reasoning || [],
+        result: "Pending",
+        placed: "Pending",
+      };
+    });
+
+    const mergedPicks = [...savedPicks];
+
+    newPicks.forEach((pick: any) => {
+      const alreadySaved = mergedPicks.some(
+        (saved: any) => saved.id === pick.id
+      );
+
+      if (!alreadySaved) {
+        mergedPicks.push(pick);
+      }
+    });
+
+    localStorage.setItem("placedashSavedPicks", JSON.stringify(mergedPicks));
+  }, [displayRaces]);
 
   return (
   <main
