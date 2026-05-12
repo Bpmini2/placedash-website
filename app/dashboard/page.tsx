@@ -935,7 +935,7 @@ backdropFilter: "blur(10px)",
             background: "rgba(2,8,18,0.45)",
           }}
         >
-          <h2 style={{ marginBottom: "15px" }}>Today’s Race Summary</h2>
+          <h2 style={{ marginBottom: "15px" }}>Saved AI Picks / Track Record</h2>
 
           <div style={{ display: "grid", gap: "10px" }}>
             {savedPicks.length === 0 ? (
@@ -983,7 +983,7 @@ backdropFilter: "blur(10px)",
           </div>
 
           <p style={{ color: "#94a3b8", marginTop: "10px", fontSize: "12px" }}>
-            Updated daily. Locked selections are available to upgraded members.
+            Saved picks will appear here once live qualifying races are found. Results are currently marked as Pending until race result tracking is connected.
           </p>
         </div>
 
