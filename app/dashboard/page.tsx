@@ -938,10 +938,10 @@ backdropFilter: "blur(10px)",
           <h2 style={{ marginBottom: "15px" }}>Today’s Race Summary</h2>
 
           <div style={{ display: "grid", gap: "10px" }}>
-            {recentPicks.length === 0 ? (
+            {savedPicks.length === 0 ? (
               <p style={{ color: "#94a3b8" }}>No saved picks yet.</p>
             ) : (
-              recentPicks.map((r, i) => (
+              savedPicks.slice(-10).reverse().map((r, i) => (
                 <div
                   key={i}
                   style={{
