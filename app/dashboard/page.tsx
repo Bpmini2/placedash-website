@@ -950,7 +950,7 @@ backdropFilter: "blur(10px)",
                   }}
                 >
                   <div style={{ fontWeight: "700", color: "#ffffff" }}>
-                    {r.race} · {r.time}
+                    {r.course} Race {r.raceNumber} · {r.raceTime}
                   </div>
 
                   <div
@@ -961,7 +961,7 @@ backdropFilter: "blur(10px)",
                     }}
                   >
                     <span>
-                      Pick: {i === 0 ? r.horse : "🔒 Upgrade to reveal pick"}
+                      Pick: {r.horseNumber}. {r.horseName}
                     </span>
                     <span style={{ color: "#facc15", fontWeight: "700" }}>
                       {r.confidence}
@@ -975,7 +975,7 @@ backdropFilter: "blur(10px)",
                       marginTop: "4px",
                     }}
                   >
-                    Date: {r.date}
+                    Date: {r.date} · Result: {r.result} · Placed: {r.placed}
                   </div>
                 </div>
               ))
