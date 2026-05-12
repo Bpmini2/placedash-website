@@ -369,7 +369,6 @@ useEffect(() => {
   width: "100%",
   marginBottom: "50px",
   background: "#f3f4f6",
-background: "#f3f4f6",
 border: "1px solid rgba(255,255,255,0.95)",
   padding: "20px 34px",
   boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
