@@ -395,7 +395,7 @@ useEffect(() => {
           alignItems: "center",
           justifyContent: "center",
           color: "#07111f",
-          fontSize: "34px",
+          fontSize: "30px",
           fontWeight: 900,
           fontStyle: "italic",
           letterSpacing: "-3px",
@@ -407,11 +407,10 @@ useEffect(() => {
 
       <span
         style={{
-          fontSize: "52px",
-          fontWeight: 800,
-          color: "#ffffff",
-          letterSpacing: "-2px",
-          lineHeight: 1,
+          fontSize: "44px",
+fontWeight: 900,
+color: "#ffffff",
+lineHeight: 1,
         }}
       >
         PlaceDash
