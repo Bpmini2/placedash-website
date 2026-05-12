@@ -6,6 +6,7 @@ export default function Dashboard() {
   const [races, setRaces] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRace, setSelectedRace] = useState<any | null>(null);
+  const [savedPicks, setSavedPicks] = useState<any[]>([]);
 
   function countStarts(runner: any) {
     if (typeof runner.starts === "number") return runner.starts;
@@ -339,6 +340,7 @@ return total - 12 * recencyWeight;
     });
 
     localStorage.setItem("placedashSavedPicks", JSON.stringify(mergedPicks));
+      setSavedPicks(mergedPicks);
   }, [displayRaces]);
 
   return (
