@@ -250,11 +250,20 @@ return total - 12 * recencyWeight;
       .sort((a: any, b: any) => b.score - a.score);
   }
 useEffect(() => {
-  const existingPicks = JSON.parse(
-    localStorage.getItem("placedashSavedPicks") || "[]"
-  );
+  async function loadSavedPicks() {
+    try {
+      const res = await fetch("/api/saved-picks");
+      const data = await res.json();
 
-  setSavedPicks(existingPicks);
+      if (data.picks) {
+        setSavedPicks(data.picks);
+      }
+    } catch (err) {
+      console.error("Failed to load saved picks", err);
+    }
+  }
+
+  loadSavedPicks();
 }, []);
   useEffect(() => {
     async function loadRaces() {
@@ -346,8 +355,7 @@ distance: race.distance || "TBA",
       }
     });
 
-    localStorage.setItem("placedashSavedPicks", JSON.stringify(mergedPicks));
-      setSavedPicks(mergedPicks);
+    setSavedPicks(mergedPicks);
   }, [displayRaces]);
 
   return (
