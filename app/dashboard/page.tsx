@@ -320,7 +320,8 @@ useEffect(() => {
         course: race.course || "Unknown",
         raceNumber: race.race_number || "",
         raceTime: race.off_time || "TBA",
-        distance: race.distance || "TBA",
+state: race.state || "",
+distance: race.distance || "TBA",
         condition: race.condition || "TBA",
         runnerCount: race.runners?.length || 0,
         horseNumber: bestRunner?.number || "",
@@ -954,8 +955,8 @@ backdropFilter: "blur(10px)",
                   }}
                 >
                   <div style={{ fontWeight: "700", color: "#ffffff" }}>
-                    {r.course} Race {r.raceNumber} · {r.raceTime}
-                  </div>
+  {r.course} Race {r.raceNumber}{r.state ? ` (${r.state})` : ""} · {r.raceTime}
+</div>
 
                   <div
                     style={{
