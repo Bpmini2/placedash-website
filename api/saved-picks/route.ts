@@ -1,27 +1,18 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export async function GET() {
   try {
-    const { data, error } = await supabase
-      .from("placedash_picks")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(50);
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/placedash_picks?select=*&order=created_at.desc&limit=50`,
+      {
+        headers: {
+          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        },
+      }
+    );
 
-    if (error) {
-      console.error("Supabase fetch error:", error);
-
-      return NextResponse.json({
-        ok: false,
-        error: error.message,
-      });
-    }
+    const data = await response.json();
 
     return NextResponse.json({
       ok: true,
@@ -29,8 +20,6 @@ export async function GET() {
       picks: data || [],
     });
   } catch (err: any) {
-    console.error("Saved picks API error:", err);
-
     return NextResponse.json({
       ok: false,
       error: err.message || "Unknown error",
