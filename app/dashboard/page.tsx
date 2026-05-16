@@ -948,60 +948,38 @@ backdropFilter: "blur(10px)",
             background: "rgba(2,8,18,0.45)",
           }}
         >
-          <h2 style={{ marginBottom: "15px" }}>Saved AI Picks / Track Record</h2>
+          <div
+  style={{
+    marginTop: "40px",
+    padding: "20px",
+    border: "1px solid rgba(255,255,255,0.1)",
+    borderRadius: "16px",
+    background: "rgba(2,8,18,0.45)",
+    textAlign: "center",
+  }}
+>
+  <h2 style={{ marginBottom: "12px" }}>Track Record</h2>
 
-          <div style={{ display: "grid", gap: "10px" }}>
-            {savedPicks.length === 0 ? (
-              <p style={{ color: "#94a3b8" }}>No saved picks yet.</p>
-            ) : (
-              savedPicks.slice(-10).reverse().map((r, i) => {
-  const isFreePick = i === 0;
+  <p style={{ color: "#94a3b8", marginBottom: "18px" }}>
+    View historical AI picks, saved races, and future performance tracking.
+  </p>
 
-  return (
-                <div
-                  key={i}
-                  style={{
-                    padding: "10px 0",
-                    borderBottom: "1px solid rgba(255,255,255,0.08)",
-                  }}
-                >
-                  <div style={{ fontWeight: "700", color: "#ffffff" }}>
-  {r.course} Race {r.raceNumber}{r.state ? ` (${r.state})` : ""} · {r.raceTime}
+  <a
+    href="/track-record"
+    style={{
+      display: "inline-block",
+      background: "#22c55e",
+      color: "#07111f",
+      padding: "14px 28px",
+      borderRadius: "12px",
+      fontWeight: 800,
+      textDecoration: "none",
+      boxShadow: "0 10px 25px rgba(34,197,94,0.35)",
+    }}
+  >
+    View Full Track Record
+  </a>
 </div>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginTop: "4px",
-                    }}
-                  >
-                    <span>
-  Pick: {isFreePick
-    ? `${r.horseNumber}. ${r.horseName}`
-    : "🔒 Upgrade to reveal pick"}
-</span>
-                    <span style={{ color: "#facc15", fontWeight: "700" }}>
-                      {r.confidence}
-                    </span>
-                  </div>
-
-                  <div
-                    style={{
-                      color: "#94a3b8",
-                      fontSize: "12px",
-                      marginTop: "4px",
-                    }}
-                  >
-                    Date: {r.date} · Result: {r.result} · Placed: {r.placed}
-                  </div>
-                </div>
-              );
-})
-            )}
-          </div>
-
-          <p style={{ color: "#94a3b8", marginTop: "10px", fontSize: "12px" }}>
             Saved picks will appear here once live qualifying races are found. Results are currently marked as Pending until race result tracking is connected.
           </p>
         </div>
