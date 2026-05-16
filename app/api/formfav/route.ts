@@ -132,7 +132,7 @@ function scoreRunner(runner: any) {
   if (score >= 65) confidence = "HIGH";
   else if (score >= 45) confidence = "MEDIUM";
 
-  const reasoning = [];
+  const reasoning: string[] = [];
 
   if (placePercent >= 55) reasoning.push("Strong overall place record");
   else if (placePercent >= 40) reasoning.push("Solid overall place record");
