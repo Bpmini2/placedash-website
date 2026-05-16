@@ -201,7 +201,6 @@ async function savePickToSupabase(race: any, bestRunner: any, pickDate: string) 
         runner_count: Number(race.runner_count || 0),
 
         place_odds: null,
-
         result: "pending",
         placed: null,
         bet_size: null,
@@ -219,68 +218,6 @@ async function savePickToSupabase(race: any, bestRunner: any, pickDate: string) 
     console.error("Supabase saved_picks insert error:", error.message);
   }
 }
-
-  const existingRes = await fetch(
-    `${supabaseUrl}/rest/v1/placedash_picks?pick_date=eq.${pickDate}&course=eq.${encodeURIComponent(
-      race.course || ""
-    )}&race_number=eq.${encodeURIComponent(String(race.race_number || ""))}`,
-    {
-      headers: {
-        apikey: supabaseSecretKey,
-        Authorization: `Bearer ${supabaseSecretKey}`,
-      },
-      cache: "no-store",
-    }
-  );
-
-  const existing = await existingRes.json();
-
-  if (Array.isArray(existing) && existing.length > 0) {
-    return;
-  }
-
-  await fetch(`${supabaseUrl}/rest/v1/placedash_picks`, {
-    method: "POST",
-    headers: {
-      apikey: supabaseSecretKey,
-      Authorization: `Bearer ${supabaseSecretKey}`,
-      "Content-Type": "application/json",
-      Prefer: "return=minimal",
-    },
-    body: JSON.stringify({
-      pick_date: pickDate,
-      source: "FormFav",
-
-      course: race.course || "",
-      race_number: String(race.race_number || ""),
-      race_name: race.race_name || "",
-      state: race.state || "",
-      off_time: race.off_time || "",
-      start_time: race.start_time || null,
-      timezone_label: race.timezone_label || "",
-      distance: race.distance || "",
-      condition: race.condition || "",
-      weather: race.weather || "",
-
-      horse_number: String(bestRunner.number || ""),
-      horse_name: bestRunner.horse || "",
-      jockey: bestRunner.jockey || "",
-      trainer: bestRunner.trainer || "",
-      barrier: String(bestRunner.draw || ""),
-      weight: String(bestRunner.lbs || ""),
-      form: bestRunner.form || "",
-
-      confidence: bestRunner.confidence || "",
-      score: bestRunner.score || 0,
-      place_percent: bestRunner.displayPlacePercent || 0,
-      reasoning: bestRunner.reasoning || [],
-
-      result_status: "pending",
-    }),
-  });
-}
-
-export async function GET() {
   try {
     const apiKey = process.env.FORMFAV_API_KEY;
 
