@@ -577,7 +577,18 @@ export default function Dashboard() {
   {runner.displayPlacePercent || 0}%
 </td>
 
-<td style={{ padding: "10px" }}>
+<td
+  style={{
+    padding: "10px",
+    color:
+      runner.confidence === "HIGH"
+        ? "#22c55e"
+        : runner.confidence === "MEDIUM"
+        ? "#facc15"
+        : "#ef4444",
+    fontWeight: 800,
+  }}
+>
   {runner.confidence} · {runner.score}
 </td>
 
