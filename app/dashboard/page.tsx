@@ -523,7 +523,7 @@ export default function Dashboard() {
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
                 <thead>
                   <tr style={{ color: "#94a3b8", textAlign: "left" }}>
-                    <
+                  
                     <th style={{ padding: "10px" }}>Rank</th>
 <th style={{ padding: "10px" }}>No.</th>
 <th style={{ padding: "10px" }}>Horse</th>
