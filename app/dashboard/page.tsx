@@ -523,17 +523,25 @@ export default function Dashboard() {
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
                 <thead>
                   <tr style={{ color: "#94a3b8", textAlign: "left" }}>
+                    <
                     <th style={{ padding: "10px" }}>Rank</th>
-                    <th style={{ padding: "10px" }}>No.</th>
-                    <th style={{ padding: "10px" }}>Horse</th>
-                    <th style={{ padding: "10px" }}>Jockey</th>
-                    <th style={{ padding: "10px" }}>Trainer</th>
-                    <th style={{ padding: "10px" }}>AI</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {scoredRunners.map((runner: any, index: number) => (
-                    <tr key={`${runner.number}-${runner.horse}`} style={{ color: "#cbd5e1" }}>
+<th style={{ padding: "10px" }}>No.</th>
+<th style={{ padding: "10px" }}>Horse</th>
+<th style={{ padding: "10px" }}>Jockey</th>
+<th style={{ padding: "10px" }}>Trainer</th>
+<th style={{ padding: "10px" }}>Barrier</th>
+<th style={{ padding: "10px" }}>Weight</th>
+<th style={{ padding: "10px" }}>Form</th>
+<th style={{ padding: "10px" }}>Starts</th>
+<th style={{ padding: "10px" }}>Place %</th>
+<th style={{ padding: "10px" }}>AI</th>
+<th style={{ padding: "10px" }}>Reasoning</th>
+                      </tr>
+</thead>
+
+<tbody>
+  {scoredRunners.map((runner: any, index: number) => (
+    <tr key={`${runner.number}-${runner.horse}`} style={{ color: "#cbd5e1" }}>
                       <td style={{ padding: "10px" }}>#{index + 1}</td>
                       <td style={{ padding: "10px" }}>{runner.number || "-"}</td>
                       <td style={{ padding: "10px" }}>{runner.horse}</td>
