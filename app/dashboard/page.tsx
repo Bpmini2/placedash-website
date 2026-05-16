@@ -354,7 +354,10 @@ distance: race.distance || "TBA",
         mergedPicks.push(pick);
       }
     });
-
+localStorage.setItem(
+  "placedashSavedPicks",
+  JSON.stringify(mergedPicks)
+);
     setSavedPicks(mergedPicks);
   }, [displayRaces]);
 
