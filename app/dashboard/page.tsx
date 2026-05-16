@@ -544,10 +544,46 @@ export default function Dashboard() {
     <tr key={`${runner.number}-${runner.horse}`} style={{ color: "#cbd5e1" }}>
                       <td style={{ padding: "10px" }}>#{index + 1}</td>
                       <td style={{ padding: "10px" }}>{runner.number || "-"}</td>
-                      <td style={{ padding: "10px" }}>{runner.horse}</td>
-                      <td style={{ padding: "10px" }}>{runner.jockey || "-"}</td>
-                      <td style={{ padding: "10px" }}>{runner.trainer || "-"}</td>
-                      <td style={{ padding: "10px" }}>{runner.confidence} · {runner.score}</td>
+
+<td style={{ padding: "10px" }}>
+  {runner.horse}
+</td>
+
+<td style={{ padding: "10px" }}>
+  {runner.jockey || "-"}
+</td>
+
+<td style={{ padding: "10px" }}>
+  {runner.trainer || "-"}
+</td>
+
+<td style={{ padding: "10px" }}>
+  {runner.draw || "-"}
+</td>
+
+<td style={{ padding: "10px" }}>
+  {runner.weight || runner.lbs || "-"}
+</td>
+
+<td style={{ padding: "10px" }}>
+  {runner.form || "-"}
+</td>
+
+<td style={{ padding: "10px" }}>
+  {runner.starts || "-"}
+</td>
+
+<td style={{ padding: "10px" }}>
+  {runner.displayPlacePercent || 0}%
+</td>
+
+<td style={{ padding: "10px" }}>
+  {runner.confidence} · {runner.score}
+</td>
+
+<td style={{ padding: "10px", minWidth: "220px", color: "#94a3b8" }}>
+  {runner.reasoning?.slice(0, 2).join(" • ") || "-"}
+</td>
                     </tr>
                   ))}
                 </tbody>
