@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "../../../lib/supabase";
 
 function getMelbourneDate() {
   return new Date().toLocaleDateString("en-CA", {
@@ -178,46 +178,46 @@ function getBestRunner(race: any) {
 async function savePickToSupabase(race: any, bestRunner: any, pickDate: string) {
   if (!bestRunner) return;
 
-  const { error } = await supabase
-    .from("saved_picks")
-    .upsert(
-      {
-        race_date: pickDate,
-        course: race.course || "",
-        race_number: Number(race.race_number || 0),
-        race_time: race.off_time || "",
+  const { error } = await supabase.from("saved_picks").upsert(
+    {
+      race_date: pickDate,
+      course: race.course || "",
+      race_number: Number(race.race_number || 0),
+      race_time: race.off_time || "",
 
-        horse_number: Number(bestRunner.number || 0),
-        horse_name: bestRunner.horse || "",
+      horse_number: Number(bestRunner.number || 0),
+      horse_name: bestRunner.horse || "",
 
-        confidence: bestRunner.confidence || "",
-        ai_score: Number(bestRunner.score || 0),
-        reasoning: Array.isArray(bestRunner.reasoning)
-          ? bestRunner.reasoning.join(", ")
-          : String(bestRunner.reasoning || ""),
+      confidence: bestRunner.confidence || "",
+      ai_score: Number(bestRunner.score || 0),
+      reasoning: Array.isArray(bestRunner.reasoning)
+        ? bestRunner.reasoning.join(", ")
+        : String(bestRunner.reasoning || ""),
 
-        distance: race.distance || "",
-        condition: race.condition || "",
-        runner_count: Number(race.runner_count || 0),
+      distance: race.distance || "",
+      condition: race.condition || "",
+      runner_count: Number(race.runner_count || 0),
 
-        place_odds: null,
-        result: "pending",
-        placed: null,
-        bet_size: null,
-        profit_loss: null,
-        running_bank: null,
+      place_odds: null,
+      result: "pending",
+      placed: null,
+      bet_size: null,
+      profit_loss: null,
+      running_bank: null,
 
-        source: "formfav",
-      },
-      {
-        onConflict: "race_date,course,race_number,horse_name",
-      }
-    );
+      source: "formfav",
+    },
+    {
+      onConflict: "race_date,course,race_number,horse_name",
+    }
+  );
 
   if (error) {
     console.error("Supabase saved_picks insert error:", error.message);
   }
 }
+
+export async function GET() {
   try {
     const apiKey = process.env.FORMFAV_API_KEY;
 
@@ -282,42 +282,42 @@ async function savePickToSupabase(race: any, bestRunner: any, pickDate: string) 
         const startTime = card?.startTime || race.startTime || null;
 
         const runners = (card?.runners || [])
-  .map((runner: any) => ({
-    number: runner.number || "",
-    horse: runner.name || "Unknown",
-    jockey: runner.jockey || "",
-    trainer: runner.trainer || "",
-    draw: runner.barrier || "",
-    lbs: runner.weight || "",
-    claim: runner.claim || "",
-    age: runner.age || "",
-    sex: runner.sex || "",
-    form: runner.form || "",
-    last20Starts: runner.last20Starts || "",
-    careerPrizeMoney: runner.careerPrizeMoney || "",
-    scratched: runner.scratched || false,
+          .map((runner: any) => ({
+            number: runner.number || "",
+            horse: runner.name || "Unknown",
+            jockey: runner.jockey || "",
+            trainer: runner.trainer || "",
+            draw: runner.barrier || "",
+            lbs: runner.weight || "",
+            claim: runner.claim || "",
+            age: runner.age || "",
+            sex: runner.sex || "",
+            form: runner.form || "",
+            last20Starts: runner.last20Starts || "",
+            careerPrizeMoney: runner.careerPrizeMoney || "",
+            scratched: runner.scratched || false,
 
-    starts: runner?.stats?.overall?.starts || 0,
-    wins: runner?.stats?.overall?.wins || 0,
-    places: runner?.stats?.overall?.places || 0,
-    seconds: runner?.stats?.overall?.seconds || 0,
-    thirds: runner?.stats?.overall?.thirds || 0,
-    placePercent: runner?.stats?.overall?.placePercent || 0,
-    winPercent: runner?.stats?.overall?.winPercent || 0,
+            starts: runner?.stats?.overall?.starts || 0,
+            wins: runner?.stats?.overall?.wins || 0,
+            places: runner?.stats?.overall?.places || 0,
+            seconds: runner?.stats?.overall?.seconds || 0,
+            thirds: runner?.stats?.overall?.thirds || 0,
+            placePercent: runner?.stats?.overall?.placePercent || 0,
+            winPercent: runner?.stats?.overall?.winPercent || 0,
 
-    trackStats: runner?.stats?.track || null,
-    distanceStats: runner?.stats?.distance || null,
-    trackDistanceStats: runner?.stats?.trackDistance || null,
-    conditionStats: runner?.stats?.condition || null,
+            trackStats: runner?.stats?.track || null,
+            distanceStats: runner?.stats?.distance || null,
+            trackDistanceStats: runner?.stats?.trackDistance || null,
+            conditionStats: runner?.stats?.condition || null,
 
-    speedMap: runner.speedMap || null,
-    classProfile: runner.classProfile || null,
-    raceClassFit: runner.raceClassFit || null,
-    gearChange: runner.gearChange || null,
+            speedMap: runner.speedMap || null,
+            classProfile: runner.classProfile || null,
+            raceClassFit: runner.raceClassFit || null,
+            gearChange: runner.gearChange || null,
 
-    firstStarter: (runner?.stats?.overall?.starts || 0) === 0,
-  }))
-  .filter((runner: any) => runner.scratched === false);
+            firstStarter: (runner?.stats?.overall?.starts || 0) === 0,
+          }))
+          .filter((runner: any) => runner.scratched === false);
 
         const hasFirstStarter = runners.some((runner: any) => runner.firstStarter);
 
