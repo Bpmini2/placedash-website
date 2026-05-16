@@ -954,7 +954,10 @@ backdropFilter: "blur(10px)",
             {savedPicks.length === 0 ? (
               <p style={{ color: "#94a3b8" }}>No saved picks yet.</p>
             ) : (
-              savedPicks.slice(-10).reverse().map((r, i) => (
+              savedPicks.slice(-10).reverse().map((r, i) => {
+  const isFreePick = i === 0;
+
+  return (
                 <div
                   key={i}
                   style={{
@@ -974,8 +977,10 @@ backdropFilter: "blur(10px)",
                     }}
                   >
                     <span>
-                      Pick: {r.horseNumber}. {r.horseName}
-                    </span>
+  Pick: {isFreePick
+    ? `${r.horseNumber}. ${r.horseName}`
+    : "🔒 Upgrade to reveal pick"}
+</span>
                     <span style={{ color: "#facc15", fontWeight: "700" }}>
                       {r.confidence}
                     </span>
@@ -991,7 +996,8 @@ backdropFilter: "blur(10px)",
                     Date: {r.date} · Result: {r.result} · Placed: {r.placed}
                   </div>
                 </div>
-              ))
+              );
+})
             )}
           </div>
 
