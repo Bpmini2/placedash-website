@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase";
 
 function getMelbourneDate() {
   return new Date().toLocaleDateString("en-CA", {
@@ -175,12 +176,49 @@ function getBestRunner(race: any) {
 }
 
 async function savePickToSupabase(race: any, bestRunner: any, pickDate: string) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY;
+  if (!bestRunner) return;
 
-  if (!supabaseUrl || !supabaseSecretKey || !bestRunner) {
-    return;
+  const { error } = await supabase
+    .from("saved_picks")
+    .upsert(
+      {
+        race_date: pickDate,
+        course: race.course || "",
+        race_number: Number(race.race_number || 0),
+        race_time: race.off_time || "",
+
+        horse_number: Number(bestRunner.number || 0),
+        horse_name: bestRunner.horse || "",
+
+        confidence: bestRunner.confidence || "",
+        ai_score: Number(bestRunner.score || 0),
+        reasoning: Array.isArray(bestRunner.reasoning)
+          ? bestRunner.reasoning.join(", ")
+          : String(bestRunner.reasoning || ""),
+
+        distance: race.distance || "",
+        condition: race.condition || "",
+        runner_count: Number(race.runner_count || 0),
+
+        place_odds: null,
+
+        result: "pending",
+        placed: null,
+        bet_size: null,
+        profit_loss: null,
+        running_bank: null,
+
+        source: "formfav",
+      },
+      {
+        onConflict: "race_date,course,race_number,horse_name",
+      }
+    );
+
+  if (error) {
+    console.error("Supabase saved_picks insert error:", error.message);
   }
+}
 
   const existingRes = await fetch(
     `${supabaseUrl}/rest/v1/placedash_picks?pick_date=eq.${pickDate}&course=eq.${encodeURIComponent(
