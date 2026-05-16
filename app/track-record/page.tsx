@@ -221,8 +221,13 @@ setPicks(statsData.last20 || []);
             <p style={{ color: "#94a3b8" }}>Loading saved AI picks...</p>
           ) : picks.length === 0 ? (
             <p style={{ color: "#94a3b8" }}>
-              No saved AI picks yet. Picks will appear here after qualifying
-              races are saved before race start.
+              No completed AI picks available yet for{" "}
+{new Date().toLocaleDateString("en-AU", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+})}
+. Race results will appear automatically after races finish.
             </p>
           ) : (
             <div style={{ display: "grid", gap: "14px" }}>
