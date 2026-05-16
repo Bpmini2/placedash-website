@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { supabase } from "../../../lib/supabase.ts";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 function getMelbourneDate() {
   return new Date().toLocaleDateString("en-CA", {
