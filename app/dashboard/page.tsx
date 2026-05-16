@@ -210,7 +210,7 @@ export default function Dashboard() {
       ...scoredRunner,
       reasoning: getRunnerReasoning(scoredRunner),
     };
-  }
+  };
 
   function getBestRunner(race: any) {
     if (!race.runners || race.runners.length === 0) return null;
