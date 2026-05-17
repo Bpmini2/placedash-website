@@ -6,6 +6,7 @@ export default function AdminPicksPage() {
   const [picks, setPicks] = useState<any[]>([]);
 const [loading, setLoading] = useState(true);
 const [selectedTrack, setSelectedTrack] = useState("All Tracks");
+const [selectedDate, setSelectedDate] = useState("");
 
   useEffect(() => {
     async function loadPicks() {
@@ -26,46 +27,108 @@ const trackNames = Array.from(
   new Set(picks.map((pick) => pick.course || "Unknown Track"))
 ).sort();
 
-const filteredPicks =
-  selectedTrack === "All Tracks"
-    ? picks
-    : picks.filter((pick) => pick.course === selectedTrack);
+const filteredPicks = picks.filter((pick) => {
+  const matchesTrack =
+    selectedTrack === "All Tracks" || pick.course === selectedTrack;
+
+  const matchesDate =
+    !selectedDate || pick.race_date === selectedDate;
+
+  return matchesTrack && matchesDate;
+});
   return (
     <main style={{ padding: "40px", background: "#07111f", minHeight: "100vh", color: "white" }}>
       <h1 style={{ fontSize: "42px", marginBottom: "10px" }}>Admin AI Picks</h1>
       <p style={{ color: "#94a3b8", marginBottom: "30px" }}>
         Full internal view of all saved PlaceDash AI selections.
       </p>
-<div style={{ marginBottom: "28px" }}>
-  <label
-    style={{
-      display: "block",
-      marginBottom: "8px",
-      color: "#94a3b8",
-      fontWeight: 700,
-    }}
-  >
-    Filter by race track
-  </label>
+<div
+  style={{
+    display: "flex",
+    gap: "18px",
+    alignItems: "end",
+    flexWrap: "wrap",
+    marginBottom: "28px",
+  }}
+>
+  <div>
+    <label
+      style={{
+        display: "block",
+        marginBottom: "8px",
+        color: "#94a3b8",
+        fontWeight: 700,
+      }}
+    >
+      Filter by date
+    </label>
 
-  <select
-    value={selectedTrack}
-    onChange={(e) => setSelectedTrack(e.target.value)}
+    <input
+      type="date"
+      value={selectedDate}
+      onChange={(e) => setSelectedDate(e.target.value)}
+      style={{
+        padding: "12px 16px",
+        borderRadius: "12px",
+        border: "1px solid rgba(255,255,255,0.18)",
+        background: "#111827",
+        color: "white",
+        fontSize: "16px",
+        fontWeight: 700,
+      }}
+    />
+  </div>
+
+  <div>
+    <label
+      style={{
+        display: "block",
+        marginBottom: "8px",
+        color: "#94a3b8",
+        fontWeight: 700,
+      }}
+    >
+      Filter by race track
+    </label>
+
+    <select
+      value={selectedTrack}
+      onChange={(e) => setSelectedTrack(e.target.value)}
+      style={{
+        padding: "12px 16px",
+        borderRadius: "12px",
+        border: "1px solid rgba(255,255,255,0.18)",
+        background: "#111827",
+        color: "white",
+        fontSize: "16px",
+        fontWeight: 700,
+      }}
+    >
+      <option>All Tracks</option>
+      {trackNames.map((track) => (
+        <option key={track}>{track}</option>
+      ))}
+    </select>
+  </div>
+
+  <button
+    onClick={() => {
+      setSelectedDate("");
+      setSelectedTrack("All Tracks");
+    }}
     style={{
-      padding: "12px 16px",
+      padding: "12px 18px",
       borderRadius: "12px",
       border: "1px solid rgba(255,255,255,0.18)",
-      background: "#111827",
-      color: "white",
+      background: "#22c55e",
+      color: "#07111f",
       fontSize: "16px",
-      fontWeight: 700,
+      fontWeight: 900,
+      cursor: "pointer",
     }}
   >
-    <option>All Tracks</option>
-    {trackNames.map((track) => (
-      <option key={track}>{track}</option>
-    ))}
-  </select>
+    Clear filters
+  </button>
 </div>
       {loading ? (
         <p>Loading picks...</p>
