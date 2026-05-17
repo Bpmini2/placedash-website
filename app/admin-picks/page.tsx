@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 
 export default function AdminPicksPage() {
   const [picks, setPicks] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+const [loading, setLoading] = useState(true);
+const [selectedTrack, setSelectedTrack] = useState("All Tracks");
 
   useEffect(() => {
     async function loadPicks() {
@@ -21,14 +22,51 @@ export default function AdminPicksPage() {
 
     loadPicks();
   }, []);
+const trackNames = Array.from(
+  new Set(picks.map((pick) => pick.course || "Unknown Track"))
+).sort();
 
+const filteredPicks =
+  selectedTrack === "All Tracks"
+    ? picks
+    : picks.filter((pick) => pick.course === selectedTrack);
   return (
     <main style={{ padding: "40px", background: "#07111f", minHeight: "100vh", color: "white" }}>
       <h1 style={{ fontSize: "42px", marginBottom: "10px" }}>Admin AI Picks</h1>
       <p style={{ color: "#94a3b8", marginBottom: "30px" }}>
         Full internal view of all saved PlaceDash AI selections.
       </p>
+<div style={{ marginBottom: "28px" }}>
+  <label
+    style={{
+      display: "block",
+      marginBottom: "8px",
+      color: "#94a3b8",
+      fontWeight: 700,
+    }}
+  >
+    Filter by race track
+  </label>
 
+  <select
+    value={selectedTrack}
+    onChange={(e) => setSelectedTrack(e.target.value)}
+    style={{
+      padding: "12px 16px",
+      borderRadius: "12px",
+      border: "1px solid rgba(255,255,255,0.18)",
+      background: "#111827",
+      color: "white",
+      fontSize: "16px",
+      fontWeight: 700,
+    }}
+  >
+    <option>All Tracks</option>
+    {trackNames.map((track) => (
+      <option key={track}>{track}</option>
+    ))}
+  </select>
+</div>
       {loading ? (
         <p>Loading picks...</p>
       ) : picks.length === 0 ? (
@@ -36,7 +74,7 @@ export default function AdminPicksPage() {
       ) : (
         <div style={{ display: "grid", gap: "28px" }}>
   {Object.entries(
-    picks.reduce((groups: any, pick: any) => {
+    filteredPicks.reduce((groups: any, pick: any) => {
       const course = pick.course || "Unknown Track";
 
       if (!groups[course]) {
@@ -75,7 +113,22 @@ export default function AdminPicksPage() {
 
             <p style={{ margin: "4px 0", color: "#dbeafe" }}>
               Time: {pick.race_time || "TBA"} · Confidence:{" "}
-              {pick.confidence || "Pending"} · Score: {pick.ai_score || 0}
+<span
+  style={{
+    color:
+      pick.confidence === "HIGH"
+        ? "#22c55e"
+        : pick.confidence === "MEDIUM"
+        ? "#facc15"
+        : pick.confidence === "LOW"
+        ? "#ef4444"
+        : "#94a3b8",
+    fontWeight: 900,
+  }}
+>
+  {pick.confidence || "Pending"}
+</span>{" "}
+· Score: {pick.ai_score || 0}
             </p>
 
             <p style={{ margin: "4px 0", color: "#94a3b8" }}>
