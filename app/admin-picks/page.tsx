@@ -7,6 +7,7 @@ export default function AdminPicksPage() {
 const [loading, setLoading] = useState(true);
 const [selectedTrack, setSelectedTrack] = useState("All Tracks");
 const [selectedDate, setSelectedDate] = useState("");
+const [selectedState, setSelectedState] = useState("All States");
 
   useEffect(() => {
     async function loadPicks() {
@@ -26,15 +27,21 @@ const [selectedDate, setSelectedDate] = useState("");
 const trackNames = Array.from(
   new Set(picks.map((pick) => pick.course || "Unknown Track"))
 ).sort();
+  const stateNames = Array.from(
+  new Set(picks.map((pick) => pick.state || "Unknown"))
+).sort();
 
 const filteredPicks = picks.filter((pick) => {
   const matchesTrack =
     selectedTrack === "All Tracks" || pick.course === selectedTrack;
 
   const matchesDate =
-    !selectedDate || pick.race_date === selectedDate;
+  !selectedDate || pick.race_date === selectedDate;
 
-  return matchesTrack && matchesDate;
+const matchesState =
+  selectedState === "All States" || (pick.state || "Unknown") === selectedState;
+
+return matchesTrack && matchesDate && matchesState;
 });
   return (
     <main style={{ padding: "40px", background: "#07111f", minHeight: "100vh", color: "white" }}>
@@ -78,7 +85,37 @@ const filteredPicks = picks.filter((pick) => {
       }}
     />
   </div>
+<div>
+  <label
+    style={{
+      display: "block",
+      marginBottom: "8px",
+      color: "#94a3b8",
+      fontWeight: 700,
+    }}
+  >
+    Filter by state
+  </label>
 
+  <select
+    value={selectedState}
+    onChange={(e) => setSelectedState(e.target.value)}
+    style={{
+      padding: "12px 16px",
+      borderRadius: "12px",
+      border: "1px solid rgba(255,255,255,0.18)",
+      background: "#111827",
+      color: "white",
+      fontSize: "16px",
+      fontWeight: 700,
+    }}
+  >
+    <option>All States</option>
+    {stateNames.map((state) => (
+      <option key={state}>{state}</option>
+    ))}
+  </select>
+</div>
   <div>
     <label
       style={{
@@ -114,7 +151,8 @@ const filteredPicks = picks.filter((pick) => {
   <button
     onClick={() => {
       setSelectedDate("");
-      setSelectedTrack("All Tracks");
+setSelectedState("All States");
+setSelectedTrack("All Tracks");
     }}
     style={{
       padding: "12px 18px",
