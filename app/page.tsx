@@ -152,19 +152,19 @@ export default function HomePage() {
             TRACK RECORD
           </div>
           <h2 style={{ fontSize: "42px", marginTop: "14px" }}>
-            Transparent performance tracking
+            Live AI Performance Tracking
           </h2>
           <p style={{ color: "#dbeafe" }}>
-            PlaceDash will track selections over time so users can review results, strike rate, and return performance.
+            PlaceDash now automatically saves AI selections before races begin and tracks real performance, strike rate, ROI, and historical results over time.
           </p>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "18px", marginTop: "34px" }}>
             {[
-              ["62%", "Example 7 day strike rate"],
-              ["+14%", "Example ROI"],
-              ["21 / 34", "Example placed selections"],
-              ["Pending", "Live historical tracking coming soon"],
-            ].map(([title, text]) => (
+  ["LIVE", "Real AI results now tracked automatically"],
+  ["SUPABASE", "Selections saved before races start"],
+  ["ROI", "Profit/loss and strike rate calculations"],
+  ["TRACK RECORD", "View full historical AI performance"],
+].map(([title, text]) => (
               <div key={title} style={{ textAlign: "left", padding: "26px", borderRadius: "22px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)" }}>
                 <h3 style={{ color: "#86efac", fontSize: "34px", margin: 0 }}>{title}</h3>
                 <p style={{ color: "#bfdbfe" }}>{text}</p>
