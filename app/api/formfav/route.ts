@@ -189,6 +189,7 @@ async function savePickToSupabase(race: any, bestRunner: any, pickDate: string) 
       course: race.course || "",
       race_number: Number(race.race_number || 0),
       race_time: race.off_time || "",
+      state: race.state || "",
 
       horse_number: Number(bestRunner.number || 0),
       horse_name: bestRunner.horse || "",
