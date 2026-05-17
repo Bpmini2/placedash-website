@@ -9,7 +9,7 @@ export default function AdminPicksPage() {
   useEffect(() => {
     async function loadPicks() {
       try {
-        const res = await fetch("/api/saved-picks");
+        const res = await fetch("/api/admin-picks");
         const data = await res.json();
         setPicks(data.picks || []);
       } catch (error) {
