@@ -289,7 +289,7 @@ setPicks(statsData.last20 || []);
                         marginTop: "8px",
                       }}
                     >
-                      Date: {r.pick_date || r.date || "Unknown"} ·{" "}
+                      Date: {r.race_date || r.pick_date || r.date || "Unknown"}
 
 <span
   style={{
