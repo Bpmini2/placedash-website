@@ -352,7 +352,7 @@ boxShadow:
     ? `🟢 PLACED (${r.result || "?"})`
     : r.placed === false
     ? `🔴 UNPLACED (${r.result || "?"})`
-    : "PENDING"}
+    : "🟡 PENDING"}
 </span>
 
  
