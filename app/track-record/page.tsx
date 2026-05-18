@@ -260,8 +260,20 @@ setPicks(statsData.last20 || []);
                     style={{
                       padding: "16px",
                       borderRadius: "16px",
-                      border: "1px solid rgba(255,255,255,0.08)",
+                      border:
+  r.placed === true
+    ? "1px solid rgba(34,197,94,0.35)"
+    : r.placed === false
+    ? "1px solid rgba(239,68,68,0.30)"
+    : "1px solid rgba(255,255,255,0.08)",
                       background: "rgba(255,255,255,0.04)",
+
+boxShadow:
+  r.placed === true
+    ? "0 0 18px rgba(34,197,94,0.12)"
+    : r.placed === false
+    ? "0 0 18px rgba(239,68,68,0.10)"
+    : "none",
                     }}
                   >
                     <div style={{ fontWeight: 800, fontSize: "17px" }}>
