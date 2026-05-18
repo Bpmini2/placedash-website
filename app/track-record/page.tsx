@@ -4,29 +4,30 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 export default function TrackRecordPage() {
-  const searchParams = useSearchParams();
-const isAdmin = searchParams.get("admin") === "true";
   const [picks, setPicks] = useState<any[]>([]);
-const [summary, setSummary] = useState<any>(null);
+  const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
- useEffect(() => {
-  async function loadTrackRecord() {
-    try {
-      const statsRes = await fetch("/api/track-record-stats");
-      const statsData = await statsRes.json();
+  const searchParams = useSearchParams();
+  const isAdmin = searchParams.get("admin") === "true";
 
-      setSummary(statsData.summary || null);
-setPicks(statsData.last20 || []);
-    } catch (err) {
-      console.error("Failed to load track record", err);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    async function loadTrackRecord() {
+      try {
+        const statsRes = await fetch("/api/track-record-stats");
+        const statsData = await statsRes.json();
+
+        setSummary(statsData.summary || null);
+        setPicks(statsData.last20 || []);
+      } catch (err) {
+        console.error("Failed to load track record", err);
+      } finally {
+        setLoading(false);
+      }
     }
-  }
 
-  loadTrackRecord();
-}, []);
+    loadTrackRecord();
+  }, []);
 
   return (
     <main
@@ -138,112 +139,134 @@ setPicks(statsData.last20 || []);
           <p style={{ color: "#b7c5d8", fontSize: "17px" }}>
             Historical PlaceDash AI picks saved before race start.
           </p>
+
           <div
-  style={{
-    color: "#94a3b8",
-    fontSize: "13px",
-    marginTop: "8px",
-    marginBottom: "20px",
-    letterSpacing: "0.04em",
-  }}
->
-  Last Updated: {new Date().toLocaleString("en-AU", {
-    timeZone: "Australia/Melbourne",
-  })}
-</div>
-        </div>
-{summary && (
-  <div
-    style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-      gap: "18px",
-      marginBottom: "28px",
-    }}
-  >
-    {[
-      {
-        label: "Total AI Picks",
-        value: summary.totalPicks,
-        color: "#22c55e",
-      },
-    {
-  label: "Completed",
-  value: summary.completedPicks,
-  color: "#38bdf8",
-},
-{
-  label: "Pending",
-  value: summary.pendingPicks,
-  color: "#facc15",
-},
-{
-  label: "Placed",
-  value: summary.placedPicks,
-  color: "#22c55e",
-},
-{
-  label: "Unplaced",
-  value: summary.unplacedPicks,
-  color: "#ef4444",
-},
-      {
-        label: "Strike Rate",
-        value: `${summary.strikeRate}%`,
-        color: "#38bdf8",
-      },
-      {
-        label: "ROI",
-        value: `${summary.roi}%`,
-        color: summary.roi >= 0 ? "#22c55e" : "#ef4444",
-      },
-      {
-        label: "Profit / Loss",
-        value: `$${summary.totalProfitLoss}`,
-        color: summary.totalProfitLoss >= 0 ? "#22c55e" : "#ef4444",
-      },
-      {
-        label: "High Confidence SR",
-        value: `${summary.highConfidenceStrikeRate}%`,
-        color: "#facc15",
-      },
-    ].map((card, index) => (
-      <div
-        key={index}
-        style={{
-          padding: "22px",
-          borderRadius: "20px",
-          background: "rgba(255,255,255,0.05)",
-          border: "1px solid rgba(255,255,255,0.08)",
-          backdropFilter: "blur(12px)",
-        }}
-      >
-        <div
-          style={{
-            color: "#94a3b8",
-            fontSize: "13px",
-            marginBottom: "10px",
-            textTransform: "uppercase",
-            letterSpacing: "0.08em",
-            fontWeight: 700,
-          }}
-        >
-          {card.label}
+            style={{
+              color: "#94a3b8",
+              fontSize: "13px",
+              marginTop: "8px",
+              marginBottom: "20px",
+              letterSpacing: "0.04em",
+            }}
+          >
+            Last Updated:{" "}
+            {new Date().toLocaleString("en-AU", {
+              timeZone: "Australia/Melbourne",
+            })}
+          </div>
+
+          {isAdmin && (
+            <div
+              style={{
+                display: "inline-block",
+                padding: "8px 14px",
+                borderRadius: "999px",
+                background: "rgba(34,197,94,0.16)",
+                border: "1px solid rgba(34,197,94,0.35)",
+                color: "#22c55e",
+                fontSize: "13px",
+                fontWeight: 800,
+                marginBottom: "18px",
+              }}
+            >
+              ADMIN MODE — All picks unlocked
+            </div>
+          )}
         </div>
 
-        <div
-          style={{
-            fontSize: "34px",
-            fontWeight: 900,
-            color: card.color,
-          }}
-        >
-          {card.value}
-        </div>
-      </div>
-    ))}
-  </div>
-)}
+        {summary && (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: "18px",
+              marginBottom: "28px",
+            }}
+          >
+            {[
+              {
+                label: "Total AI Picks",
+                value: summary.totalPicks,
+                color: "#22c55e",
+              },
+              {
+                label: "Completed",
+                value: summary.completedPicks,
+                color: "#38bdf8",
+              },
+              {
+                label: "Pending",
+                value: summary.pendingPicks,
+                color: "#facc15",
+              },
+              {
+                label: "Placed",
+                value: summary.placedPicks,
+                color: "#22c55e",
+              },
+              {
+                label: "Unplaced",
+                value: summary.unplacedPicks,
+                color: "#ef4444",
+              },
+              {
+                label: "Strike Rate",
+                value: `${summary.strikeRate}%`,
+                color: "#38bdf8",
+              },
+              {
+                label: "ROI",
+                value: `${summary.roi}%`,
+                color: summary.roi >= 0 ? "#22c55e" : "#ef4444",
+              },
+              {
+                label: "Profit / Loss",
+                value: `$${summary.totalProfitLoss}`,
+                color: summary.totalProfitLoss >= 0 ? "#22c55e" : "#ef4444",
+              },
+              {
+                label: "High Confidence SR",
+                value: `${summary.highConfidenceStrikeRate}%`,
+                color: "#facc15",
+              },
+            ].map((card, index) => (
+              <div
+                key={index}
+                style={{
+                  padding: "22px",
+                  borderRadius: "20px",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  backdropFilter: "blur(12px)",
+                }}
+              >
+                <div
+                  style={{
+                    color: "#94a3b8",
+                    fontSize: "13px",
+                    marginBottom: "10px",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                    fontWeight: 700,
+                  }}
+                >
+                  {card.label}
+                </div>
+
+                <div
+                  style={{
+                    fontSize: "34px",
+                    fontWeight: 900,
+                    color: card.color,
+                  }}
+                >
+                  {card.value}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         <section
           style={{
             padding: "24px",
@@ -258,17 +281,17 @@ setPicks(statsData.last20 || []);
           ) : picks.length === 0 ? (
             <p style={{ color: "#94a3b8" }}>
               No completed AI picks available yet for{" "}
-{new Date().toLocaleDateString("en-AU", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-})}
-. Race results will appear automatically after races finish.
+              {new Date().toLocaleDateString("en-AU", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+              . Race results will appear automatically after races finish.
             </p>
           ) : (
             <div style={{ display: "grid", gap: "14px" }}>
               {picks.map((r, i) => {
-                const isFreePick = isAdmin || i === 0;
+                const canRevealPick = isAdmin || i === 0;
 
                 return (
                   <div
@@ -277,19 +300,18 @@ setPicks(statsData.last20 || []);
                       padding: "16px",
                       borderRadius: "16px",
                       border:
-  r.placed === true
-    ? "1px solid rgba(34,197,94,0.35)"
-    : r.placed === false
-    ? "1px solid rgba(239,68,68,0.30)"
-    : "1px solid rgba(255,255,255,0.08)",
+                        r.placed === true
+                          ? "1px solid rgba(34,197,94,0.35)"
+                          : r.placed === false
+                          ? "1px solid rgba(239,68,68,0.30)"
+                          : "1px solid rgba(255,255,255,0.08)",
                       background: "rgba(255,255,255,0.04)",
-
-boxShadow:
-  r.placed === true
-    ? "0 0 18px rgba(34,197,94,0.12)"
-    : r.placed === false
-    ? "0 0 18px rgba(239,68,68,0.10)"
-    : "none",
+                      boxShadow:
+                        r.placed === true
+                          ? "0 0 18px rgba(34,197,94,0.12)"
+                          : r.placed === false
+                          ? "0 0 18px rgba(239,68,68,0.10)"
+                          : "none",
                     }}
                   >
                     <div style={{ fontWeight: 800, fontSize: "17px" }}>
@@ -308,38 +330,42 @@ boxShadow:
                     >
                       <span>
                         AI Pick:{" "}
-                        {isAdmin || isFreePick
-  ? `${r.horse_number || r.horseNumber}. ${
-      r.horse_name || r.horseName
-    }`
-                          
-  : "🔒 Upgrade to reveal pick"}
+                        {canRevealPick
+                          ? `${r.horse_number || r.horseNumber}. ${
+                              r.horse_name || r.horseName
+                            }`
+                          : "🔒 Upgrade to reveal pick"}
                       </span>
 
                       <span
-  style={{
-    color:
-      r.confidence === "HIGH"
-        ? "#22c55e"
-        : r.confidence === "MEDIUM"
-        ? "#facc15"
-        : "#ef4444",
-    fontWeight: 800,
-  }}
->
+                        style={{
+                          color:
+                            r.confidence === "HIGH"
+                              ? "#22c55e"
+                              : r.confidence === "MEDIUM"
+                              ? "#facc15"
+                              : "#ef4444",
+                          fontWeight: 800,
+                        }}
+                      >
                         {r.confidence || "PENDING"}
                       </span>
-                    <div
-  style={{
-    color: "#94a3b8",
-    fontSize: "12px",
-    marginTop: "10px",
-    lineHeight: "1.5",
-  }}
->
-  <strong style={{ color: "#cbd5e1" }}>Reason:</strong>{" "}
-  {r.reasoning || "AI analysis pending"}
-</div>
+                    </div>
+
+                    {canRevealPick && (
+                      <div
+                        style={{
+                          color: "#94a3b8",
+                          fontSize: "12px",
+                          marginTop: "10px",
+                          lineHeight: "1.5",
+                        }}
+                      >
+                        <strong style={{ color: "#cbd5e1" }}>Reason:</strong>{" "}
+                        {r.reasoning || "AI analysis pending"}
+                      </div>
+                    )}
+
                     <div
                       style={{
                         color: "#94a3b8",
@@ -347,28 +373,25 @@ boxShadow:
                         marginTop: "8px",
                       }}
                     >
-                      Date: {r.race_date || r.pick_date || r.date || "Unknown"}{" "}
-•{" "}
-
-<span
-  style={{
-    color:
-      r.placed === true
-        ? "#22c55e"
-        : r.placed === false
-        ? "#ef4444"
-        : "#94a3b8",
-    fontWeight: 700,
-  }}
->
-  {r.placed === true
-    ? `🟢 PLACED (${r.result || "?"})`
-    : r.placed === false
-    ? `🔴 UNPLACED (${r.result || "?"})`
-    : "🟡 PENDING"}
-</span>
-
- 
+                      Date:{" "}
+                      {r.race_date || r.pick_date || r.date || "Unknown"} •{" "}
+                      <span
+                        style={{
+                          color:
+                            r.placed === true
+                              ? "#22c55e"
+                              : r.placed === false
+                              ? "#ef4444"
+                              : "#94a3b8",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {r.placed === true
+                          ? `🟢 PLACED (${r.result || "?"})`
+                          : r.placed === false
+                          ? `🔴 UNPLACED (${r.result || "?"})`
+                          : "🟡 PENDING"}
+                      </span>
                     </div>
                   </div>
                 );
