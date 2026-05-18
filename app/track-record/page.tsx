@@ -151,6 +151,26 @@ setPicks(statsData.last20 || []);
         value: summary.totalPicks,
         color: "#22c55e",
       },
+    {
+  label: "Completed",
+  value: summary.completedPicks,
+  color: "#38bdf8",
+},
+{
+  label: "Pending",
+  value: summary.pendingPicks,
+  color: "#facc15",
+},
+{
+  label: "Placed",
+  value: summary.placedPicks,
+  color: "#22c55e",
+},
+{
+  label: "Unplaced",
+  value: summary.unplacedPicks,
+  color: "#ef4444",
+},
       {
         label: "Strike Rate",
         value: `${summary.strikeRate}%`,
