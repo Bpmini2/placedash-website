@@ -35,16 +35,8 @@ function getRunnerPosition(runner: any) {
 }
 
 function getRunnerDividend(runner: any) {
-  const possibleValues = [
-    runner.placeDividend,
-    runner.place_dividend,
-    runner.fixedPlace,
-    runner.fixed_place,
-    runner.dividend,
-    runner.price,
-    runner.sp,
-    runner.startingPrice,
-  ];
+  return null;
+}
 
   for (const value of possibleValues) {
     if (value === null || value === undefined) continue;
