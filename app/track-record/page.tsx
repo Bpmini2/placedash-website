@@ -325,8 +325,17 @@ boxShadow:
 >
                         {r.confidence || "PENDING"}
                       </span>
-                    </div>
-
+                    <div
+  style={{
+    color: "#94a3b8",
+    fontSize: "12px",
+    marginTop: "10px",
+    lineHeight: "1.5",
+  }}
+>
+  <strong style={{ color: "#cbd5e1" }}>Reason:</strong>{" "}
+  {r.reasoning || "AI analysis pending"}
+</div>
                     <div
                       style={{
                         color: "#94a3b8",
