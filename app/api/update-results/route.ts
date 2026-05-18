@@ -40,7 +40,7 @@ function getRunnerDividend(runner: any) {
 
 function isScratchedRunner(runner: any) {
   const statusText = String(
-  const statusText = String(
+  
     runner.status ||
       runner.runnerStatus ||
       runner.scratched ||
