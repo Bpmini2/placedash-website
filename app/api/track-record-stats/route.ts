@@ -39,11 +39,21 @@ export async function GET() {
       (pick: any) => pick.placed === true
     );
 
-    const totalProfitLoss = completedPicks.reduce((total: number, pick: any) => {
-      return total + Number(pick.profit_loss || 0);
-    }, 0);
+    const moneySettledPicks = completedPicks.filter(
+      (pick: any) =>
+        pick.profit_loss !== null &&
+        pick.profit_loss !== undefined &&
+        pick.settlement_status === "settled"
+    );
 
-    const totalBetSize = completedPicks.reduce((total: number, pick: any) => {
+    const totalProfitLoss = moneySettledPicks.reduce(
+      (total: number, pick: any) => {
+        return total + Number(pick.profit_loss || 0);
+      },
+      0
+    );
+
+    const totalBetSize = moneySettledPicks.reduce((total: number, pick: any) => {
       return total + Number(pick.bet_size || 0);
     }, 0);
 
@@ -78,6 +88,7 @@ export async function GET() {
         highConfidencePicks: highConfidencePicks.length,
         highConfidencePlaced: highConfidencePlaced.length,
         highConfidenceStrikeRate,
+        moneySettledPicks: moneySettledPicks.length,
         totalBetSize,
         totalProfitLoss,
         roi,
