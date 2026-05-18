@@ -146,10 +146,12 @@ async function fetchPuntingFormRaceResult(
 
   const meetingResult = Array.isArray(data?.payLoad) ? data.payLoad[0] : data?.payLoad;
 
-  const raceResult =
-    meetingResult?.raceResults ||
-    meetingResult?.races?.[0] ||
-    meetingResult;
+  const raceResults = meetingResult?.raceResults || meetingResult?.races || [];
+
+const raceResult = Array.isArray(raceResults)
+  ? raceResults.find((race: any) => Number(race.raceNumber) === Number(raceNumber)) ||
+    raceResults[0]
+  : raceResults || meetingResult;
 
   return {
     meetingId,
