@@ -304,9 +304,9 @@ setPicks(statsData.last20 || []);
   }}
 >
   {r.placed === true
-    ? `PLACED (${r.result || "?"})`
+    ? `🟢 PLACED (${r.result || "?"})`
     : r.placed === false
-    ? `UNPLACED (${r.result || "?"})`
+    ? `🔴 UNPLACED (${r.result || "?"})`
     : "PENDING"}
 </span>
 
