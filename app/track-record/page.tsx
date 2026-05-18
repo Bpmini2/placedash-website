@@ -309,7 +309,7 @@ setPicks(statsData.last20 || []);
     : "PENDING"}
 </span>
 
- · Score: {r.score || 0}
+ 
                     </div>
                   </div>
                 );
