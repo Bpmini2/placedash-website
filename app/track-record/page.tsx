@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 export default function TrackRecordPage() {
+  const searchParams = useSearchParams();
+const isAdmin = searchParams.get("admin") === "true";
   const [picks, setPicks] = useState<any[]>([]);
 const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -265,7 +268,7 @@ setPicks(statsData.last20 || []);
           ) : (
             <div style={{ display: "grid", gap: "14px" }}>
               {picks.map((r, i) => {
-                const isFreePick = i === 0;
+                const isFreePick = isAdmin || i === 0;
 
                 return (
                   <div
