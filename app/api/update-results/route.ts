@@ -38,13 +38,7 @@ function getRunnerDividend(runner: any) {
   return null;
 }
 
-  for (const value of possibleValues) {
-    if (value === null || value === undefined) continue;
-
-    const parsed = Number(String(value).replace(/[^0-9.]/g, ""));
-
-    if (parsed > 0) return parsed;
-  }
+function isScratchedRunner(runner: any) {
 
   return null;
 }
