@@ -289,9 +289,27 @@ setPicks(statsData.last20 || []);
                         marginTop: "8px",
                       }}
                     >
-                      Date: {r.pick_date || r.date || "Unknown"} · Result:{" "}
-                      {r.result_status || r.result || "Pending"} · Score:{" "}
-                      {r.score || 0}
+                      Date: {r.pick_date || r.date || "Unknown"} ·{" "}
+
+<span
+  style={{
+    color:
+      r.placed === true
+        ? "#22c55e"
+        : r.placed === false
+        ? "#ef4444"
+        : "#94a3b8",
+    fontWeight: 700,
+  }}
+>
+  {r.placed === true
+    ? `PLACED (${r.result || "?"})`
+    : r.placed === false
+    ? `UNPLACED (${r.result || "?"})`
+    : "PENDING"}
+</span>
+
+ · Score: {r.score || 0}
                     </div>
                   </div>
                 );
