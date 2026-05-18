@@ -19,22 +19,37 @@ function normaliseText(value: string) {
 }
 
 function getRunnerPosition(runner: any) {
+  const rawPosition =
+    runner.position ??
+    runner.finishingPosition ??
+    runner.finishing_position ??
+    runner.result ??
+    runner.finishPosition ??
+    runner.finish_position ??
+    runner.place ??
+    runner.placing;
+
+  const parsed = Number(String(rawPosition || "").replace(/[^0-9]/g, ""));
+
+  return parsed > 0 ? parsed : null;
+}
+
+function getRunnerDividend(runner: any) {
   const possibleValues = [
-    runner.position,
-    runner.finishingPosition,
-    runner.finishing_position,
-    runner.result,
-    runner.finishPosition,
-    runner.finish_position,
-    runner.place,
-    runner.placing,
+    runner.placeDividend,
+    runner.place_dividend,
+    runner.fixedPlace,
+    runner.fixed_place,
+    runner.dividend,
+    runner.price,
+    runner.sp,
+    runner.startingPrice,
   ];
 
   for (const value of possibleValues) {
     if (value === null || value === undefined) continue;
 
-    const numberOnly = String(value).replace(/[^0-9]/g, "");
-    const parsed = Number(numberOnly);
+    const parsed = Number(String(value).replace(/[^0-9.]/g, ""));
 
     if (parsed > 0) return parsed;
   }
@@ -42,80 +57,151 @@ function getRunnerPosition(runner: any) {
   return null;
 }
 
-async function findRaceSlug(date: string, course: string, raceNumber: number) {
-  const apiKey = process.env.FORMFAV_API_KEY;
+function isScratchedRunner(runner: any) {
+  const statusText = String(
+    runner.status ||
+      runner.runnerStatus ||
+      runner.scratched ||
+      runner.inRun ||
+      runner.result ||
+      ""
+  ).toLowerCase();
 
-  if (!apiKey) return null;
+  return (
+    runner.scratched === true ||
+    statusText.includes("scr") ||
+    statusText.includes("scratch") ||
+    statusText.includes("late scratching")
+  );
+}
 
-  const meetingsRes = await fetch(
-    `https://api.formfav.com/v1/form/meetings?date=${date}`,
+async function getPuntingFormMeetings(date: string) {
+  const apiKey = process.env.PUNTINGFORM_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("PUNTINGFORM_API_KEY is missing");
+  }
+
+  const res = await fetch(
+    `https://api.puntingform.com.au/v2/form/meetingslist?meetingDate=${date}&apiKey=${apiKey}`,
     {
       headers: {
-        "X-API-Key": apiKey,
+        accept: "application/json",
       },
       cache: "no-store",
     }
   );
 
-  const meetingsData = await meetingsRes.json();
-  const meetings = meetingsData?.meetings || meetingsData?.data?.meetings || [];
+  const data = await res.json();
 
-  const matchingMeeting = meetings.find((meeting: any) => {
-    return normaliseText(meeting.track) === normaliseText(course);
-  });
-
-  if (!matchingMeeting?.slug) return null;
-
-  const hasRace = (matchingMeeting.races || []).some((race: any) => {
-    return Number(race.raceNumber) === Number(raceNumber);
-  });
-
-  if (!hasRace) return null;
-
-  return matchingMeeting.slug;
-}
-
-async function fetchRaceResult(date: string, course: string, raceNumber: number) {
-  const apiKey = process.env.FORMFAV_API_KEY;
-
-  if (!apiKey) {
-    throw new Error("FORMFAV_API_KEY is missing");
+  if (!res.ok || data?.statusCode >= 400) {
+    throw new Error(data?.error || "Failed to fetch Punting Form meetings");
   }
 
-  const slug = await findRaceSlug(date, course, raceNumber);
+  return data?.payLoad || [];
+}
 
-  if (!slug) {
+async function findPuntingFormMeetingId(date: string, course: string) {
+  const meetings = await getPuntingFormMeetings(date);
+
+  const matched = meetings.find((meeting: any) => {
+    return normaliseText(meeting?.track?.name || meeting?.name || meeting?.track) === normaliseText(course);
+  });
+
+  return matched?.meetingId || null;
+}
+
+async function fetchPuntingFormRaceResult(
+  date: string,
+  course: string,
+  raceNumber: number
+) {
+  const apiKey = process.env.PUNTINGFORM_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("PUNTINGFORM_API_KEY is missing");
+  }
+
+  const meetingId = await findPuntingFormMeetingId(date, course);
+
+  if (!meetingId) {
     return null;
   }
 
-  const raceRes = await fetch(
-    `https://api.formfav.com/v1/form?date=${date}&track=${encodeURIComponent(
-      slug
-    )}&race=${raceNumber}`,
+  const res = await fetch(
+    `https://api.puntingform.com.au/v2/form/results?meetingId=${meetingId}&raceNumber=${raceNumber}&apiKey=${apiKey}`,
     {
       headers: {
-        "X-API-Key": apiKey,
+        accept: "application/json",
       },
       cache: "no-store",
     }
   );
 
-  const raceData = await raceRes.json();
-  const card = raceData?.data || raceData;
+  const data = await res.json();
 
-  return card;
+  if (!res.ok || data?.statusCode >= 400) {
+    throw new Error(data?.error || "Failed to fetch Punting Form results");
+  }
+
+  const meetingResult = Array.isArray(data?.payLoad) ? data.payLoad[0] : data?.payLoad;
+
+  const raceResult =
+    meetingResult?.raceResults ||
+    meetingResult?.races?.[0] ||
+    meetingResult;
+
+  return {
+    meetingId,
+    raceResult,
+  };
+}
+
+async function getStrategySettings() {
+  const { data, error } = await supabase
+    .from("strategy_settings")
+    .select("*")
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .single();
+
+  if (error) {
+    throw new Error(`Strategy settings error: ${error.message}`);
+  }
+
+  return data;
+}
+
+async function updateStrategyBank(strategyId: string, newBank: number) {
+  const { error } = await supabase
+    .from("strategy_settings")
+    .update({
+      current_bank: Number(newBank.toFixed(2)),
+    })
+    .eq("id", strategyId);
+
+  if (error) {
+    throw new Error(`Failed to update strategy bank: ${error.message}`);
+  }
 }
 
 export async function GET() {
   try {
     const today = getMelbourneDate();
 
+    const strategy = await getStrategySettings();
+
+    let runningBank = Number(strategy.current_bank || strategy.starting_bank || 1000);
+    const betPercentage = Number(strategy.bet_percentage || 10);
+
     const { data: pendingPicks, error: pendingError } = await supabase
       .from("saved_picks")
       .select("*")
       .eq("result", "pending")
       .lte("race_date", today)
-      .limit(50);
+      .order("race_date", { ascending: true })
+      .order("race_time", { ascending: true })
+      .limit(100);
 
     if (pendingError) {
       return NextResponse.json({
@@ -130,70 +216,134 @@ export async function GET() {
 
     for (const pick of pendingPicks || []) {
       try {
-        const raceCard = await fetchRaceResult(
+        const puntingFormResult = await fetchPuntingFormRaceResult(
           pick.race_date,
           pick.course,
-          pick.race_number
+          Number(pick.race_number)
         );
 
-        if (!raceCard?.runners || !Array.isArray(raceCard.runners)) {
+        if (!puntingFormResult?.raceResult) {
           notReady.push({
             id: pick.id,
             course: pick.course,
             race_number: pick.race_number,
-            reason: "Race result not available yet",
+            horse_name: pick.horse_name,
+            reason: "No Punting Form race result found yet",
           });
           continue;
         }
 
-        const matchedRunner = raceCard.runners.find((runner: any) => {
+        const runners =
+          puntingFormResult.raceResult?.runners ||
+          puntingFormResult.raceResult?.results ||
+          [];
+
+        if (!Array.isArray(runners) || runners.length === 0) {
+          notReady.push({
+            id: pick.id,
+            course: pick.course,
+            race_number: pick.race_number,
+            horse_name: pick.horse_name,
+            reason: "Punting Form result returned no runners",
+          });
+          continue;
+        }
+
+        const matchedRunner = runners.find((runner: any) => {
+          const runnerName =
+            runner.runner ||
+            runner.name ||
+            runner.horse ||
+            runner.horseName ||
+            "";
+
+          const runnerNumber =
+            runner.tabNo ||
+            runner.number ||
+            runner.runnerNumber ||
+            runner.horse_number;
+
           return (
-            normaliseText(runner.name) === normaliseText(pick.horse_name) ||
-            Number(runner.number) === Number(pick.horse_number)
+            normaliseText(runnerName) === normaliseText(pick.horse_name) ||
+            Number(runnerNumber) === Number(pick.horse_number)
           );
         });
 
         if (!matchedRunner) {
           failed.push({
             id: pick.id,
+            course: pick.course,
+            race_number: pick.race_number,
             horse_name: pick.horse_name,
-            reason: "Horse not found in returned race data",
+            reason: "Horse not found in Punting Form result",
           });
           continue;
         }
 
+        const scratched = isScratchedRunner(matchedRunner);
         const position = getRunnerPosition(matchedRunner);
 
-        if (!position) {
+        const bankBeforeBet = runningBank;
+        const betSize = Number((bankBeforeBet * (betPercentage / 100)).toFixed(2));
+
+        let resultValue = "pending";
+        let placed: boolean | null = null;
+        let profitLoss: number | null = null;
+        let dividend: number | null = getRunnerDividend(matchedRunner);
+        let bankAfterBet = bankBeforeBet;
+        let settlementStatus = "pending";
+
+        if (scratched) {
+          resultValue = "scratched";
+          placed = null;
+          profitLoss = 0;
+          dividend = null;
+          bankAfterBet = bankBeforeBet;
+          settlementStatus = "scratched";
+        } else if (position) {
+          resultValue = String(position);
+          placed = position <= 3;
+
+          if (placed && dividend) {
+            profitLoss = Number((betSize * dividend - betSize).toFixed(2));
+          } else if (placed && !dividend) {
+            profitLoss = null;
+          } else {
+            profitLoss = -betSize;
+          }
+
+          if (profitLoss !== null) {
+            bankAfterBet = Number((bankBeforeBet + profitLoss).toFixed(2));
+            runningBank = bankAfterBet;
+            settlementStatus = "settled";
+          } else {
+            bankAfterBet = bankBeforeBet;
+            settlementStatus = "needs_dividend";
+          }
+        } else {
           notReady.push({
             id: pick.id,
             course: pick.course,
             race_number: pick.race_number,
             horse_name: pick.horse_name,
-            reason: "No finishing position available yet",
+            reason: "No finishing position found in Punting Form result",
           });
           continue;
-        }
-
-        const placed = position <= 3;
-        const betSize = Number(pick.bet_size || 100);
-        const placeOdds = pick.place_odds ? Number(pick.place_odds) : null;
-
-        let profitLoss = null;
-
-        if (placed && placeOdds) {
-          profitLoss = betSize * placeOdds - betSize;
-        } else if (!placed) {
-          profitLoss = -betSize;
         }
 
         const { error: updateError } = await supabase
           .from("saved_picks")
           .update({
-            result: String(position),
+            result: resultValue,
             placed,
             bet_size: betSize,
             profit_loss: profitLoss,
+            bank_start: Number(strategy.starting_bank || 1000),
+            bet_percentage: betPercentage,
+            bank_before_bet: Number(bankBeforeBet.toFixed(2)),
+            bank_after_bet: Number(bankAfterBet.toFixed(2)),
+            dividend,
+            settlement_status: settlementStatus,
           })
           .eq("id", pick.id);
 
@@ -205,18 +355,30 @@ export async function GET() {
           continue;
         }
 
+        if (settlementStatus === "settled" || settlementStatus === "scratched") {
+          await updateStrategyBank(strategy.id, runningBank);
+        }
+
         updated.push({
           id: pick.id,
           course: pick.course,
           race_number: pick.race_number,
           horse_name: pick.horse_name,
-          result: position,
+          result: resultValue,
           placed,
+          bet_size: betSize,
+          dividend,
           profit_loss: profitLoss,
+          bank_before_bet: Number(bankBeforeBet.toFixed(2)),
+          bank_after_bet: Number(bankAfterBet.toFixed(2)),
+          settlement_status: settlementStatus,
         });
       } catch (error) {
         failed.push({
           id: pick.id,
+          course: pick.course,
+          race_number: pick.race_number,
+          horse_name: pick.horse_name,
           reason: String(error),
         });
       }
@@ -224,15 +386,21 @@ export async function GET() {
 
     return NextResponse.json({
       ok: true,
+      source: "Punting Form",
       checked: pendingPicks?.length || 0,
       updated,
       notReady,
       failed,
+      strategy: {
+        starting_bank: Number(strategy.starting_bank || 1000),
+        current_bank: Number(runningBank.toFixed(2)),
+        bet_percentage: betPercentage,
+      },
     });
   } catch (error) {
     return NextResponse.json({
       ok: false,
-      error: "Failed to update race results",
+      error: "Failed to update race results with Punting Form",
       details: String(error),
     });
   }
