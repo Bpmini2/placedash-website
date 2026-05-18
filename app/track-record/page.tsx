@@ -135,6 +135,19 @@ setPicks(statsData.last20 || []);
           <p style={{ color: "#b7c5d8", fontSize: "17px" }}>
             Historical PlaceDash AI picks saved before race start.
           </p>
+          <div
+  style={{
+    color: "#94a3b8",
+    fontSize: "13px",
+    marginTop: "8px",
+    marginBottom: "20px",
+    letterSpacing: "0.04em",
+  }}
+>
+  Last Updated: {new Date().toLocaleString("en-AU", {
+    timeZone: "Australia/Melbourne",
+  })}
+</div>
         </div>
 {summary && (
   <div
