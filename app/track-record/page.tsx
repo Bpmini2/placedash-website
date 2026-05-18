@@ -308,11 +308,11 @@ boxShadow:
                     >
                       <span>
                         AI Pick:{" "}
-                        {isFreePick
-                          ? `${r.horse_number || r.horseNumber}. ${
-                              r.horse_name || r.horseName
-                            }`
-                          : "🔒 Upgrade to reveal pick"}
+                        {isAdmin || isFreePick
+  ? `${r.horse_number || r.horseNumber}. ${
+      r.horse_name || r.horseName
+    }`
+  : "🔒 Upgrade to reveal pick"}
                       </span>
 
                       <span
