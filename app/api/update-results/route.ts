@@ -293,7 +293,7 @@ export async function GET() {
           } else if (placed && !dividend) {
             profitLoss = null;
           } else {
-            profitLoss = -betSize;
+            profitLoss = null;
           }
 
           if (profitLoss !== null) {
