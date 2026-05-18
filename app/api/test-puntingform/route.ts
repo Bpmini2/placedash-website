@@ -11,7 +11,7 @@ export async function GET() {
   }
 
   const res = await fetch(
-    `https://api.puntingform.com.au/v2/form/meetingslist?apiKey=${apiKey}`,
+    `https://api.puntingform.com.au/v2/form/meetingslist?meetingDate=2026-05-17&apiKey=${apiKey}`,
     {
       headers: {
         accept: "application/json",
