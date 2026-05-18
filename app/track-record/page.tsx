@@ -312,6 +312,7 @@ boxShadow:
   ? `${r.horse_number || r.horseNumber}. ${
       r.horse_name || r.horseName
     }`
+                          
   : "🔒 Upgrade to reveal pick"}
                       </span>
 
