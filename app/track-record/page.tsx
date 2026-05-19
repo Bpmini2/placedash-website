@@ -1,4 +1,5 @@
 "use client";
+// Admin mode enabled for Track Record testing
 
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
