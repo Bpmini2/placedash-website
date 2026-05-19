@@ -2,17 +2,17 @@
 // Admin mode enabled for Track Record testing
 
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+
 
 export default function TrackRecordPage() {
   const [picks, setPicks] = useState<any[]>([]);
   const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const searchParams = useSearchParams();
-  const isAdmin = searchParams.get("admin") === "true";
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    setIsAdmin(new URLSearchParams(window.location.search).get("admin") === "true");
     async function loadTrackRecord() {
       try {
         const statsRes = await fetch("/api/track-record-stats");
