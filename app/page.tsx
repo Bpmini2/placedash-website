@@ -149,21 +149,21 @@ export default function HomePage() {
 
         <section id="track-record" style={{ padding: "90px 0", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
           <div style={{ color: "#22c55e", fontSize: "14px", fontWeight: 900, letterSpacing: "0.14em" }}>
-            TRACK RECORD
+            HOW PLACEDASH WORKS
           </div>
           <h2 style={{ fontSize: "42px", marginTop: "14px" }}>
-            Live AI Performance Tracking
+            AI-powered race filtering and performance tracking
           </h2>
           <p style={{ color: "#dbeafe" }}>
-            PlaceDash now automatically saves AI selections before races begin and tracks real performance, strike rate, ROI, and historical results over time.
+            PlaceDash automatically filters Australian races, saves AI selections before race start, and tracks historical performance over time.
           </p>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "18px", marginTop: "34px" }}>
             {[
-  ["LIVE", "Real AI results now tracked automatically"],
-  ["SUPABASE", "Selections saved before races start"],
-  ["ROI", "Profit/loss and strike rate calculations"],
-  ["TRACK RECORD", "View full historical AI performance"],
+  ["LIVE FILTERING", "Australian races filtered automatically using PlaceDash AI rules"],
+  ["AI DATA STORAGE", "Selections saved before races begin for historical tracking"],
+  ["PERFORMANCE METRICS", "Strike rate, ROI, and AI performance tracked automatically"],
+  ["HISTORICAL RESULTS", "View long-term AI selection performance and race history"],
 ].map(([title, text]) => (
               <div key={title} style={{ textAlign: "left", padding: "26px", borderRadius: "22px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)" }}>
                 <h3 style={{ color: "#86efac", fontSize: "34px", margin: 0 }}>{title}</h3>
