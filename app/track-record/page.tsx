@@ -142,19 +142,23 @@ export default function TrackRecordPage() {
           </p>
 
           <div
-            style={{
-              color: "#94a3b8",
-              fontSize: "13px",
-              marginTop: "8px",
-              marginBottom: "20px",
-              letterSpacing: "0.04em",
-            }}
-          >
-            Last Updated:{" "}
-            {new Date().toLocaleString("en-AU", {
-              timeZone: "Australia/Melbourne",
-            })}
-          </div>
+  style={{
+    display: "inline-block",
+    marginTop: "10px",
+    marginBottom: "20px",
+    padding: "6px 10px",
+    borderRadius: "999px",
+    background: "rgba(34,197,94,0.12)",
+    color: "#22c55e",
+    fontSize: "12px",
+    fontWeight: "600",
+  }}
+>
+  Last Updated:{" "}
+  {new Date().toLocaleString("en-AU", {
+    timeZone: "Australia/Melbourne",
+  })}
+</div>
 
           {isAdmin && (
             <div
