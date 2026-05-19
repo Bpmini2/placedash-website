@@ -72,7 +72,7 @@ export async function GET() {
         : 0;
 
     const roi =
-      simBankStatus: "Pending Dividends",
+      simBankStatus: "Pending Dividend Data",
       totalBetSize > 0
         ? Math.round((totalProfitLoss / totalBetSize) * 100)
         : 0;
