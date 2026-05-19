@@ -396,7 +396,7 @@ export default function Dashboard() {
         </p>
 
         <div style={{ display: "inline-block", marginTop: "10px", padding: "6px 10px", borderRadius: "999px", background: "rgba(34,197,94,0.12)", color: "#22c55e", fontSize: "12px", fontWeight: "600" }}>
-          ● Updated {new Date().toLocaleDateString("en-AU")} · Live race data
+          Last Updated: {new Date().toLocaleString("en-AU")}
         </div>
 
         <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "8px" }}>
