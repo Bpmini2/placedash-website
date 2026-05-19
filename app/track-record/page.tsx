@@ -123,7 +123,7 @@ export default function TrackRecordPage() {
               textTransform: "uppercase",
             }}
           >
-            Saved AI Picks TEST
+            SAVED AI PICKS
           </div>
 
           <h1
