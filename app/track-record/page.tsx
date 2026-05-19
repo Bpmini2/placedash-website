@@ -138,7 +138,7 @@ export default function TrackRecordPage() {
           </h1>
 
           <p style={{ color: "#b7c5d8", fontSize: "17px" }}>
-            Historical PlaceDash AI picks saved before race start.
+            Historical PlaceDash AI picks saved before race start..
           </p>
 
           <div
