@@ -239,6 +239,41 @@ export default function Dashboard() {
         const data = await res.json();
 
         setRaces(data.racecards || []);
+       if (data.racecards?.length) {
+  for (const race of data.racecards) {
+    const scored = getScoredRunners(race);
+
+    if (!scored.length) continue;
+
+    const topPick = scored[0];
+
+    try {
+      await fetch("/api/saved-picks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          race_date: new Date().toISOString().split("T")[0],
+          course: race.course,
+          race_number: race.raceNumber,
+          race_time: race.raceTime,
+          horse_number: topPick.number,
+          horse_name: topPick.name,
+          confidence: topPick.confidence,
+          ai_score: topPick.score,
+          reasoning: topPick.reasoning,
+          distance: race.distance,
+          condition: race.condition,
+          runner_count: race.runners?.length || 0,
+          state: race.state,
+        }),
+      });
+    } catch (err) {
+      console.error("Failed to save pick", err);
+    }
+  }
+} 
         setLoading(false);
       } catch (err) {
         console.error(err);
