@@ -259,7 +259,7 @@ const filteredPicks = picks.filter((pick) => {
             ].map((card, index) => (
               <div
   key={index}
-  onClick={() => setActiveFilter(card.filter)}
+  onClick={() => setActiveFilter(card.filter || "all")}
   style={{
     cursor: "pointer",
                   padding: "22px",
@@ -319,7 +319,7 @@ const filteredPicks = picks.filter((pick) => {
             </p>
           ) : (
             <div style={{ display: "grid", gap: "14px" }}>
-              filteredPicks.map((r, i) => {
+              {filteredPicks.map((r, i) => {
                 const canRevealPick = isAdmin || i === 0;
 
                 return (
