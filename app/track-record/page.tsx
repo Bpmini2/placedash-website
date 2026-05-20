@@ -237,7 +237,7 @@ const filteredPicks = picks.filter((pick) => {
 
 {
   label: "High Confidence SR",
-  value: `${summary.highConfidenceStrikeRate}%`,
+  value: `${summary.highConfidenceStrikeRate}% (${summary.highConfidencePlaced}/${summary.highConfidencePicks})`,
   color: "#facc15",
   filter: "high",
 },
