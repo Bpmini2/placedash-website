@@ -251,11 +251,7 @@ const filteredPicks = picks.filter((pick) => {
                 value: `$${summary.totalProfitLoss}`,
                 color: summary.totalProfitLoss >= 0 ? "#22c55e" : "#ef4444",
               },
-              {
-                label: "High Confidence SR",
-                value: `${summary.highConfidenceStrikeRate}%`,
-                color: "#facc15",
-              },
+              
             ].map((card, index) => (
               <div
   key={index}
