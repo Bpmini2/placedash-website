@@ -315,20 +315,22 @@ export async function GET() {
           continue;
         }
 
-        const { error: updateError } = await supabase
-          .from("saved_picks")
-          .update({
-            result: resultValue,
-            placed,
-            bet_size: betSize,
-            profit_loss: profitLoss,
-            bank_start: Number(strategy.starting_bank || 1000),
-            bet_percentage: betPercentage,
-            bank_before_bet: Number(bankBeforeBet.toFixed(2)),
-            bank_after_bet: Number(bankAfterBet.toFixed(2)),
-            dividend,
-            settlement_status: settlementStatus,
-          })
+              .update({
+        result: resultValue,
+        placed,
+        bet_size: betSize,
+        profit_loss: profitLoss,
+        bank_start: Number(strategy.starting_bank || 1000),
+        bet_percentage: betPercentage,
+        bank_before_bet: Number(bankBeforeBet.toFixed(2)),
+        bank_after_bet: Number(bankAfterBet.toFixed(2)),
+        dividend,
+        place_dividend: dividend,
+        return_amount:
+          profitLoss !== null ? Number((betSize + profitLoss).toFixed(2)) : null,
+        running_bank: Number(bankAfterBet.toFixed(2)),
+        settlement_status: settlementStatus,
+      })
           .eq("id", pick.id);
 
         if (updateError) {
