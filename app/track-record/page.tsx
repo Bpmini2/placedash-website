@@ -40,7 +40,7 @@ const filteredPicks = picks.filter((pick) => {
   return true;
 });
 
-return (
+
   return (
     <main
       style={{
