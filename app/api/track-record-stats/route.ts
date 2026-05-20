@@ -78,7 +78,7 @@ export async function GET() {
 
 const simBankStatus = "Pending Dividend Data.";
 
-    const last20 = completedPicks.slice(0, 20);
+    const last20 = allPicks.slice(0, 20);
 
     return NextResponse.json({
       ok: true,
