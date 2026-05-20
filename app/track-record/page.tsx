@@ -39,7 +39,17 @@ const filteredPicks = picks.filter((pick) => {
   if (activeFilter === "high") return pick.confidence === "HIGH";
   return true;
 });
+const filterTitles: any = {
+  all: "All AI Picks",
+  completed: "Completed Picks",
+  pending: "Pending Picks",
+  placed: "Placed Picks",
+  unplaced: "Unplaced Picks",
+  high: "High Confidence Picks",
+};
 
+const currentFilterTitle =
+  filterTitles[activeFilter] || "All AI Picks";
 
   return (
     <main
@@ -322,6 +332,16 @@ const filteredPicks = picks.filter((pick) => {
             </p>
           ) : (
             <div style={{ display: "grid", gap: "14px" }}>
+              <div
+  style={{
+    color: "#22c55e",
+    fontSize: "18px",
+    fontWeight: 700,
+    marginBottom: "18px",
+  }}
+>
+  Showing: {currentFilterTitle}
+</div>
               {filteredPicks.map((r, i) => {
                 const canRevealPick = isAdmin || i === 0;
 
