@@ -1,23 +1,100 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function GET() {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/placedash_picks?select=*&order=created_at.desc&limit=50`,
-      {
-        headers: {
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-        },
-      }
-    );
+    const { data, error } = await supabase
+      .from("saved_picks")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50);
 
-    const data = await response.json();
+    if (error) {
+      return NextResponse.json({
+        ok: false,
+        error: error.message,
+      });
+    }
 
     return NextResponse.json({
       ok: true,
       total: data?.length || 0,
       picks: data || [],
+    });
+  } catch (err: any) {
+    return NextResponse.json({
+      ok: false,
+      error: err.message || "Unknown error",
+    });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const pick = await request.json();
+
+    const { data: existingPick } = await supabase
+      .from("saved_picks")
+      .select("id")
+      .eq("race_date", pick.race_date)
+      .eq("course", pick.course)
+      .eq("race_number", pick.race_number)
+      .eq("horse_number", pick.horse_number)
+      .maybeSingle();
+
+    if (existingPick) {
+      return NextResponse.json({
+        ok: true,
+        skipped: true,
+        reason: "Pick already saved",
+        id: existingPick.id,
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("saved_picks")
+      .insert({
+        race_date: pick.race_date,
+        course: pick.course,
+        race_number: pick.race_number,
+        race_time: pick.race_time,
+        horse_number: pick.horse_number,
+        horse_name: pick.horse_name,
+        confidence: pick.confidence,
+        ai_score: pick.ai_score,
+        reasoning: pick.reasoning,
+        distance: pick.distance,
+        condition: pick.condition,
+        runner_count: pick.runner_count,
+        state: pick.state,
+        result: "pending",
+        placed: null,
+        dividend: null,
+        profit_loss: null,
+        settlement_status: "pending",
+        bank_start: 1000,
+        bet_percentage: 10,
+        source: "dashboard",
+      })
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json({
+        ok: false,
+        error: error.message,
+      });
+    }
+
+    return NextResponse.json({
+      ok: true,
+      saved: true,
+      pick: data,
     });
   } catch (err: any) {
     return NextResponse.json({
