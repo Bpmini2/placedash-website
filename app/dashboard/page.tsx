@@ -241,11 +241,9 @@ export default function Dashboard() {
         setRaces(data.racecards || []);
        if (data.racecards?.length) {
   for (const race of data.racecards) {
-    const scored = getScoredRunners(race);
+    const topPick = getBestRunner(race);
 
-    if (!scored.length) continue;
-
-    const topPick = scored[0];
+if (!topPick) continue;
 
     try {
       await fetch("/api/saved-picks", {
