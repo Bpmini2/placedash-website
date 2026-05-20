@@ -34,7 +34,7 @@ const filteredPicks = picks.filter((pick) => {
   if (activeFilter === "all") return true;
   if (activeFilter === "completed") return pick.result && pick.result !== "pending";
   if (activeFilter === "pending") return !pick.result || pick.result === "pending";
-  if (activeFilter === "placed") return pick.placed === true;
+    if (activeFilter === "placed") return pick.placed === true;
   if (activeFilter === "unplaced") return pick.placed === false;
   if (activeFilter === "high") return pick.confidence === "HIGH";
   return true;
