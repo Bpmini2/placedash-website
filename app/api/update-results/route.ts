@@ -314,7 +314,8 @@ export async function GET() {
           });
           continue;
         }
-
+const { error: updateError } = await supabase
+  .from("saved_picks")
               .update({
         result: resultValue,
         placed,
