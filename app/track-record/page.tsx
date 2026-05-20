@@ -8,6 +8,7 @@ export default function TrackRecordPage() {
   const [picks, setPicks] = useState<any[]>([]);
   const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState("all");
 
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -29,7 +30,17 @@ export default function TrackRecordPage() {
 
     loadTrackRecord();
   }, []);
+const filteredPicks = picks.filter((pick) => {
+  if (activeFilter === "all") return true;
+  if (activeFilter === "completed") return pick.result && pick.result !== "pending";
+  if (activeFilter === "pending") return !pick.result || pick.result === "pending";
+  if (activeFilter === "placed") return pick.placed === true;
+  if (activeFilter === "unplaced") return pick.placed === false;
+  if (activeFilter === "high") return pick.confidence === "HIGH";
+  return true;
+});
 
+return (
   return (
     <main
       style={{
@@ -190,35 +201,46 @@ export default function TrackRecordPage() {
           >
             {[
               {
-                label: "Total AI Picks",
-                value: summary.totalPicks,
-                color: "#22c55e",
-              },
-              {
-                label: "Completed",
-                value: summary.completedPicks,
-                color: "#38bdf8",
-              },
-              {
-                label: "Pending",
-                value: summary.pendingPicks,
-                color: "#facc15",
-              },
-              {
-                label: "Placed",
-                value: summary.placedPicks,
-                color: "#22c55e",
-              },
-              {
-                label: "Unplaced",
-                value: summary.unplacedPicks,
-                color: "#ef4444",
-              },
-              {
-                label: "Strike Rate",
-                value: `${summary.strikeRate}%`,
-                color: "#38bdf8",
-              },
+  label: "Total AI Picks",
+  value: summary.totalPicks,
+  color: "#22c55e",
+  filter: "all",
+},
+
+{
+  label: "Completed",
+  value: summary.completedPicks,
+  color: "#38bdf8",
+  filter: "completed",
+},
+
+{
+  label: "Pending",
+  value: summary.pendingPicks,
+  color: "#facc15",
+  filter: "pending",
+},
+
+{
+  label: "Placed",
+  value: summary.placedPicks,
+  color: "#22c55e",
+  filter: "placed",
+},
+
+{
+  label: "Unplaced",
+  value: summary.unplacedPicks,
+  color: "#ef4444",
+  filter: "unplaced",
+},
+
+{
+  label: "High Confidence SR",
+  value: `${summary.highConfidenceStrikeRate}%`,
+  color: "#facc15",
+  filter: "high",
+},
               {
                 label: "ROI",
                 value: `${summary.roi}%`,
@@ -236,8 +258,10 @@ export default function TrackRecordPage() {
               },
             ].map((card, index) => (
               <div
-                key={index}
-                style={{
+  key={index}
+  onClick={() => setActiveFilter(card.filter)}
+  style={{
+    cursor: "pointer",
                   padding: "22px",
                   borderRadius: "20px",
                   background: "rgba(255,255,255,0.05)",
@@ -295,7 +319,7 @@ export default function TrackRecordPage() {
             </p>
           ) : (
             <div style={{ display: "grid", gap: "14px" }}>
-              {picks.map((r, i) => {
+              filteredPicks.map((r, i) => {
                 const canRevealPick = isAdmin || i === 0;
 
                 return (
