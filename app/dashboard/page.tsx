@@ -489,21 +489,23 @@ if (!topPick) continue;
                 </p>
 
                 <p style={{ marginTop: "10px" }}>
-                  Selection: <strong>{isFreePick ? visibleHorse : "🔒 Upgrade to reveal pick"}</strong>
-                </p>
+  Selection: <strong>{visibleHorse}</strong>
+</p>
 
-                <div style={{ color: "#facc15", fontSize: "13px", marginTop: "8px", fontWeight: "700" }}>
-                  {isFreePick ? "Click to view full race card" : "AI-rated place selection available"}
-                </div>
+<div style={{ color: "#afacc15", fontSize: "13px", marginTop: "8px", fontWeight: "700" }}>
+  Click to view full race card
+</div>
 
-                {isFreePick && bestRunner?.reasoning && (
-                  <div style={{ marginTop: "14px", padding: "14px", borderRadius: "16px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "#cbd5e1", fontSize: "13px", lineHeight: "1.6" }}>
-                    <strong style={{ color: "#ffffff" }}>AI Reasoning</strong>
-                    <ul style={{ margin: "6px 0 0 16px", padding: 0 }}>
-                      {bestRunner.reasoning.map((reason: string, reasonIndex: number) => (
-                        <li key={reasonIndex}>{reason}</li>
-                      ))}
-                    </ul>
+{bestRunner?.reasoning && (
+  <div style={{ marginTop: "14px", padding: "14px", borderRadius: "15px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "#cbd5e1", fontSize: "13px", lineHeight: "1.6" }}>
+    <strong style={{ color: "#ffffff" }}>AI Reasoning</strong>
+    <ul style={{ margin: "6px 0 0 15px", padding: 0 }}>
+      {bestRunner.reasoning.map((reason: string, reasonIndex: number) => (
+        <li key={reasonIndex}>{reason}</li>
+      ))}
+    </ul>
+  </div>
+)}
                   </div>
                 )}
 
