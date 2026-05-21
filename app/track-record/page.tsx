@@ -369,7 +369,7 @@ const currentFilterTitle =
                     <div style={{ fontWeight: 800, fontSize: "17px" }}>
                       {r.course} Race {r.race_number || r.raceNumber}
                       {r.state ? ` (${r.state})` : ""} ·{" "}
-                      {r.off_time || r.raceTime || "TBA"}
+                      {r.race_time || r.off_time || r.raceTime || "TBA"}
                     </div>
 
                     <div
