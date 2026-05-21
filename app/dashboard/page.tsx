@@ -522,7 +522,7 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
               </div>
             );
           })}
-
+</div>
           
 
         {selectedRace && (
