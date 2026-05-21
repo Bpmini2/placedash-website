@@ -291,7 +291,7 @@ if (!topPick) continue;
       const best = getBestRunner(race);
       return best && (best.confidence === "HIGH" || best.confidence === "MEDIUM");
     })
-    .slice(0, 3);
+    
   
   const selectedBestRunner = selectedRace ? getBestRunner(selectedRace) : null;
   const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
@@ -466,8 +466,7 @@ if (!topPick) continue;
               <div
                 key={`${race.course}-${race.race_number}`}
                 onClick={() => {
-                  if (isFreePick) setSelectedRace(race);
-                  else window.location.href = "/#pricing";
+                  setSelectedRace(race);
                 }}
                 style={{
                   padding: "26px",
@@ -508,28 +507,13 @@ if (!topPick) continue;
                 )}
 
                 <div style={{ display: "inline-block", marginTop: "10px", padding: "6px 10px", borderRadius: "8px", fontSize: "12px", fontWeight: "600", background: bestRunner?.confidence === "HIGH" ? "rgba(34,197,94,0.15)" : "rgba(250,204,21,0.15)", color: bestRunner?.confidence === "HIGH" ? "#22c55e" : "#facc15" }}>
-                  {isFreePick ? `${bestRunner?.confidence || "LOW"} CONFIDENCE` : "CONFIDENCE LOCKED"}
+                  {`${bestRunner?.confidence || "LOW"} CONFIDENCE`}
                 </div>
               </div>
             );
           })}
 
-          <div style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px", opacity: 0.9, background: "rgba(2,8,18,0.45)" }}>
-            <h3>Premium Picks Locked 🔒</h3>
-            <p style={{ color: "#94a3b8" }}>
-              Only 3 of today’s AI picks are visible — more high-confidence selections are locked.
-            </p>
-            <p style={{ color: "#facc15", fontWeight: "600" }}>
-              ⚠ You’re missing today’s HIGH confidence selections
-            </p>
-            <p style={{ color: "#94a3b8" }}>
-              Upgrade to unlock the strongest AI-rated picks.
-            </p>
-            <a href="/#pricing" style={{ display: "inline-block", marginTop: "15px", padding: "10px 16px", background: "#22c55e", color: "#000", borderRadius: "10px", fontWeight: "600" }}>
-              Upgrade to Silver
-            </a>
-          </div>
-        </div>
+          
 
         {selectedRace && (
           <div style={{ marginTop: "40px", padding: "20px", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "16px", background: "rgba(2,8,18,0.72)" }}>
