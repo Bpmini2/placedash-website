@@ -283,19 +283,17 @@ if (!topPick) continue;
   }, []);
 
   const displayRaces = races
-    .filter((race: any) => {
-      const runnerCount = race.runners?.length || 0;
-      return runnerCount >= 8 && runnerCount <= 11;
-    })
-    .filter((race: any) => {
-      const best = getBestRunner(race);
-      return best && (best.confidence === "HIGH" || best.confidence === "MEDIUM");
-    })
-    
-  
-  const selectedBestRunner = selectedRace ? getBestRunner(selectedRace) : null;
-  const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
+  .filter((race: any) => {
+    const runnerCount = race.runners?.length || 0;
+    return runnerCount >= 8 && runnerCount <= 11;
+  })
+  .filter((race: any) => {
+    const best = getBestRunner(race);
+    return best && (best.confidence === "HIGH" || best.confidence === "MEDIUM");
+  });
 
+const selectedBestRunner = selectedRace ? getBestRunner(selectedRace) : null;
+const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
   return (
     <main
       style={{
