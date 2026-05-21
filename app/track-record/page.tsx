@@ -381,13 +381,11 @@ const currentFilterTitle =
                       }}
                     >
                       <span>
-                        AI Pick:{" "}
-                        {canRevealPick
-                          ? `${r.horse_number || r.horseNumber}. ${
-                              r.horse_name || r.horseName
-                            }`
-                          : "🔒 Upgrade to reveal pick"}
-                      </span>
+  AI Pick:{" "}
+  {`${r.horse_number || r.horseNumber}. ${
+    r.horse_name || r.horseName
+  }`}
+</span>
 
                       <span
                         style={{
@@ -426,24 +424,30 @@ const currentFilterTitle =
                       }}
                     >
                       Date:{" "}
-                      {r.race_date || r.pick_date || r.date || "Unknown"} •{" "}
-                      <span
-                        style={{
-                          color:
-                            r.placed === true
-                              ? "#22c55e"
-                              : r.placed === false
-                              ? "#ef4444"
-                              : "#94a3b8",
-                          fontWeight: 700,
-                        }}
-                      >
-                        {r.placed === true
-                          ? `🟢 PLACED (${r.result || "?"})`
-                          : r.placed === false
-                          ? `🔴 UNPLACED (${r.result || "?"})`
-                          : "🟡 PENDING"}
-                      </span>
+{r.race_date || r.pick_date || r.date || "Unknown"} ·{" "}
+<span
+  style={{
+    color:
+      r.placed === true
+        ? "#22c55e"
+        : r.placed === false
+        ? "#ef4444"
+        : "#94a3b8",
+    fontWeight: 700,
+  }}
+>
+  {r.placed === true
+    ? `🟢 PLACED (${r.result || "?"})`
+    : r.placed === false
+    ? `🔴 UNPLACED (${r.result || "?"})`
+    : "🟡 PENDING"}
+</span>
+
+{r.placed === true && (r.place_dividend || r.dividend) && (
+  <span style={{ marginLeft: "10px", color: "#22c55e", fontWeight: 800 }}>
+    Place Price: ${r.place_dividend || r.dividend}
+  </span>
+)}
                     </div>
                   </div>
                 );
