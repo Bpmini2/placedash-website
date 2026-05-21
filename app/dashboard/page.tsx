@@ -292,7 +292,7 @@ if (!topPick) continue;
       return best && (best.confidence === "HIGH" || best.confidence === "MEDIUM");
     })
     .slice(0, 3);
-
+  
   const selectedBestRunner = selectedRace ? getBestRunner(selectedRace) : null;
   const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
 
