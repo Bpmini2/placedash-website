@@ -496,15 +496,27 @@ if (!topPick) continue;
 </div>
 
 {bestRunner?.reasoning && (
-  <div style={{ marginTop: "14px", padding: "14px", borderRadius: "15px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "#cbd5e1", fontSize: "13px", lineHeight: "1.6" }}>
+  <div
+    style={{
+      marginTop: "14px",
+      padding: "14px",
+      borderRadius: "15px",
+      background: "rgba(255,255,255,0.05)",
+      border: "1px solid rgba(255,255,255,0.08)",
+      color: "#cbd5e1",
+      fontSize: "13px",
+      lineHeight: "1.6",
+    }}
+  >
     <strong style={{ color: "#ffffff" }}>AI Reasoning</strong>
+
     <ul style={{ margin: "6px 0 0 15px", padding: 0 }}>
       {bestRunner.reasoning.map((reason: string, reasonIndex: number) => (
         <li key={reasonIndex}>{reason}</li>
       ))}
     </ul>
-                   </div>
-                )}
+  </div>
+)}
 
                 <div style={{ display: "inline-block", marginTop: "10px", padding: "6px 10px", borderRadius: "8px", fontSize: "12px", fontWeight: "600", background: bestRunner?.confidence === "HIGH" ? "rgba(34,197,94,0.15)" : "rgba(250,204,21,0.15)", color: bestRunner?.confidence === "HIGH" ? "#22c55e" : "#facc15" }}>
                   {`${bestRunner?.confidence || "LOW"} CONFIDENCE`}
