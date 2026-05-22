@@ -291,7 +291,7 @@ export async function GET() {
   dividend = null;
   bankAfterBet = bankBeforeBet;
   settlementStatus = "void";
-}
+
         } else if (position) {
           resultValue = String(position);
           placed = position <= 3;
