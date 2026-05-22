@@ -40,29 +40,34 @@ export default function TrackRecordPage() {
   }, []);
 
   const filteredPicks = picks.filter((pick) => {
-    const pickDate = pick.race_date || pick.pick_date || pick.date;
+  const pickDate = pick.race_date || pick.pick_date || pick.date;
 
-    if (dateMode === "today" || dateMode === "yesterday" || dateMode === "custom") {
-      if (pickDate !== selectedDate) return false;
-    }
+  if (
+    dateMode === "today" ||
+    dateMode === "yesterday" ||
+    dateMode === "custom"
+  ) {
+    if (pickDate !== selectedDate) return false;
+  }
 
-    if (dateMode === "last7" || dateMode === "last30") {
-  const pickTime = new Date(pickDate).getTime();
-  const todayTime = new Date(today).getTime();
-  const daysBack = dateMode === "last30" ? 29 : 6;
-  const startDate = todayTime - daysBack * 24 * 60 * 60 * 1000;
+  if (dateMode === "last7" || dateMode === "last30") {
+    const pickTime = new Date(pickDate).getTime();
+    const todayTime = new Date(today).getTime();
+    const daysBack = dateMode === "last30" ? 29 : 6;
+    const startDate = todayTime - daysBack * 24 * 60 * 60 * 1000;
 
-  if (pickTime < startDate || pickTime > todayTime) return false;
-}
-    if (activeFilter === "all") return true;
-    if (activeFilter === "completed") return pick.result && pick.result !== "pending";
-    if (activeFilter === "pending") return !pick.result || pick.result === "pending";
-    if (activeFilter === "placed") return pick.placed === true;
-    if (activeFilter === "unplaced") return pick.placed === false;
-    if (activeFilter === "high") return pick.confidence === "HIGH";
+    if (pickTime < startDate || pickTime > todayTime) return false;
+  }
 
-    return true;
-  });
+  if (activeFilter === "all") return true;
+  if (activeFilter === "completed") return pick.result && pick.result !== "pending";
+  if (activeFilter === "pending") return !pick.result || pick.result === "pending";
+  if (activeFilter === "placed") return pick.placed === true;
+  if (activeFilter === "unplaced") return pick.placed === false;
+  if (activeFilter === "high") return pick.confidence === "HIGH";
+
+  return true;
+});
 
   const filterTitles: any = {
     all: "All AI Picks",
