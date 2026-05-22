@@ -322,13 +322,12 @@ export async function GET() {
           placed = position <= 3;
 
           if (placed && dividend) {
-            profitLoss = Number((betSize * dividend - betSize).toFixed(2));
-          } else if (placed && !dividend) {
-            profitLoss = null;
-          } else {
-            profitLoss = null;
-          }
-
+  profitLoss = Number((betSize * dividend - betSize).toFixed(2));
+} else if (placed && !dividend) {
+  profitLoss = null;
+} else {
+  profitLoss = Number((-betSize).toFixed(2));
+}
           if (profitLoss !== null) {
             bankAfterBet = Number((bankBeforeBet + profitLoss).toFixed(2));
             runningBank = bankAfterBet;
