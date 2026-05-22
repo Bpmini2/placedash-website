@@ -436,7 +436,86 @@ export default function TrackRecordPage() {
                     >
                       Last 7 Days
                     </button>
+<button
+  onClick={() => {
+    const headers = [
+      "Date",
+      "Track",
+      "Race Number",
+      "Race Time",
+      "Horse Number",
+      "Horse Name",
+      "Confidence",
+      "AI Score",
+      "Result",
+      "Placed",
+      "Place Dividend",
+      "Bet Size",
+      "Return Amount",
+      "Profit Loss",
+      "Bank Before Bet",
+      "Bank After Bet",
+    ];
 
+    const rows = filteredPicks.map((r: any) => [
+      r.race_date || "",
+      r.course || "",
+      r.race_number || "",
+      r.race_time || "",
+      r.horse_number || "",
+      r.horse_name || "",
+      r.confidence || "",
+      r.ai_score || "",
+      r.result || "",
+      r.placed === true
+        ? "Placed"
+        : r.placed === false
+        ? "Unplaced"
+        : "Pending",
+      r.place_dividend || r.dividend || "",
+      r.bet_size || "",
+      r.return_amount || "",
+      r.profit_loss || "",
+      r.bank_before_bet || "",
+      r.bank_after_bet || r.running_bank || "",
+    ]);
+
+    const csvContent =
+      [headers, ...rows]
+        .map((e) =>
+          e.map((x) => `"${String(x).replace(/"/g, '""')}"`).join(",")
+        )
+        .join("\n");
+
+    const blob = new Blob([csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute(
+      "download",
+      `placedash-track-record-${selectedDate}.csv`
+    );
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }}
+  style={{
+    padding: "8px 14px",
+    borderRadius: "10px",
+    border: "1px solid rgba(34,197,94,0.35)",
+    background: "rgba(34,197,94,0.12)",
+    color: "#22c55e",
+    cursor: "pointer",
+    fontWeight: 700,
+  }}
+>
+  Download CSV
+</button>
                     <input
                       type="date"
                       value={selectedDate}
