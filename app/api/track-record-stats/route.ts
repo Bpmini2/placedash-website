@@ -17,19 +17,18 @@ export async function GET() {
       .order("race_date", { ascending: false })
       .order("race_time", { ascending: false });
 
-   if (error) {
-  return NextResponse.json(
-    {
-      ok: false,
-      error: error.message,
-    },
-    {
-      headers: {
-        "Cache-Control": "no-store, max-age=0",
-      },
-    }
-  );
-}
+    if (error) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: error.message,
+        },
+        {
+          headers: {
+            "Cache-Control": "no-store, max-age=0",
+          },
+        }
+      );
     }
 
     const allPicks = picks || [];
@@ -51,22 +50,8 @@ export async function GET() {
     );
 
     const moneySettledPicks = completedPicks.filter(
-      (pick: any) =>
-        pick.profit_loss !== null &&
-        pick.profit_loss !== undefined &&
-        pick.settlement_status === "settled"
+      (pick: any) => pick.settlement_status === "settled"
     );
-
-    const totalProfitLoss = moneySettledPicks.reduce(
-      (total: number, pick: any) => {
-        return total + Number(pick.profit_loss || 0);
-      },
-      0
-    );
-
-    const totalBetSize = moneySettledPicks.reduce((total: number, pick: any) => {
-      return total + Number(pick.bet_size || 0);
-    }, 0);
 
     const strikeRate =
       completedPicks.length > 0
@@ -80,38 +65,59 @@ export async function GET() {
           )
         : 0;
 
-    const roi =
-  totalBetSize > 0
-    ? Math.round((totalProfitLoss / totalBetSize) * 100)
-    : 0;
+    const totalBetSize = moneySettledPicks.reduce(
+      (sum: number, pick: any) => sum + Number(pick.bet_size || 0),
+      0
+    );
 
-const simBankStatus = "Pending Dividend Data.";
+    const totalProfitLoss = moneySettledPicks.reduce(
+      (sum: number, pick: any) => sum + Number(pick.profit_loss || 0),
+      0
+    );
+
+    const roi =
+      totalBetSize > 0 ? Math.round((totalProfitLoss / totalBetSize) * 100) : 0;
 
     const last20 = allPicks.slice(0, 20);
 
     return NextResponse.json(
-  {
-    ok: true,
-    summary: {
-      totalPicks: allPicks.length,
-      completedPicks: completedPicks.length,
-      pendingPicks: allPicks.length - completedPicks.length,
-      placedPicks: placedPicks.length,
-      unplacedPicks: completedPicks.length - placedPicks.length,
-      strikeRate,
-      highConfidencePicks: highConfidencePicks.length,
-      highConfidencePlaced: highConfidencePlaced.length,
-      highConfidenceStrikeRate,
-      moneySettledPicks: moneySettledPicks.length,
-      totalBetSize,
-      totalProfitLoss,
-      roi,
-    },
-    last20,
-  },
-  {
-    headers: {
-      "Cache-Control": "no-store, max-age=0",
-    },
+      {
+        ok: true,
+        summary: {
+          totalPicks: allPicks.length,
+          completedPicks: completedPicks.length,
+          pendingPicks: allPicks.length - completedPicks.length,
+          placedPicks: placedPicks.length,
+          unplacedPicks: completedPicks.length - placedPicks.length,
+          strikeRate,
+          highConfidencePicks: highConfidencePicks.length,
+          highConfidencePlaced: highConfidencePlaced.length,
+          highConfidenceStrikeRate,
+          moneySettledPicks: moneySettledPicks.length,
+          totalBetSize,
+          totalProfitLoss,
+          roi,
+        },
+        last20,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "Failed to build track record stats",
+        details: String(error),
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      }
+    );
   }
-);
+}
