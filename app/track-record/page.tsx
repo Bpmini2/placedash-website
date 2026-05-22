@@ -436,11 +436,13 @@ const currentFilterTitle =
     fontWeight: 700,
   }}
 >
-  {r.placed === true
-    ? `🟢 PLACED (${r.result || "?"})`
-    : r.placed === false
-    ? `🔴 UNPLACED (${r.result || "?"})`
-    : "🟡 PENDING"}
+  {r.result === "scratched" || r.settlement_status === "void"
+  ? "⚪ SCRATCHED · VOID / NO BET"
+  : r.placed === true
+  ? `🟢 PLACED (${r.result || "?"})`
+  : r.placed === false
+  ? `🔴 UNPLACED (${r.result || "?"})`
+  : "🟡 PENDING"}
 </span>
 
 {r.placed === true && (r.place_dividend || r.dividend) && (
