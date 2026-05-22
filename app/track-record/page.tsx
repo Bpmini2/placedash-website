@@ -9,7 +9,9 @@ export default function TrackRecordPage() {
   const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("all");
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toLocaleDateString("en-CA", {
+  timeZone: "Australia/Melbourne",
+});
 const [selectedDate, setSelectedDate] = useState(today);
   const [isAdmin, setIsAdmin] = useState(false);
 
