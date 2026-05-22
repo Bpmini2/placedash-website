@@ -13,6 +13,7 @@ export default function TrackRecordPage() {
   timeZone: "Australia/Melbourne",
 });
 const [selectedDate, setSelectedDate] = useState(today);
+  const [dateMode, setDateMode] = useState("today");
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -37,7 +38,17 @@ const filteredPicks = picks.filter((pick) => {
   const pickDate =
     pick.race_date || pick.pick_date || pick.date;
 
+  if (dateMode === "today" || dateMode === "yesterday" || dateMode === "custom") {
   if (pickDate !== selectedDate) return false;
+}
+
+if (dateMode === "last7") {
+  const pickTime = new Date(pickDate).getTime();
+  const todayTime = new Date(today).getTime();
+  const sevenDaysAgo = todayTime - 6 * 24 * 60 * 60 * 1000;
+
+  if (pickTime < sevenDaysAgo || pickTime > todayTime) return false;
+}
 
   if (activeFilter === "all") return true;
 
@@ -396,9 +407,10 @@ const currentFilterTitle =
     yesterday.setDate(yesterday.getDate() - 1);
 
     setSelectedDate(
-      yesterday.toISOString().split("T")[0]
-    );
-  }}
+  yesterday.toISOString().split("T")[0]
+);
+
+setDateMode("yesterday");
   style={{
     padding: "8px 14px",
     borderRadius: "10px",
