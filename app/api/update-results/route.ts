@@ -261,15 +261,40 @@ export async function GET() {
         });
 
         if (!matchedRunner) {
-          failed.push({
-            id: pick.id,
-            course: pick.course,
-            race_number: pick.race_number,
-            horse_name: pick.horse_name,
-            reason: "Horse not found in Punting Form result",
-          });
-          continue;
-        }
+  const { error: scratchedUpdateError } = await supabase
+    .from("saved_picks")
+    .update({
+      result: "scratched",
+      placed: null,
+      profit_loss: 0,
+      dividend: null,
+      place_dividend: null,
+      return_amount: 0,
+      settlement_status: "void",
+    })
+    .eq("id", pick.id);
+
+  if (scratchedUpdateError) {
+    failed.push({
+      id: pick.id,
+      course: pick.course,
+      race_number: pick.race_number,
+      horse_name: pick.horse_name,
+      reason: scratchedUpdateError.message,
+    });
+  } else {
+    updated.push({
+      id: pick.id,
+      course: pick.course,
+      race_number: pick.race_number,
+      horse_name: pick.horse_name,
+      result: "scratched",
+      settlement_status: "void",
+    });
+  }
+
+  continue;
+}
 
         const scratched = isScratchedRunner(matchedRunner);
         const position = getRunnerPosition(matchedRunner);
