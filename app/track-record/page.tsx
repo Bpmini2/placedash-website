@@ -280,6 +280,11 @@ export default function TrackRecordPage() {
                 value: `$${summary.totalProfitLoss}`,
                 color: summary.totalProfitLoss >= 0 ? "#22c55e" : "#ef4444",
               },
+            {
+  label: "Current Bank",
+  value: `$${summary.currentBank || 1000}`,
+  color: "#22c55e",
+},
             ].map((card, index) => (
               <div
                 key={index}
