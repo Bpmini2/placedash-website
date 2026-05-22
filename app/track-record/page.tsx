@@ -40,34 +40,34 @@ export default function TrackRecordPage() {
   }, []);
 
   const filteredPicks = picks.filter((pick) => {
-  const pickDate = pick.race_date || pick.pick_date || pick.date;
+    const pickDate = pick.race_date || pick.pick_date || pick.date;
 
-  if (
-    dateMode === "today" ||
-    dateMode === "yesterday" ||
-    dateMode === "custom"
-  ) {
-    if (pickDate !== selectedDate) return false;
-  }
+    if (
+      dateMode === "today" ||
+      dateMode === "yesterday" ||
+      dateMode === "custom"
+    ) {
+      if (pickDate !== selectedDate) return false;
+    }
 
-  if (dateMode === "last7" || dateMode === "last30") {
-    const pickTime = new Date(pickDate).getTime();
-    const todayTime = new Date(today).getTime();
-    const daysBack = dateMode === "last30" ? 29 : 6;
-    const startDate = todayTime - daysBack * 24 * 60 * 60 * 1000;
+    if (dateMode === "last7" || dateMode === "last30") {
+      const pickTime = new Date(pickDate).getTime();
+      const todayTime = new Date(today).getTime();
+      const daysBack = dateMode === "last30" ? 29 : 6;
+      const startDate = todayTime - daysBack * 24 * 60 * 60 * 1000;
 
-    if (pickTime < startDate || pickTime > todayTime) return false;
-  }
+      if (pickTime < startDate || pickTime > todayTime) return false;
+    }
 
-  if (activeFilter === "all") return true;
-  if (activeFilter === "completed") return pick.result && pick.result !== "pending";
-  if (activeFilter === "pending") return !pick.result || pick.result === "pending";
-  if (activeFilter === "placed") return pick.placed === true;
-  if (activeFilter === "unplaced") return pick.placed === false;
-  if (activeFilter === "high") return pick.confidence === "HIGH";
+    if (activeFilter === "all") return true;
+    if (activeFilter === "completed") return pick.result && pick.result !== "pending";
+    if (activeFilter === "pending") return !pick.result || pick.result === "pending";
+    if (activeFilter === "placed") return pick.placed === true;
+    if (activeFilter === "unplaced") return pick.placed === false;
+    if (activeFilter === "high") return pick.confidence === "HIGH";
 
-  return true;
-});
+    return true;
+  });
 
   const filterTitles: any = {
     all: "All AI Picks",
@@ -79,6 +79,72 @@ export default function TrackRecordPage() {
   };
 
   const currentFilterTitle = filterTitles[activeFilter] || "All AI Picks";
+
+  function downloadCSV() {
+    const headers = [
+      "Date",
+      "Track",
+      "Race Number",
+      "Race Time",
+      "Horse Number",
+      "Horse Name",
+      "Confidence",
+      "AI Score",
+      "Result",
+      "Placed Status",
+      "Place Dividend",
+      "Bet Size",
+      "Return Amount",
+      "Profit Loss",
+      "Bank Before Bet",
+      "Bank After Bet",
+    ];
+
+    const rows = filteredPicks.map((r: any) => [
+      r.race_date || "",
+      r.course || "",
+      r.race_number || "",
+      r.race_time || "",
+      r.horse_number || "",
+      r.horse_name || "",
+      r.confidence || "",
+      r.ai_score || "",
+      r.result || "",
+      r.result === "scratched" || r.settlement_status === "void"
+        ? "Void"
+        : r.placed === true
+        ? "Placed"
+        : r.placed === false
+        ? "Unplaced"
+        : "Pending",
+      r.place_dividend || r.dividend || "",
+      r.bet_size || "",
+      r.return_amount || "",
+      r.profit_loss || "",
+      r.bank_before_bet || "",
+      r.bank_after_bet || r.running_bank || "",
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map((row) =>
+        row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(",")
+      )
+      .join("\n");
+
+    const blob = new Blob([csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.setAttribute("download", `placedash-track-record-${dateMode}-${selectedDate}.csv`);
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 
   return (
     <main
@@ -209,24 +275,6 @@ export default function TrackRecordPage() {
               timeZone: "Australia/Melbourne",
             })}
           </div>
-
-          {isAdmin && (
-            <div
-              style={{
-                display: "inline-block",
-                padding: "8px 14px",
-                borderRadius: "999px",
-                background: "rgba(34,197,94,0.16)",
-                border: "1px solid rgba(34,197,94,0.35)",
-                color: "#22c55e",
-                fontSize: "13px",
-                fontWeight: 800,
-                marginBottom: "18px",
-              }}
-            >
-              ADMIN MODE — All picks unlocked
-            </div>
-          )}
         </div>
 
         {summary && (
@@ -239,57 +287,28 @@ export default function TrackRecordPage() {
             }}
           >
             {[
-              {
-                label: "Total AI Picks",
-                value: summary.totalPicks,
-                color: "#22c55e",
-                filter: "all",
-              },
-              {
-                label: "Completed",
-                value: summary.completedPicks,
-                color: "#38bdf8",
-                filter: "completed",
-              },
-              {
-                label: "Pending",
-                value: summary.pendingPicks,
-                color: "#facc15",
-                filter: "pending",
-              },
-              {
-                label: "Placed",
-                value: summary.placedPicks,
-                color: "#22c55e",
-                filter: "placed",
-              },
-              {
-                label: "Unplaced",
-                value: summary.unplacedPicks,
-                color: "#ef4444",
-                filter: "unplaced",
-              },
+              { label: "Total AI Picks", value: summary.totalPicks, color: "#22c55e", filter: "all" },
+              { label: "Completed", value: summary.completedPicks, color: "#38bdf8", filter: "completed" },
+              { label: "Pending", value: summary.pendingPicks, color: "#facc15", filter: "pending" },
+              { label: "Placed", value: summary.placedPicks, color: "#22c55e", filter: "placed" },
+              { label: "Unplaced", value: summary.unplacedPicks, color: "#ef4444", filter: "unplaced" },
               {
                 label: "Place Strike Rate",
                 value: `${summary.strikeRate}% (${summary.placedPicks}/${summary.completedPicks})`,
                 color: "#facc15",
                 filter: "placed",
               },
-              {
-                label: "ROI",
-                value: `${summary.roi}%`,
-                color: summary.roi >= 0 ? "#22c55e" : "#ef4444",
-              },
+              { label: "ROI", value: `${summary.roi}%`, color: summary.roi >= 0 ? "#22c55e" : "#ef4444" },
               {
                 label: "Profit / Loss",
                 value: `$${summary.totalProfitLoss}`,
                 color: summary.totalProfitLoss >= 0 ? "#22c55e" : "#ef4444",
               },
-            {
-  label: "Current Bank",
-  value: `$${summary.currentBank || 1000}`,
-  color: "#22c55e",
-},
+              {
+                label: "Current Bank",
+                value: `$${summary.currentBank || 1000}`,
+                color: "#22c55e",
+              },
             ].map((card, index) => (
               <div
                 key={index}
@@ -348,10 +367,6 @@ export default function TrackRecordPage() {
         >
           {loading ? (
             <p style={{ color: "#94a3b8" }}>Loading saved AI picks...</p>
-          ) : picks.length === 0 ? (
-            <p style={{ color: "#94a3b8" }}>
-              No completed AI picks available yet. Race results will appear automatically after races finish.
-            </p>
           ) : (
             <div style={{ display: "grid", gap: "14px" }}>
               <div
@@ -373,7 +388,14 @@ export default function TrackRecordPage() {
                 >
                   <div>Showing: {currentFilterTitle}</div>
 
-                  <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                    }}
+                  >
                     <button
                       onClick={() => {
                         setSelectedDate(today);
@@ -383,10 +405,7 @@ export default function TrackRecordPage() {
                         padding: "8px 14px",
                         borderRadius: "10px",
                         border: "1px solid rgba(255,255,255,0.12)",
-                        background:
-                          dateMode === "today"
-                            ? "rgba(34,197,94,0.18)"
-                            : "rgba(255,255,255,0.05)",
+                        background: dateMode === "today" ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.05)",
                         color: "#fff",
                         cursor: "pointer",
                         fontWeight: 700,
@@ -410,10 +429,7 @@ export default function TrackRecordPage() {
                         padding: "8px 14px",
                         borderRadius: "10px",
                         border: "1px solid rgba(255,255,255,0.12)",
-                        background:
-                          dateMode === "yesterday"
-                            ? "rgba(34,197,94,0.18)"
-                            : "rgba(255,255,255,0.05)",
+                        background: dateMode === "yesterday" ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.05)",
                         color: "#fff",
                         cursor: "pointer",
                         fontWeight: 700,
@@ -423,17 +439,12 @@ export default function TrackRecordPage() {
                     </button>
 
                     <button
-                      onClick={() => {
-                        setDateMode("last7");
-                      }}
+                      onClick={() => setDateMode("last7")}
                       style={{
                         padding: "8px 14px",
                         borderRadius: "10px",
                         border: "1px solid rgba(255,255,255,0.12)",
-                        background:
-                          dateMode === "last7"
-                            ? "rgba(34,197,94,0.18)"
-                            : "rgba(255,255,255,0.05)",
+                        background: dateMode === "last7" ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.05)",
                         color: "#fff",
                         cursor: "pointer",
                         fontWeight: 700,
@@ -441,113 +452,22 @@ export default function TrackRecordPage() {
                     >
                       Last 7 Days
                     </button>
+
+                    <button
+                      onClick={() => setDateMode("last30")}
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: "10px",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        background: dateMode === "last30" ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.05)",
+                        color: "#fff",
+                        cursor: "pointer",
+                        fontWeight: 700,
+                      }}
+                    >
+                      Last 30 Days
                     </button>
 
-<button
-  onClick={() => {
-    setDateMode("last30");
-  }}
-  style={{
-    padding: "8px 14px",
-    borderRadius: "10px",
-    border: "1px solid rgba(255,255,255,0.12)",
-    background:
-      dateMode === "last30"
-        ? "rgba(34,197,94,0.18)"
-        : "rgba(255,255,255,0.05)",
-    color: "#fff",
-    cursor: "pointer",
-    fontWeight: 700,
-  }}
->
-  Last 30 Days
-</button>
-
-<button
-  onClick={() => {
-    const headers = [
-<button
-  onClick={() => {
-    const headers = [
-      "Date",
-      "Track",
-      "Race Number",
-      "Race Time",
-      "Horse Number",
-      "Horse Name",
-      "Confidence",
-      "AI Score",
-      "Result",
-      "Placed",
-      "Place Dividend",
-      "Bet Size",
-      "Return Amount",
-      "Profit Loss",
-      "Bank Before Bet",
-      "Bank After Bet",
-    ];
-
-    const rows = filteredPicks.map((r: any) => [
-      r.race_date || "",
-      r.course || "",
-      r.race_number || "",
-      r.race_time || "",
-      r.horse_number || "",
-      r.horse_name || "",
-      r.confidence || "",
-      r.ai_score || "",
-      r.result || "",
-      r.result === "scratched" || r.settlement_status === "void"
-  ? "Void"
-  : r.placed === true
-  ? "Placed"
-  : r.placed === false
-  ? "Unplaced"
-  : "Pending",
-      r.place_dividend || r.dividend || "",
-      r.bet_size || "",
-      r.return_amount || "",
-      r.profit_loss || "",
-      r.bank_before_bet || "",
-      r.bank_after_bet || r.running_bank || "",
-    ]);
-
-    const csvContent =
-      [headers, ...rows]
-        .map((e) =>
-          e.map((x) => `"${String(x).replace(/"/g, '""')}"`).join(",")
-        )
-        .join("\n");
-
-    const blob = new Blob([csvContent], {
-      type: "text/csv;charset=utf-8;",
-    });
-
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute(
-      "download",
-      `placedash-track-record-${selectedDate}.csv`
-    );
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }}
-  style={{
-    padding: "8px 14px",
-    borderRadius: "10px",
-    border: "1px solid rgba(34,197,94,0.35)",
-    background: "rgba(34,197,94,0.12)",
-    color: "#22c55e",
-    cursor: "pointer",
-    fontWeight: 700,
-  }}
->
-  Download CSV
-</button>
                     <input
                       type="date"
                       value={selectedDate}
@@ -563,14 +483,27 @@ export default function TrackRecordPage() {
                         color: "#fff",
                       }}
                     />
+
+                    <button
+                      onClick={downloadCSV}
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: "10px",
+                        border: "1px solid rgba(34,197,94,0.35)",
+                        background: "rgba(34,197,94,0.12)",
+                        color: "#22c55e",
+                        cursor: "pointer",
+                        fontWeight: 700,
+                      }}
+                    >
+                      Download CSV
+                    </button>
                   </div>
                 </div>
               </div>
 
               {filteredPicks.length === 0 ? (
-                <p style={{ color: "#94a3b8" }}>
-                  No picks found for this date/filter.
-                </p>
+                <p style={{ color: "#94a3b8" }}>No picks found for this date/filter.</p>
               ) : (
                 filteredPicks.map((r, i) => {
                   const canRevealPick = isAdmin || i === 0;
@@ -588,12 +521,6 @@ export default function TrackRecordPage() {
                             ? "1px solid rgba(239,68,68,0.30)"
                             : "1px solid rgba(255,255,255,0.08)",
                         background: "rgba(255,255,255,0.04)",
-                        boxShadow:
-                          r.placed === true
-                            ? "0 0 18px rgba(34,197,94,0.12)"
-                            : r.placed === false
-                            ? "0 0 18px rgba(239,68,68,0.10)"
-                            : "none",
                       }}
                     >
                       <div style={{ fontWeight: 800, fontSize: "17px" }}>
@@ -602,19 +529,9 @@ export default function TrackRecordPage() {
                         {r.race_time || r.off_time || r.raceTime || "TBA"}
                       </div>
 
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          gap: "18px",
-                          marginTop: "8px",
-                        }}
-                      >
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: "18px", marginTop: "8px" }}>
                         <span>
-                          AI Pick:{" "}
-                          {`${r.horse_number || r.horseNumber}. ${
-                            r.horse_name || r.horseName
-                          }`}
+                          AI Pick: {`${r.horse_number || r.horseNumber}. ${r.horse_name || r.horseName}`}
                         </span>
 
                         <span
@@ -633,26 +550,13 @@ export default function TrackRecordPage() {
                       </div>
 
                       {canRevealPick && (
-                        <div
-                          style={{
-                            color: "#94a3b8",
-                            fontSize: "12px",
-                            marginTop: "10px",
-                            lineHeight: "1.5",
-                          }}
-                        >
+                        <div style={{ color: "#94a3b8", fontSize: "12px", marginTop: "10px", lineHeight: "1.5" }}>
                           <strong style={{ color: "#cbd5e1" }}>Reason:</strong>{" "}
                           {r.reasoning || "AI analysis pending"}
                         </div>
                       )}
 
-                      <div
-                        style={{
-                          color: "#94a3b8",
-                          fontSize: "12px",
-                          marginTop: "8px",
-                        }}
-                      >
+                      <div style={{ color: "#94a3b8", fontSize: "12px", marginTop: "8px" }}>
                         Date: {r.race_date || r.pick_date || r.date || "Unknown"} ·{" "}
                         <span
                           style={{
@@ -677,13 +581,7 @@ export default function TrackRecordPage() {
                         </span>
 
                         {r.placed === true && (r.place_dividend || r.dividend) && (
-                          <span
-                            style={{
-                              marginLeft: "10px",
-                              color: "#22c55e",
-                              fontWeight: 800,
-                            }}
-                          >
+                          <span style={{ marginLeft: "10px", color: "#22c55e", fontWeight: 800 }}>
                             Place Price: ${r.place_dividend || r.dividend}
                           </span>
                         )}
