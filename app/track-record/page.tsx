@@ -467,11 +467,13 @@ export default function TrackRecordPage() {
       r.confidence || "",
       r.ai_score || "",
       r.result || "",
-      r.placed === true
-        ? "Placed"
-        : r.placed === false
-        ? "Unplaced"
-        : "Pending",
+      r.result === "scratched" || r.settlement_status === "void"
+  ? "Void"
+  : r.placed === true
+  ? "Placed"
+  : r.placed === false
+  ? "Unplaced"
+  : "Pending",
       r.place_dividend || r.dividend || "",
       r.bet_size || "",
       r.return_amount || "",
