@@ -384,6 +384,8 @@ const currentFilterTitle =
     Showing: {currentFilterTitle}
     <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
   <button
+    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+  <button
     onClick={() => {
       setSelectedDate(today);
       setDateMode("today");
@@ -455,6 +457,9 @@ const currentFilterTitle =
       border: "1px solid rgba(255,255,255,0.12)",
       background: "rgba(255,255,255,0.05)",
       color: "#fff",
+    }}
+  />
+</div>
     }}
   />
 </div>
