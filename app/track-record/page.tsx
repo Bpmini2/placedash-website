@@ -46,14 +46,14 @@ export default function TrackRecordPage() {
       if (pickDate !== selectedDate) return false;
     }
 
-    if (dateMode === "last7") {
-      const pickTime = new Date(pickDate).getTime();
-      const todayTime = new Date(today).getTime();
-      const sevenDaysAgo = todayTime - 6 * 24 * 60 * 60 * 1000;
+    if (dateMode === "last7" || dateMode === "last30") {
+  const pickTime = new Date(pickDate).getTime();
+  const todayTime = new Date(today).getTime();
+  const daysBack = dateMode === "last30" ? 29 : 6;
+  const startDate = todayTime - daysBack * 24 * 60 * 60 * 1000;
 
-      if (pickTime < sevenDaysAgo || pickTime > todayTime) return false;
-    }
-
+  if (pickTime < startDate || pickTime > todayTime) return false;
+}
     if (activeFilter === "all") return true;
     if (activeFilter === "completed") return pick.result && pick.result !== "pending";
     if (activeFilter === "pending") return !pick.result || pick.result === "pending";
@@ -436,6 +436,31 @@ export default function TrackRecordPage() {
                     >
                       Last 7 Days
                     </button>
+                    </button>
+
+<button
+  onClick={() => {
+    setDateMode("last30");
+  }}
+  style={{
+    padding: "8px 14px",
+    borderRadius: "10px",
+    border: "1px solid rgba(255,255,255,0.12)",
+    background:
+      dateMode === "last30"
+        ? "rgba(34,197,94,0.18)"
+        : "rgba(255,255,255,0.05)",
+    color: "#fff",
+    cursor: "pointer",
+    fontWeight: 700,
+  }}
+>
+  Last 30 Days
+</button>
+
+<button
+  onClick={() => {
+    const headers = [
 <button
   onClick={() => {
     const headers = [
