@@ -77,6 +77,17 @@ export async function GET() {
 
     const roi =
       totalBetSize > 0 ? Math.round((totalProfitLoss / totalBetSize) * 100) : 0;
+    const latestBankPick = [...allPicks]
+  .filter((pick: any) => pick.bank_after_bet || pick.running_bank)
+  .sort((a: any, b: any) => {
+    return new Date(b.race_date).getTime() - new Date(a.race_date).getTime();
+  })[0];
+
+const currentBank = Number(
+  latestBankPick?.bank_after_bet ||
+    latestBankPick?.running_bank ||
+    1000
+);
 
     const last20 = allPicks.slice(0, 20);
 
@@ -97,6 +108,7 @@ export async function GET() {
           totalBetSize,
           totalProfitLoss,
           roi,
+          currentBank,
         },
         last20,
       },
