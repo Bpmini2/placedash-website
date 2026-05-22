@@ -382,6 +382,82 @@ const currentFilterTitle =
 >
   <div>
     Showing: {currentFilterTitle}
+    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+  <button
+    onClick={() => {
+      setSelectedDate(today);
+      setDateMode("today");
+    }}
+    style={{
+      padding: "8px 14px",
+      borderRadius: "10px",
+      border: "1px solid rgba(255,255,255,0.12)",
+      background: dateMode === "today" ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.05)",
+      color: "#fff",
+      cursor: "pointer",
+      fontWeight: 700,
+    }}
+  >
+    Today
+  </button>
+
+  <button
+    onClick={() => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      setSelectedDate(
+        yesterday.toLocaleDateString("en-CA", {
+          timeZone: "Australia/Melbourne",
+        })
+      );
+      setDateMode("yesterday");
+    }}
+    style={{
+      padding: "8px 14px",
+      borderRadius: "10px",
+      border: "1px solid rgba(255,255,255,0.12)",
+      background: dateMode === "yesterday" ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.05)",
+      color: "#fff",
+      cursor: "pointer",
+      fontWeight: 700,
+    }}
+  >
+    Yesterday
+  </button>
+
+  <button
+    onClick={() => {
+      setDateMode("last7");
+    }}
+    style={{
+      padding: "8px 14px",
+      borderRadius: "10px",
+      border: "1px solid rgba(255,255,255,0.12)",
+      background: dateMode === "last7" ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.05)",
+      color: "#fff",
+      cursor: "pointer",
+      fontWeight: 700,
+    }}
+  >
+    Last 7 Days
+  </button>
+
+  <input
+    type="date"
+    value={selectedDate}
+    onChange={(e) => {
+      setSelectedDate(e.target.value);
+      setDateMode("custom");
+    }}
+    style={{
+      padding: "8px 12px",
+      borderRadius: "10px",
+      border: "1px solid rgba(255,255,255,0.12)",
+      background: "rgba(255,255,255,0.05)",
+      color: "#fff",
+    }}
+  />
+</div>
   </div>
 
   <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
