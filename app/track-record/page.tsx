@@ -9,7 +9,8 @@ export default function TrackRecordPage() {
   const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("all");
-
+  const today = new Date().toISOString().split("T")[0];
+const [selectedDate, setSelectedDate] = useState(today);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -31,13 +32,30 @@ export default function TrackRecordPage() {
     loadTrackRecord();
   }, []);
 const filteredPicks = picks.filter((pick) => {
+  const pickDate =
+    pick.race_date || pick.pick_date || pick.date;
+
+  if (pickDate !== selectedDate) return false;
+
   if (activeFilter === "all") return true;
-  if (activeFilter === "completed") return pick.result && pick.result !== "pending";
-  if (activeFilter === "pending") return !pick.result || pick.result === "pending";
-    if (activeFilter === "placed") return pick.placed === true;
-  if (activeFilter === "unplaced") return pick.placed === false;
-  if (activeFilter === "high") return pick.confidence === "HIGH";
+
+  if (activeFilter === "completed")
+    return pick.result && pick.result !== "pending";
+
+  if (activeFilter === "pending")
+    return !pick.result || pick.result === "pending";
+
+  if (activeFilter === "placed")
+    return pick.placed === true;
+
+  if (activeFilter === "unplaced")
+    return pick.placed === false;
+
+  if (activeFilter === "high")
+    return pick.confidence === "HIGH";
+
   return true;
+});
 });
 const filterTitles: any = {
   all: "All AI Picks",
@@ -340,7 +358,51 @@ const currentFilterTitle =
     marginBottom: "18px",
   }}
 >
-  Showing: {currentFilterTitle}
+  <div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "16px",
+    flexWrap: "wrap",
+  }}
+>
+  <div>
+    Showing: {currentFilterTitle}
+  </div>
+
+  <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+    <button
+      onClick={() => setSelectedDate(today)}
+      style={{
+        padding: "8px 14px",
+        borderRadius: "10px",
+        border: "1px solid rgba(255,255,255,0.12)",
+        background: selectedDate === today
+          ? "rgba(34,197,94,0.18)"
+          : "rgba(255,255,255,0.05)",
+        color: "#fff",
+        cursor: "pointer",
+        fontWeight: 700,
+      }}
+    >
+      Today
+    </button>
+
+    <input
+      type="date"
+      value={selectedDate}
+      onChange={(e) => setSelectedDate(e.target.value)}
+      style={{
+        padding: "8px 12px",
+        borderRadius: "10px",
+        border: "1px solid rgba(255,255,255,0.12)",
+        background: "rgba(255,255,255,0.05)",
+        color: "#fff",
+      }}
+    />
+  </div>
+</div>
 </div>
               {filteredPicks.map((r, i) => {
                 const canRevealPick = isAdmin || i === 0;
