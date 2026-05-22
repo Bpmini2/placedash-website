@@ -388,7 +388,42 @@ const currentFilterTitle =
     >
       Today
     </button>
+<button
+  onClick={() => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
 
+    setSelectedDate(
+      yesterday.toISOString().split("T")[0]
+    );
+  }}
+  style={{
+    padding: "8px 14px",
+    borderRadius: "10px",
+    border: "1px solid rgba(255,255,255,0.12)",
+    background: "rgba(255,255,255,0.05)",
+    color: "#fff",
+    cursor: "pointer",
+    fontWeight: 700,
+  }}
+>
+  Yesterday
+</button>
+
+<button
+  onClick={() => setActiveFilter("all")}
+  style={{
+    padding: "8px 14px",
+    borderRadius: "10px",
+    border: "1px solid rgba(255,255,255,0.12)",
+    background: "rgba(255,255,255,0.05)",
+    color: "#fff",
+    cursor: "pointer",
+    fontWeight: 700,
+  }}
+>
+  Last 7 Days
+</button>
     <input
       type="date"
       value={selectedDate}
