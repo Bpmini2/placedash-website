@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -16,11 +17,19 @@ export async function GET() {
       .order("race_date", { ascending: false })
       .order("race_time", { ascending: false });
 
-    if (error) {
-      return NextResponse.json({
-        ok: false,
-        error: error.message,
-      });
+   if (error) {
+  return NextResponse.json(
+    {
+      ok: false,
+      error: error.message,
+    },
+    {
+      headers: {
+        "Cache-Control": "no-store, max-age=0",
+      },
+    }
+  );
+}
     }
 
     const allPicks = picks || [];
@@ -80,30 +89,29 @@ const simBankStatus = "Pending Dividend Data.";
 
     const last20 = allPicks.slice(0, 20);
 
-    return NextResponse.json({
-      ok: true,
-      summary: {
-        totalPicks: allPicks.length,
-        completedPicks: completedPicks.length,
-        pendingPicks: allPicks.length - completedPicks.length,
-        placedPicks: placedPicks.length,
-        unplacedPicks: completedPicks.length - placedPicks.length,
-        strikeRate,
-        highConfidencePicks: highConfidencePicks.length,
-        highConfidencePlaced: highConfidencePlaced.length,
-        highConfidenceStrikeRate,
-        moneySettledPicks: moneySettledPicks.length,
-        totalBetSize,
-        totalProfitLoss,
-        roi,
-      },
-      last20,
-    });
-  } catch (error) {
-    return NextResponse.json({
-      ok: false,
-      error: "Failed to build track record stats",
-      details: String(error),
-    });
+    return NextResponse.json(
+  {
+    ok: true,
+    summary: {
+      totalPicks: allPicks.length,
+      completedPicks: completedPicks.length,
+      pendingPicks: allPicks.length - completedPicks.length,
+      placedPicks: placedPicks.length,
+      unplacedPicks: completedPicks.length - placedPicks.length,
+      strikeRate,
+      highConfidencePicks: highConfidencePicks.length,
+      highConfidencePlaced: highConfidencePlaced.length,
+      highConfidenceStrikeRate,
+      moneySettledPicks: moneySettledPicks.length,
+      totalBetSize,
+      totalProfitLoss,
+      roi,
+    },
+    last20,
+  },
+  {
+    headers: {
+      "Cache-Control": "no-store, max-age=0",
+    },
   }
-}
+);
