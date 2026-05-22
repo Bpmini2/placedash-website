@@ -56,7 +56,7 @@ const filteredPicks = picks.filter((pick) => {
 
   return true;
 });
-});
+
 const filterTitles: any = {
   all: "All AI Picks",
   completed: "Completed Picks",
