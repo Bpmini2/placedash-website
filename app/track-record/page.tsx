@@ -246,10 +246,10 @@ const currentFilterTitle =
 },
 
 {
-  label: "High Confidence SR",
-  value: `${summary.highConfidenceStrikeRate}% (${summary.highConfidencePlaced}/${summary.highConfidencePicks})`,
+  label: "Place Strike Rate",
+  value: `${summary.strikeRate}% (${summary.placedPicks}/${summary.completedPicks})`,
   color: "#facc15",
-  filter: "high",
+  filter: "placed",
 },
               {
                 label: "ROI",
