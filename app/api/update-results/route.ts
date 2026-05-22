@@ -40,23 +40,30 @@ function getRunnerDividend(runner: any) {
 
 function isScratchedRunner(runner: any) {
   const statusText = String(
-  
     runner.status ||
       runner.runnerStatus ||
+      runner.runner_status ||
       runner.scratched ||
+      runner.isScratched ||
+      runner.is_scratched ||
       runner.inRun ||
       runner.result ||
+      runner.resultStatus ||
+      runner.result_status ||
       ""
   ).toLowerCase();
 
   return (
     runner.scratched === true ||
+    runner.isScratched === true ||
+    runner.is_scratched === true ||
     statusText.includes("scr") ||
     statusText.includes("scratch") ||
-    statusText.includes("late scratching")
+    statusText.includes("scratched") ||
+    statusText.includes("late scratching") ||
+    statusText.includes("withdrawn")
   );
 }
-
 async function getPuntingFormMeetings(date: string) {
   const apiKey = process.env.PUNTINGFORM_API_KEY;
 
@@ -278,12 +285,13 @@ export async function GET() {
         let settlementStatus = "pending";
 
         if (scratched) {
-          resultValue = "scratched";
-          placed = null;
-          profitLoss = 0;
-          dividend = null;
-          bankAfterBet = bankBeforeBet;
-          settlementStatus = "scratched";
+  resultValue = "scratched";
+  placed = null;
+  profitLoss = 0;
+  dividend = null;
+  bankAfterBet = bankBeforeBet;
+  settlementStatus = "void";
+}
         } else if (position) {
           resultValue = String(position);
           placed = position <= 3;
@@ -342,7 +350,7 @@ const { error: updateError } = await supabase
           continue;
         }
 
-        if (settlementStatus === "settled" || settlementStatus === "scratched") {
+        if (settlementStatus === "settled" || settlementStatus === "void") {
           await updateStrategyBank(strategy.id, runningBank);
         }
 
