@@ -680,19 +680,19 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
   style={{
     padding: "10px",
     color:
-      runner.confidence === "HIGH"
-        ? "#22c55e"
-        : runner.confidence === "MEDIUM"
-        ? "#facc15"
-        : "#ef4444",
+  runner.betStatus === "BET"
+    ? "#22c55e"
+    : runner.betStatus === "WATCH"
+    ? "#facc15"
+    : "#ef4444",
     fontWeight: 800,
   }}
 >
-  {runner.confidence} · {runner.score}
+  {runner.confidence} · {runner.betStatus} · {runner.score}
 </td>
 
 <td style={{ padding: "10px", minWidth: "220px", color: "#94a3b8" }}>
-  {runner.reasoning?.slice(0, 2).join(" • ") || "-"}
+  {runner.betStatus} • {runner.reasoning?.slice(0, 2).join(" • ") || "-"}
 </td>
                     </tr>
                   ))}
