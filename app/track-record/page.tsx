@@ -483,7 +483,25 @@ export default function TrackRecordPage() {
                         color: "#fff",
                       }}
                     />
-
+<select
+  value={activeFilter}
+  onChange={(e) => setActiveFilter(e.target.value)}
+  style={{
+    padding: "8px 12px",
+    borderRadius: "10px",
+    border: "1px solid rgba(255,255,255,0.12)",
+    background: "rgba(255,255,255,0.05)",
+    color: "#fff",
+    fontWeight: 700,
+  }}
+>
+  <option value="all">All</option>
+  <option value="placed">Placed</option>
+  <option value="unplaced">Unplaced</option>
+  <option value="pending">Pending</option>
+  <option value="completed">Completed</option>
+  <option value="high">High Confidence</option>
+</select>
                     <button
                       onClick={downloadCSV}
                       style={{
@@ -589,29 +607,7 @@ export default function TrackRecordPage() {
       flexWrap: "wrap",
     }}
   >
-    <select
-  defaultValue={
-    r.result === "scratched" || r.settlement_status === "void"
-      ? "scratched"
-      : r.placed === true
-      ? "placed"
-      : r.placed === false
-      ? "unplaced"
-      : "pending"
-  }
-  style={{
-    padding: "8px 10px",
-    borderRadius: "8px",
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(255,255,255,0.05)",
-    color: "#fff",
-  }}
->
-  <option value="pending">Pending</option>
-  <option value="placed">Placed</option>
-  <option value="unplaced">Unplaced</option>
-  <option value="scratched">Scratched / Void</option>
-</select>
+    
     <input
       type="number"
       step="0.01"
