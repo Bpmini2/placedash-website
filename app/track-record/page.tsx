@@ -411,8 +411,8 @@ export default function TrackRecordPage() {
                         borderRadius: "10px",
                         border: "1px solid rgba(255,255,255,0.12)",
                         background: dateMode === "today" ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.05)",
-                        color: "#111",
-                        background: "#fff",
+                        color: "#fff",
+                        
                         cursor: "pointer",
                         fontWeight: 700,
                       }}
