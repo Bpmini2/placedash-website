@@ -613,6 +613,20 @@ export default function TrackRecordPage() {
       flexWrap: "wrap",
     }}
   >
+    <select
+  defaultValue="Placed"
+  style={{
+    padding: "8px 10px",
+    borderRadius: "8px",
+    border: "1px solid rgba(255,255,255,0.12)",
+    background: "rgba(255,255,255,0.05)",
+    color: "#fff",
+  }}
+>
+  <option value="Placed">Placed</option>
+  <option value="Unplaced">Unplaced</option>
+  <option value="Scratched/Void">Scratched/Void</option>
+</select>
     
     <input
       type="number"
@@ -630,8 +644,15 @@ export default function TrackRecordPage() {
 
     <button
   onClick={async (e) => {
-    const input =
-      e.currentTarget.previousElementSibling as HTMLInputElement;
+    const container = e.currentTarget.parentElement;
+
+const input = container?.querySelector(
+  'input'
+) as HTMLInputElement;
+
+const select = container?.querySelector(
+  'select'
+) as HTMLSelectElement;
 
     const placeDividend = input?.value;
 
@@ -645,13 +666,14 @@ export default function TrackRecordPage() {
       headers: {
         "Content-Type": "application/json",
       },
+      const selectedResult = select?.value || "Placed";
       body: JSON.stringify({
   id: r.id,
-  result: prompt(
-    "Enter result: Placed, Unplaced, or Scratched/Void",
-    "Placed"
-  ),
-  place_dividend: placeDividend || null,
+  result: selectedResult,
+  place_dividend:
+  selectedResult === "Placed"
+    ? placeDividend || null
+    : null,
 }),
     });
 
