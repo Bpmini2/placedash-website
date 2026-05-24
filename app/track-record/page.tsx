@@ -635,7 +635,7 @@ export default function TrackRecordPage() {
 
     const placeDividend = input?.value;
 
-    if (!placeDividend) {
+    if (!placeDividend && false) {
       alert("Please enter a place dividend first.");
       return;
     }
@@ -646,9 +646,13 @@ export default function TrackRecordPage() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        id: r.id,
-        place_dividend: placeDividend,
-      }),
+  id: r.id,
+  result: prompt(
+    "Enter result: Placed, Unplaced, or Scratched/Void",
+    "Placed"
+  ),
+  place_dividend: placeDividend || null,
+}),
     });
 
     const data = await res.json();
@@ -670,7 +674,7 @@ export default function TrackRecordPage() {
         cursor: "pointer",
       }}
     >
-      Save Dividend
+      Save Result
     </button>
   </div>
 )}
