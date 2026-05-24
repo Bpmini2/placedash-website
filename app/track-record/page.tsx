@@ -684,8 +684,16 @@ const selectedResult = select?.value || "Placed";
       alert(data.error || "Failed to save dividend.");
       return;
     }
-
-    alert("Place dividend saved.");
+r.result = data.result;
+r.placed = data.placed;
+r.place_dividend = data.place_dividend;
+r.dividend = data.dividend;
+r.return_amount = data.return_amount;
+r.profit_loss = data.profit_loss;
+r.bank_after_bet = data.bank_after_bet;
+r.running_bank = data.running_bank;
+r.settlement_status = data.settlement_status;
+    alert("Result saved.");
       }}
   style={{
         padding: "8px 14px",
