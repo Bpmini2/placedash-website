@@ -8,7 +8,7 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { id, place_dividend, status } = await request.json();
+    const { id, place_dividend, result } = await request.json();
 
     if (!id) {
       return NextResponse.json({ ok: false, error: "Missing pick id" });
