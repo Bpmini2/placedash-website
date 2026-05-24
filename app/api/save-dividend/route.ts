@@ -32,7 +32,7 @@ export async function POST(request: Request) {
 
     let updateData: any = {};
 
-    if (status === "scratched") {
+    if (result === "scratched") {
       updateData = {
         result: "scratched",
         placed: null,
@@ -40,11 +40,11 @@ export async function POST(request: Request) {
         profit_loss: 0,
         bank_after_bet: bankBeforeBet,
         running_bank: bankBeforeBet,
-        settlement_status: "void",
+        settlement_result: "void",
       };
     }
 
-    if (status === "unplaced") {
+    if (result === "unplaced") {
       const profitLoss = Number((-betSize).toFixed(2));
       const bankAfterBet = Number((bankBeforeBet + profitLoss).toFixed(2));
 
@@ -54,11 +54,11 @@ export async function POST(request: Request) {
         profit_loss: profitLoss,
         bank_after_bet: bankAfterBet,
         running_bank: bankAfterBet,
-        settlement_status: "settled",
+        settlement_result: "settled",
       };
     }
 
-    if (status === "placed") {
+    if (result === "placed") {
       if (!place_dividend) {
         return NextResponse.json({
           ok: false,
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
         profit_loss: profitLoss,
         bank_after_bet: bankAfterBet,
         running_bank: bankAfterBet,
-        settlement_status: "settled",
+        settlement_result: "settled",
       };
     }
 
