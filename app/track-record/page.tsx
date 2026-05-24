@@ -659,7 +659,19 @@ export default function TrackRecordPage() {
     }
 
     alert("Place dividend saved.");
-    window.location.reload();
+    setSavedPicks((prev: any[]) =>
+  prev.map((pick) =>
+    pick.id === savedPick.id
+      ? {
+          ...pick,
+          placed: selectedResult,
+          result: selectedResult,
+          place_dividend:
+            selectedResult === "Placed" ? Number(placeDividend) : null,
+        }
+      : pick
+  )
+)
   }}
   style={{
         padding: "8px 14px",
