@@ -579,7 +579,45 @@ export default function TrackRecordPage() {
                             ? `🔴 UNPLACED (${r.result || "?"})`
                             : "🟡 PENDING"}
                         </span>
+{r.placed === true && !(r.place_dividend || r.dividend) && (
+  <div
+    style={{
+      marginTop: "10px",
+      display: "flex",
+      gap: "10px",
+      alignItems: "center",
+      flexWrap: "wrap",
+    }}
+  >
+    <input
+      type="number"
+      step="0.01"
+      placeholder="Enter Place Dividend"
+      style={{
+        padding: "8px 10px",
+        borderRadius: "8px",
+        border: "1px solid rgba(255,255,255,0.12)",
+        background: "rgba(255,255,255,0.05)",
+        color: "#fff",
+        width: "180px",
+      }}
+    />
 
+    <button
+      style={{
+        padding: "8px 14px",
+        borderRadius: "8px",
+        border: "none",
+        background: "#22c55e",
+        color: "#07111f",
+        fontWeight: 800,
+        cursor: "pointer",
+      }}
+    >
+      Save Dividend
+    </button>
+  </div>
+)}
                         {r.placed === true && (r.place_dividend || r.dividend) && (
                           <span style={{ marginLeft: "10px", color: "#22c55e", fontWeight: 800 }}>
                             Place Price: ${r.place_dividend || r.dividend}
