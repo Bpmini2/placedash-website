@@ -89,7 +89,7 @@ const currentBank = Number(
     1000
 );
 
-    const last20 = allPicks.slice(0, 20);
+    const last20 = allPicks;
 
     return NextResponse.json(
       {
