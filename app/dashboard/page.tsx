@@ -116,12 +116,33 @@ export default function Dashboard() {
     const starts = Number(runner.starts || 0);
     const placePercent = Number(runner.displayPlacePercent || 0);
     const score = Number(runner.score || 0);
+    const betStatus = String(runner.betStatus || "");
+    const horsePlacePercent = Number(runner.placePercentage || runner.placePercent || runner.place_rate || 0);
+    const lastRun = Number(
+  String(runner.form || "")
+    .replace(/[^0-9]/g, "")
+    .slice(0, 1)
+);
 
     if (placePercent >= 55) reasons.push("Strong overall place record");
     else if (placePercent >= 40) reasons.push("Solid overall place record");
 
-    if (runner.recentFormScore >= 65) reasons.push("Strong recent form");
-    else if (runner.recentFormScore >= 45) reasons.push("Recent form support");
+    const hasRecentPlace =
+  String(runner.form || "")
+    .replace(/[^0-9]/g, "")
+    .slice(0, 4)
+    .split("")
+    .some((n) => ["1", "2", "3"].includes(n));
+
+if (runner.recentFormScore >= 65 && hasRecentPlace) {
+  reasons.push("Strong recent form");
+} else if (runner.recentFormScore >= 45 && hasRecentPlace) {
+  reasons.push("Recent form support");
+} else if (!hasRecentPlace) {
+  reasons.push("No recent placing support");
+} else {
+  reasons.push("Recent form concern");
+}
 
     if (starts >= 10) reasons.push("Experienced runner");
     else if (starts >= 3) reasons.push("Meets minimum race experience");
@@ -144,7 +165,19 @@ export default function Dashboard() {
     else if (score >= 50) reasons.push("Medium PlaceDash score");
 
     if (reasons.length === 0) reasons.push("Limited data available");
-
+if (betStatus === "BET") {
+  reasons.unshift("Bet-qualified profile");
+} else if (betStatus === "WATCH") {
+  reasons.unshift("Watch only - not strong enough for official bet");
+} else if (betStatus === "AVOID") {
+  reasons.unshift("Avoid profile");
+}
+    if (horsePlacePercent > 0 && horsePlacePercent < 40) {
+  reasons.push("Low overall place strike rate");
+}
+    if (lastRun >= 8) {
+  reasons.push("Last start concern");
+}
     return Array.from(new Set(reasons)).slice(0, 5);
   }
     function scoreRunner(runner: any) {
@@ -192,8 +225,8 @@ export default function Dashboard() {
     score = Math.min(100, Math.max(0, score));
 
     let confidence = "LOW";
-if (score >= 65) confidence = "HIGH";
-else if (score >= 45) confidence = "MEDIUM";
+if (score >= 70) confidence = "HIGH";
+else if (score >= 55) confidence = "MEDIUM";
 
 let betStatus = "AVOID";
 
@@ -211,15 +244,22 @@ const hasRecentBadRun =
     .split("")
     .some((n) => Number(n) >= 8);
 
-if (
-  score >= 60 &&
+const lastRun = Number(
+  String(runner.form || "")
+    .replace(/[^0-9]/g, "")
+    .slice(0, 1)
+);
+const lowPlaceRecord = horsePlacePercent < 40;
+if (lastRun >= 8 || runner.scratched) {
+  betStatus = "AVOID";
+} else if (
+  score >= 62 &&
   horsePlacePercent >= 40 &&
   hasRecentPlace &&
-  !hasRecentBadRun &&
-  !runner.scratched
+  !hasRecentBadRun
 ) {
   betStatus = "BET";
-} else if (score >= 45 && !runner.scratched) {
+} else if (score >= 55 && !lowPlaceRecord && hasRecentPlace) {
   betStatus = "WATCH";
 }
 
