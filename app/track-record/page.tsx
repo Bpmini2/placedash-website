@@ -64,6 +64,11 @@ export default function TrackRecordPage() {
     if (activeFilter === "pending") return !pick.result || pick.result === "pending";
     if (activeFilter === "placed") return pick.placed === true;
     if (activeFilter === "unplaced") return pick.placed === false;
+    if (activeFilter === "scratched")
+  return (
+    pick.result === "scratched" ||
+    pick.settlement_status === "void"
+  );
     if (activeFilter === "high") return pick.confidence === "HIGH";
 
     return true;
@@ -500,6 +505,7 @@ export default function TrackRecordPage() {
 <option value="unplaced" style={{ color: "#07111f" }}>Unplaced</option>
 <option value="pending" style={{ color: "#07111f" }}>Pending</option>
 <option value="completed" style={{ color: "#07111f" }}>Completed</option>
+  <option value="scratched" style={{ color: "#07111f" }}>Scratched/Void</option>
 <option value="high" style={{ color: "#07111f" }}>High Confidence</option>
 </select>
                     <button
