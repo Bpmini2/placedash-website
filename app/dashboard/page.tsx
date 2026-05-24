@@ -368,6 +368,9 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
               <a href="/track-record" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
                 Track Record
               </a>
+              <a href="/admin-picks" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
+  Admin
+</a>
               <a href="/#pricing" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
                 Pricing
               </a>
