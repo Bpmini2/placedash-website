@@ -192,13 +192,42 @@ export default function Dashboard() {
     score = Math.min(100, Math.max(0, score));
 
     let confidence = "LOW";
-    if (score >= 65) confidence = "HIGH";
-    else if (score >= 45) confidence = "MEDIUM";
+if (score >= 65) confidence = "HIGH";
+else if (score >= 45) confidence = "MEDIUM";
 
-    const scoredRunner = {
-      ...runner,
-      score: Math.round(score),
-      confidence,
+let betStatus = "AVOID";
+
+const hasRecentPlace =
+  String(runner.form || "")
+    .replace(/[^0-9]/g, "")
+    .slice(0, 4)
+    .split("")
+    .some((n) => ["1", "2", "3"].includes(n));
+
+const hasRecentBadRun =
+  String(runner.form || "")
+    .replace(/[^0-9]/g, "")
+    .slice(0, 3)
+    .split("")
+    .some((n) => Number(n) >= 8);
+
+if (
+  score >= 60 &&
+  horsePlacePercent >= 40 &&
+  hasRecentPlace &&
+  !hasRecentBadRun &&
+  !runner.scratched
+) {
+  betStatus = "BET";
+} else if (score >= 45 && !runner.scratched) {
+  betStatus = "WATCH";
+}
+
+const scoredRunner = {
+  ...runner,
+  score: Math.round(score),
+  confidence,
+  betStatus,
       starts,
       recentFormScore: recentForm,
       displayPlacePercent: Math.round(horsePlacePercent),
