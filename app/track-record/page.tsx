@@ -629,7 +629,39 @@ export default function TrackRecordPage() {
     />
 
     <button
-      style={{
+  onClick={async (e) => {
+    const input =
+      e.currentTarget.previousElementSibling as HTMLInputElement;
+
+    const placeDividend = input?.value;
+
+    if (!placeDividend) {
+      alert("Please enter a place dividend first.");
+      return;
+    }
+
+    const res = await fetch("/api/save-dividend", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: r.id,
+        place_dividend: placeDividend,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      alert(data.error || "Failed to save dividend.");
+      return;
+    }
+
+    alert("Place dividend saved.");
+    window.location.reload();
+  }}
+  style={{
         padding: "8px 14px",
         borderRadius: "8px",
         border: "none",
