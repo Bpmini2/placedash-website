@@ -240,6 +240,36 @@ setSelectedTrack("All Tracks");
               Result: {pick.result || "pending"} · Placed:{" "}
               {String(pick.placed ?? "pending")} · Profit/Loss: $
               {pick.profit_loss ?? 0}
+              <div style={{ marginTop: "12px", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+  <input
+    type="number"
+    step="0.01"
+    placeholder="Place Dividend"
+    defaultValue={pick.place_dividend || ""}
+    style={{
+      padding: "8px 10px",
+      borderRadius: "8px",
+      border: "1px solid rgba(255,255,255,0.12)",
+      background: "rgba(255,255,255,0.05)",
+      color: "#fff",
+      width: "140px",
+    }}
+  />
+
+  <button
+    style={{
+      padding: "8px 14px",
+      borderRadius: "8px",
+      border: "none",
+      background: "#22c55e",
+      color: "#07111f",
+      fontWeight: 800,
+      cursor: "pointer",
+    }}
+  >
+    Save Dividend
+  </button>
+</div>
             </p>
           </div>
         ))}
