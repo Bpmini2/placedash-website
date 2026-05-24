@@ -18,8 +18,8 @@ export async function POST(request: Request) {
       .from("saved_picks")
       .select("*")
       .eq("id", id)
-      .single();
-
+      .limit(1)
+.maybeSingle()
     if (fetchError || !pick) {
       return NextResponse.json({
         ok: false,
