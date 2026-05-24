@@ -660,13 +660,13 @@ const select = container?.querySelector(
       alert("Please enter a place dividend first.");
       return;
     }
-
+const selectedResult = select?.value || "Placed";
     const res = await fetch("/api/save-dividend", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      const selectedResult = select?.value || "Placed";
+      
       body: JSON.stringify({
   id: r.id,
   result: selectedResult,
