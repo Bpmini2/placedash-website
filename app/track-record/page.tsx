@@ -495,12 +495,12 @@ export default function TrackRecordPage() {
     fontWeight: 700,
   }}
 >
-  <option value="all">All</option>
-  <option value="placed">Placed</option>
-  <option value="unplaced">Unplaced</option>
-  <option value="pending">Pending</option>
-  <option value="completed">Completed</option>
-  <option value="high">High Confidence</option>
+  <option value="all" style={{ color: "#07111f" }}>All</option>
+<option value="placed" style={{ color: "#07111f" }}>Placed</option>
+<option value="unplaced" style={{ color: "#07111f" }}>Unplaced</option>
+<option value="pending" style={{ color: "#07111f" }}>Pending</option>
+<option value="completed" style={{ color: "#07111f" }}>Completed</option>
+<option value="high" style={{ color: "#07111f" }}>High Confidence</option>
 </select>
                     <button
                       onClick={downloadCSV}
