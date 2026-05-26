@@ -131,12 +131,32 @@ function scoreRunner(runner: any) {
   if (adjustedWeight && adjustedWeight <= 54) score += 4;
   else if (adjustedWeight && adjustedWeight <= 56) score += 2;
   else if (adjustedWeight && adjustedWeight >= 60) score -= 3;
+if (adjustedWeight && adjustedWeight <= 54) score += 4;
+else if (adjustedWeight && adjustedWeight <= 56) score += 2;
+else if (adjustedWeight && adjustedWeight >= 60) score -= 3;
 
+// Strong penalties for weak profiles
+if (recentForm < 40) score -= 12;
+
+if (placePercent < 35) score -= 10;
+
+const latestRun =
+  runner.form?.replace(/[^0-9]/g, "").charAt(0) || "";
+
+if (["7", "8", "9"].includes(latestRun)) {
+  score -= 14;
+}
+
+score = Math.min(100, Math.max(0, score));
   score = Math.min(100, Math.max(0, score));
 
   let confidence = "LOW";
-  if (score >= 65) confidence = "HIGH";
-  else if (score >= 45) confidence = "MEDIUM";
+
+if (score >= 72) {
+  confidence = "HIGH";
+} else if (score >= 56) {
+  confidence = "MEDIUM";
+}
 
   const reasoning: string[] = [];
 
@@ -361,9 +381,13 @@ export async function GET() {
         const bestRunner = getBestRunner(race);
 
         if (
-          bestRunner &&
-          (bestRunner.confidence === "HIGH" || bestRunner.confidence === "MEDIUM")
-        ) {
+  bestRunner &&
+  (
+    bestRunner.confidence === "HIGH" ||
+    (bestRunner.confidence === "MEDIUM" &&
+      bestRunner.score >= 56)
+  )
+) {
           await savePickToSupabase(race, bestRunner, today);
         }
       })
