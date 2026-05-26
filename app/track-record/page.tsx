@@ -710,82 +710,119 @@ r.settlement_status = data.settlement_status;
   </div>
 )}
                         {r.placed === true && (r.place_dividend || r.dividend) && (
-  <div
-    style={{
-      marginTop: "10px",
-      display: "flex",
-      gap: "10px",
-      alignItems: "center",
-      flexWrap: "wrap",
-    }}
-  >
-    <span style={{ color: "#22c55e", fontWeight: 800 }}>
-      Place Price: ${r.place_dividend || r.dividend}
-    </span>
-
-    <input
-      type="number"
-      step="0.01"
-      defaultValue={r.place_dividend || r.dividend}
+  <div style={{ marginTop: "10px" }}>
+    <div
       style={{
-        padding: "8px 10px",
-        borderRadius: "8px",
-        border: "1px solid rgba(255,255,255,0.12)",
-        background: "rgba(255,255,255,0.05)",
-        color: "#fff",
-        width: "140px",
-      }}
-    />
-
-    <button
-      onClick={async (e) => {
-        const container = e.currentTarget.parentElement;
-
-        const input = container?.querySelector(
-          "input"
-        ) as HTMLInputElement;
-
-        const placeDividend = input?.value;
-
-        if (!placeDividend) {
-          alert("Please enter a place dividend.");
-          return;
-        }
-
-        const res = await fetch("/api/save-dividend", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: r.id,
-            result: "Placed",
-            place_dividend: placeDividend,
-          }),
-        });
-
-        const data = await res.json();
-
-        if (!data.ok) {
-          alert(data.error || "Failed to update dividend.");
-          return;
-        }
-
-        alert("Dividend updated.");
-        window.location.reload();
-      }}
-      style={{
-        padding: "8px 14px",
-        borderRadius: "8px",
-        border: "none",
-        background: "#22c55e",
-        color: "#07111f",
-        fontWeight: 800,
-        cursor: "pointer",
+        display: "flex",
+        gap: "10px",
+        alignItems: "center",
+        flexWrap: "wrap",
       }}
     >
-      Update Price
-    </button>
+      <span style={{ color: "#22c55e", fontWeight: 800 }}>
+        Place Price: ${r.place_dividend || r.dividend}
+      </span>
+
+      <button
+        onClick={(e) => {
+          const container = e.currentTarget.parentElement?.parentElement;
+          const editBox = container?.querySelector(
+            ".edit-dividend-box"
+          ) as HTMLDivElement;
+
+          if (editBox) {
+            editBox.style.display =
+              editBox.style.display === "none" ? "flex" : "none";
+          }
+        }}
+        style={{
+          padding: "5px 10px",
+          borderRadius: "8px",
+          border: "1px solid rgba(34,197,94,0.35)",
+          background: "rgba(34,197,94,0.12)",
+          color: "#22c55e",
+          fontWeight: 800,
+          cursor: "pointer",
+        }}
+      >
+        Edit
+      </button>
+    </div>
+
+    <div
+      className="edit-dividend-box"
+      style={{
+        display: "none",
+        marginTop: "10px",
+        gap: "10px",
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      <input
+        type="number"
+        step="0.01"
+        defaultValue={r.place_dividend || r.dividend}
+        style={{
+          padding: "8px 10px",
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.12)",
+          background: "rgba(255,255,255,0.05)",
+          color: "#fff",
+          width: "140px",
+        }}
+      />
+
+      <button
+        onClick={async (e) => {
+          const container = e.currentTarget.parentElement;
+
+          const input = container?.querySelector(
+            "input"
+          ) as HTMLInputElement;
+
+          const placeDividend = input?.value;
+
+          if (!placeDividend) {
+            alert("Please enter a place dividend.");
+            return;
+          }
+
+          const res = await fetch("/api/save-dividend", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: r.id,
+              result: "Placed",
+              place_dividend: placeDividend,
+            }),
+          });
+
+          const data = await res.json();
+
+          if (!data.ok) {
+            alert(data.error || "Failed to update dividend.");
+            return;
+          }
+
+          alert("Dividend updated.");
+          window.location.reload();
+        }}
+        style={{
+          padding: "8px 14px",
+          borderRadius: "8px",
+          border: "none",
+          background: "#22c55e",
+          color: "#07111f",
+          fontWeight: 800,
+          cursor: "pointer",
+        }}
+      >
+        Update Price
+      </button>
+    </div>
   </div>
 )}
                       </div>
