@@ -386,7 +386,9 @@ export default function TrackRecordPage() {
                     flexWrap: "wrap",
                   }}
                 >
-                  <div>Showing: {currentFilterTitle}</div>
+                  <div>
+  Showing: {currentFilterTitle} ({filteredPicks.length})
+</div>
 
                   <div
                     style={{
