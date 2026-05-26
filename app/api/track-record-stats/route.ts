@@ -9,6 +9,10 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+function money(value: number) {
+  return Math.round(value * 100) / 100;
+}
+
 export async function GET() {
   try {
     const { data: picks, error } = await supabase
@@ -19,15 +23,8 @@ export async function GET() {
 
     if (error) {
       return NextResponse.json(
-        {
-          ok: false,
-          error: error.message,
-        },
-        {
-          headers: {
-            "Cache-Control": "no-store, max-age=0",
-          },
-        }
+        { ok: false, error: error.message },
+        { headers: { "Cache-Control": "no-store, max-age=0" } }
       );
     }
 
@@ -50,7 +47,9 @@ export async function GET() {
     );
 
     const moneySettledPicks = completedPicks.filter(
-      (pick: any) => pick.settlement_status === "settled"
+      (pick: any) =>
+        pick.settlement_status === "settled" ||
+        pick.settlement_status === "void"
     );
 
     const strikeRate =
@@ -70,24 +69,28 @@ export async function GET() {
       0
     );
 
-    const totalProfitLoss = moneySettledPicks.reduce(
-      (sum: number, pick: any) => sum + Number(pick.profit_loss || 0),
-      0
+    const sortedBankPicks = [...allPicks]
+      .filter((pick: any) => pick.bank_after_bet || pick.running_bank)
+      .sort((a: any, b: any) => {
+        const dateA = `${a.race_date || ""} ${a.race_time || ""}`;
+        const dateB = `${b.race_date || ""} ${b.race_time || ""}`;
+        return dateA.localeCompare(dateB);
+      });
+
+    const latestBankPick = sortedBankPicks[sortedBankPicks.length - 1];
+
+    const currentBank = Number(
+      latestBankPick?.bank_after_bet ||
+        latestBankPick?.running_bank ||
+        1000
     );
+
+    const startingBank = Number(latestBankPick?.bank_start || 1000);
+
+    const totalProfitLoss = money(currentBank - startingBank);
 
     const roi =
       totalBetSize > 0 ? Math.round((totalProfitLoss / totalBetSize) * 100) : 0;
-    const latestBankPick = [...allPicks]
-  .filter((pick: any) => pick.bank_after_bet || pick.running_bank)
-  .sort((a: any, b: any) => {
-    return new Date(b.race_date).getTime() - new Date(a.race_date).getTime();
-  })[0];
-
-const currentBank = Number(
-  latestBankPick?.bank_after_bet ||
-    latestBankPick?.running_bank ||
-    1000
-);
 
     const last20 = allPicks;
 
