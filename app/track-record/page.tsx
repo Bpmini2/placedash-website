@@ -744,81 +744,111 @@ r.settlement_status = data.settlement_status;
           fontWeight: 800,
           cursor: "pointer",
         }}
+        
       >
         Edit
       </button>
     </div>
 
     <div
-      className="edit-dividend-box"
-      style={{
-        display: "none",
-        marginTop: "10px",
-        gap: "10px",
-        alignItems: "center",
-        flexWrap: "wrap",
-      }}
-    >
-      <input
-        type="number"
-        step="0.01"
-        defaultValue={r.place_dividend || r.dividend}
-        style={{
-          padding: "8px 10px",
-          borderRadius: "8px",
-          border: "1px solid rgba(255,255,255,0.12)",
-          background: "rgba(255,255,255,0.05)",
-          color: "#fff",
-          width: "140px",
-        }}
-      />
+  className="edit-result-box"
+  style={{
+    display: "none",
+    marginTop: "10px",
+    gap: "10px",
+    alignItems: "center",
+    flexWrap: "wrap",
+  }}
+>
+  <select
+    defaultValue={
+      r.result === "scratched" || r.settlement_status === "void"
+        ? "Scratched/Void"
+        : r.placed === true
+        ? "Placed"
+        : r.placed === false
+        ? "Unplaced"
+        : "Placed"
+    }
+    style={{
+      padding: "8px 10px",
+      borderRadius: "8px",
+      border: "1px solid rgba(255,255,255,0.12)",
+      background: "rgba(255,255,255,0.05)",
+      color: "#fff",
+    }}
+  >
+    <option value="Placed" style={{ color: "#07111f" }}>Placed</option>
+    <option value="Unplaced" style={{ color: "#07111f" }}>Unplaced</option>
+    <option value="Scratched/Void" style={{ color: "#07111f" }}>Scratched/Void</option>
+  </select>
 
-      <button
-        onClick={async (e) => {
-          const container = e.currentTarget.parentElement;
+  <input
+    type="number"
+    step="0.01"
+    placeholder="Place Dividend"
+    defaultValue={r.place_dividend || r.dividend || ""}
+    style={{
+      padding: "8px 10px",
+      borderRadius: "8px",
+      border: "1px solid rgba(255,255,255,0.12)",
+      background: "rgba(255,255,255,0.05)",
+      color: "#fff",
+      width: "160px",
+    }}
+  />
 
-          const input = container?.querySelector(
-            "input"
-          ) as HTMLInputElement;
+  <button
+    onClick={async (e) => {
+      const container = e.currentTarget.parentElement;
 
-          const placeDividend = input?.value;
+      const input = container?.querySelector("input") as HTMLInputElement;
+      const select = container?.querySelector("select") as HTMLSelectElement;
 
-          if (!placeDividend) {
-            alert("Please enter a place dividend.");
-            return;
-          }
+      const selectedResult = select?.value || "Placed";
+      const placeDividend = input?.value;
 
-          const res = await fetch("/api/save-dividend", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              id: r.id,
-              result: "Placed",
-              place_dividend: placeDividend,
-            }),
-          });
+      if (selectedResult === "Placed" && !placeDividend) {
+        alert("Please enter a place dividend.");
+        return;
+      }
 
-          const data = await res.json();
+      const res = await fetch("/api/save-dividend", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: r.id,
+          result: selectedResult,
+          place_dividend:
+            selectedResult === "Placed" ? placeDividend : null,
+        }),
+      });
 
-          if (!data.ok) {
-            alert(data.error || "Failed to update dividend.");
-            return;
-          }
+      const data = await res.json();
 
-          alert("Dividend updated.");
-          window.location.reload();
-        }}
-        style={{
-          padding: "8px 14px",
-          borderRadius: "8px",
-          border: "none",
-          background: "#22c55e",
-          color: "#07111f",
-          fontWeight: 800,
-          cursor: "pointer",
-        }}
+      if (!data.ok) {
+        alert(data.error || "Failed to update result.");
+        return;
+      }
+
+      alert("Result updated.");
+      window.location.reload();
+    }}
+    style={{
+      padding: "8px 14px",
+      borderRadius: "8px",
+      border: "none",
+      background: "#22c55e",
+      color: "#07111f",
+      fontWeight: 800,
+      cursor: "pointer",
+    }}
+  >
+    Update Result
+  </button>
+</div>
       >
         Update Price
       </button>
