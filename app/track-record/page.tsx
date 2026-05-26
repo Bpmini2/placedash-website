@@ -151,8 +151,9 @@ export default function TrackRecordPage() {
     document.body.removeChild(link);
   }
 
+
   return (
-    <main
+      <main
       style={{
         minHeight: "100vh",
         padding: "32px 48px",
