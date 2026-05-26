@@ -42,11 +42,7 @@ export default function TrackRecordPage() {
   const filteredPicks = picks.filter((pick) => {
     const pickDate = pick.race_date || pick.pick_date || pick.date;
 
-    if (
-      dateMode === "today" ||
-      dateMode === "yesterday" ||
-      dateMode === "custom"
-    ) {
+    if (dateMode === "today" || dateMode === "yesterday" || dateMode === "custom") {
       if (pickDate !== selectedDate) return false;
     }
 
@@ -64,11 +60,9 @@ export default function TrackRecordPage() {
     if (activeFilter === "pending") return !pick.result || pick.result === "pending";
     if (activeFilter === "placed") return pick.placed === true;
     if (activeFilter === "unplaced") return pick.placed === false;
-    if (activeFilter === "scratched")
-  return (
-    pick.result === "scratched" ||
-    pick.settlement_status === "void"
-  );
+    if (activeFilter === "scratched") {
+      return pick.result === "scratched" || pick.settlement_status === "void";
+    }
     if (activeFilter === "high") return pick.confidence === "HIGH";
 
     return true;
@@ -80,30 +74,31 @@ export default function TrackRecordPage() {
     pending: "Pending Picks",
     placed: "Placed Picks",
     unplaced: "Unplaced Picks",
+    scratched: "Scratched / Void Picks",
     high: "High Confidence Picks",
   };
 
   const currentFilterTitle = filterTitles[activeFilter] || "All AI Picks";
 
   function downloadCSV() {
-  const headers = [
-    "Date",
-    "Track",
-    "Race Number",
-    "Race Time",
-    "Horse Number",
-    "Horse Name",
-    "Confidence",
-    "AI Score",
-    "Result",
-    "Placed Status",
-    "Place Dividend",
-    "Bet Size",
-    "Return Amount",
-    "Profit Loss",
-    "Bank Before Bet",
-    "Bank After Bet",
-  ];
+    const headers = [
+      "Date",
+      "Track",
+      "Race Number",
+      "Race Time",
+      "Horse Number",
+      "Horse Name",
+      "Confidence",
+      "AI Score",
+      "Result",
+      "Placed Status",
+      "Place Dividend",
+      "Bet Size",
+      "Return Amount",
+      "Profit Loss",
+      "Bank Before Bet",
+      "Bank After Bet",
+    ];
 
     const rows = filteredPicks.map((r: any) => [
       r.race_date || "",
@@ -151,9 +146,8 @@ export default function TrackRecordPage() {
     document.body.removeChild(link);
   }
 
-
   return (
-      <main
+    <main
       style={{
         minHeight: "100vh",
         padding: "32px 48px",
@@ -413,7 +407,6 @@ export default function TrackRecordPage() {
                         border: "1px solid rgba(255,255,255,0.12)",
                         background: dateMode === "today" ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.05)",
                         color: "#fff",
-                        
                         cursor: "pointer",
                         fontWeight: 700,
                       }}
@@ -490,26 +483,28 @@ export default function TrackRecordPage() {
                         color: "#fff",
                       }}
                     />
-<select
-  value={activeFilter}
-  onChange={(e) => setActiveFilter(e.target.value)}
-  style={{
-    padding: "8px 12px",
-    borderRadius: "10px",
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(255,255,255,0.05)",
-    color: "#fff",
-    fontWeight: 700,
-  }}
->
-  <option value="all" style={{ color: "#07111f" }}>All</option>
-<option value="placed" style={{ color: "#07111f" }}>Placed</option>
-<option value="unplaced" style={{ color: "#07111f" }}>Unplaced</option>
-<option value="pending" style={{ color: "#07111f" }}>Pending</option>
-<option value="completed" style={{ color: "#07111f" }}>Completed</option>
-  <option value="scratched" style={{ color: "#07111f" }}>Scratched/Void</option>
-<option value="high" style={{ color: "#07111f" }}>High Confidence</option>
-</select>
+
+                    <select
+                      value={activeFilter}
+                      onChange={(e) => setActiveFilter(e.target.value)}
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: "10px",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        background: "rgba(255,255,255,0.05)",
+                        color: "#fff",
+                        fontWeight: 700,
+                      }}
+                    >
+                      <option value="all" style={{ color: "#07111f" }}>All</option>
+                      <option value="placed" style={{ color: "#07111f" }}>Placed</option>
+                      <option value="unplaced" style={{ color: "#07111f" }}>Unplaced</option>
+                      <option value="pending" style={{ color: "#07111f" }}>Pending</option>
+                      <option value="completed" style={{ color: "#07111f" }}>Completed</option>
+                      <option value="scratched" style={{ color: "#07111f" }}>Scratched/Void</option>
+                      <option value="high" style={{ color: "#07111f" }}>High Confidence</option>
+                    </select>
+
                     <button
                       onClick={downloadCSV}
                       style={{
@@ -605,257 +600,136 @@ export default function TrackRecordPage() {
                             ? `🔴 UNPLACED (${r.result || "?"})`
                             : "🟡 PENDING"}
                         </span>
-{(!r.result || r.result === "pending" || r.placed === true) && !(r.place_dividend || r.dividend) && (
-  <div
-    style={{
-      marginTop: "10px",
-      display: "flex",
-      gap: "10px",
-      alignItems: "center",
-      flexWrap: "wrap",
-    }}
-  >
-    <select
-  defaultValue="Placed"
-  style={{
-    padding: "8px 10px",
-    borderRadius: "8px",
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(255,255,255,0.05)",
-    color: "#fff",
-  }}
->
-  <option value="Placed">Placed</option>
-  <option value="Unplaced">Unplaced</option>
-  <option value="Scratched/Void">Scratched/Void</option>
-</select>
-    
-    <input
-      type="number"
-      step="0.01"
-      placeholder="Enter Place Dividend"
-      style={{
-        padding: "8px 10px",
-        borderRadius: "8px",
-        border: "1px solid rgba(255,255,255,0.12)",
-        background: "rgba(255,255,255,0.05)",
-        color: "#fff",
-        width: "180px",
-      }}
-    />
 
-    <button
-  onClick={async (e) => {
-    const container = e.currentTarget.parentElement;
-
-const input = container?.querySelector(
-  'input'
-) as HTMLInputElement;
-
-const select = container?.querySelector(
-  'select'
-) as HTMLSelectElement;
-
-    const placeDividend = input?.value;
-
-    if (!placeDividend && false) {
-      alert("Please enter a place dividend first.");
-      return;
-    }
-const selectedResult = select?.value || "Placed";
-    const res = await fetch("/api/save-dividend", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      
-      body: JSON.stringify({
-  id: r.id,
-  result: selectedResult,
-  place_dividend:
-  selectedResult === "Placed"
-    ? placeDividend || null
-    : null,
-}),
-    });
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      alert(data.error || "Failed to save dividend.");
-      return;
-    }
-r.result = data.result;
-r.placed = data.placed;
-r.place_dividend = data.place_dividend;
-r.dividend = data.dividend;
-r.return_amount = data.return_amount;
-r.profit_loss = data.profit_loss;
-r.bank_after_bet = data.bank_after_bet;
-r.running_bank = data.running_bank;
-r.settlement_status = data.settlement_status;
-    alert("Result saved.");
-      }}
-  style={{
-        padding: "8px 14px",
-        borderRadius: "8px",
-        border: "none",
-        background: "#22c55e",
-        color: "#07111f",
-        fontWeight: 800,
-        cursor: "pointer",
-      }}
-    >
-      Save Result
-    </button>
-  </div>
-)}
                         {r.placed === true && (r.place_dividend || r.dividend) && (
-  <div style={{ marginTop: "10px" }}>
-    <div
-      style={{
-        display: "flex",
-        gap: "10px",
-        alignItems: "center",
-        flexWrap: "wrap",
-      }}
-    >
-      <span style={{ color: "#22c55e", fontWeight: 800 }}>
-        Place Price: ${r.place_dividend || r.dividend}
-      </span>
+                          <span style={{ marginLeft: "10px", color: "#22c55e", fontWeight: 800 }}>
+                            Place Price: ${r.place_dividend || r.dividend}
+                          </span>
+                        )}
 
-      <button
-        onClick={(e) => {
-          const container = e.currentTarget.parentElement?.parentElement;
-          const editBox = container?.querySelector(
-            ".edit-dividend-box"
-          ) as HTMLDivElement;
+                        <button
+                          onClick={(e) => {
+                            const container = e.currentTarget.parentElement?.parentElement;
+                            const editBox = container?.querySelector(".edit-result-box") as HTMLDivElement;
 
-          if (editBox) {
-            editBox.style.display =
-              editBox.style.display === "none" ? "flex" : "none";
-          }
-        }}
-        style={{
-          padding: "5px 10px",
-          borderRadius: "8px",
-          border: "1px solid rgba(34,197,94,0.35)",
-          background: "rgba(34,197,94,0.12)",
-          color: "#22c55e",
-          fontWeight: 800,
-          cursor: "pointer",
-        }}
-        
-      >
-        Edit
-      </button>
-    </div>
+                            if (editBox) {
+                              editBox.style.display =
+                                editBox.style.display === "none" ? "flex" : "none";
+                            }
+                          }}
+                          style={{
+                            marginLeft: "10px",
+                            padding: "5px 10px",
+                            borderRadius: "8px",
+                            border: "1px solid rgba(34,197,94,0.35)",
+                            background: "rgba(34,197,94,0.12)",
+                            color: "#22c55e",
+                            fontWeight: 800,
+                            cursor: "pointer",
+                          }}
+                        >
+                          Edit
+                        </button>
+                      </div>
 
-    <div
-  className="edit-result-box"
-  style={{
-    display: "none",
-    marginTop: "10px",
-    gap: "10px",
-    alignItems: "center",
-    flexWrap: "wrap",
-  }}
->
-  <select
-    defaultValue={
-      r.result === "scratched" || r.settlement_status === "void"
-        ? "Scratched/Void"
-        : r.placed === true
-        ? "Placed"
-        : r.placed === false
-        ? "Unplaced"
-        : "Placed"
-    }
-    style={{
-      padding: "8px 10px",
-      borderRadius: "8px",
-      border: "1px solid rgba(255,255,255,0.12)",
-      background: "rgba(255,255,255,0.05)",
-      color: "#fff",
-    }}
-  >
-    <option value="Placed" style={{ color: "#07111f" }}>Placed</option>
-    <option value="Unplaced" style={{ color: "#07111f" }}>Unplaced</option>
-    <option value="Scratched/Void" style={{ color: "#07111f" }}>Scratched/Void</option>
-  </select>
+                      <div
+                        className="edit-result-box"
+                        style={{
+                          display: "none",
+                          marginTop: "10px",
+                          gap: "10px",
+                          alignItems: "center",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <select
+                          defaultValue={
+                            r.result === "scratched" || r.settlement_status === "void"
+                              ? "Scratched/Void"
+                              : r.placed === true
+                              ? "Placed"
+                              : r.placed === false
+                              ? "Unplaced"
+                              : "Placed"
+                          }
+                          style={{
+                            padding: "8px 10px",
+                            borderRadius: "8px",
+                            border: "1px solid rgba(255,255,255,0.12)",
+                            background: "rgba(255,255,255,0.05)",
+                            color: "#fff",
+                          }}
+                        >
+                          <option value="Placed" style={{ color: "#07111f" }}>Placed</option>
+                          <option value="Unplaced" style={{ color: "#07111f" }}>Unplaced</option>
+                          <option value="Scratched/Void" style={{ color: "#07111f" }}>Scratched/Void</option>
+                        </select>
 
-  <input
-    type="number"
-    step="0.01"
-    placeholder="Place Dividend"
-    defaultValue={r.place_dividend || r.dividend || ""}
-    style={{
-      padding: "8px 10px",
-      borderRadius: "8px",
-      border: "1px solid rgba(255,255,255,0.12)",
-      background: "rgba(255,255,255,0.05)",
-      color: "#fff",
-      width: "160px",
-    }}
-  />
+                        <input
+                          type="number"
+                          step="0.01"
+                          placeholder="Place Dividend"
+                          defaultValue={r.place_dividend || r.dividend || ""}
+                          style={{
+                            padding: "8px 10px",
+                            borderRadius: "8px",
+                            border: "1px solid rgba(255,255,255,0.12)",
+                            background: "rgba(255,255,255,0.05)",
+                            color: "#fff",
+                            width: "160px",
+                          }}
+                        />
 
-  <button
-    onClick={async (e) => {
-      const container = e.currentTarget.parentElement;
+                        <button
+                          onClick={async (e) => {
+                            const container = e.currentTarget.parentElement;
 
-      const input = container?.querySelector("input") as HTMLInputElement;
-      const select = container?.querySelector("select") as HTMLSelectElement;
+                            const input = container?.querySelector("input") as HTMLInputElement;
+                            const select = container?.querySelector("select") as HTMLSelectElement;
 
-      const selectedResult = select?.value || "Placed";
-      const placeDividend = input?.value;
+                            const selectedResult = select?.value || "Placed";
+                            const placeDividend = input?.value;
 
-      if (selectedResult === "Placed" && !placeDividend) {
-        alert("Please enter a place dividend.");
-        return;
-      }
+                            if (selectedResult === "Placed" && !placeDividend) {
+                              alert("Please enter a place dividend.");
+                              return;
+                            }
 
-      const res = await fetch("/api/save-dividend", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: r.id,
-          result: selectedResult,
-          place_dividend:
-            selectedResult === "Placed" ? placeDividend : null,
-        }),
-      });
+                            const res = await fetch("/api/save-dividend", {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json",
+                              },
+                              body: JSON.stringify({
+                                id: r.id,
+                                result: selectedResult,
+                                place_dividend:
+                                  selectedResult === "Placed" ? placeDividend : null,
+                              }),
+                            });
 
-      const data = await res.json();
+                            const data = await res.json();
 
-      if (!data.ok) {
-        alert(data.error || "Failed to update result.");
-        return;
-      }
+                            if (!data.ok) {
+                              alert(data.error || "Failed to update result.");
+                              return;
+                            }
 
-      alert("Result updated.");
-      window.location.reload();
-    }}
-    style={{
-      padding: "8px 14px",
-      borderRadius: "8px",
-      border: "none",
-      background: "#22c55e",
-      color: "#07111f",
-      fontWeight: 800,
-      cursor: "pointer",
-    }}
-  >
-    Update Result
-  </button>
-</div>
-      >
-        Update Price
-      </button>
-    </div>
-  </div>
-)}
+                            alert("Result updated.");
+                            window.location.reload();
+                          }}
+                          style={{
+                            padding: "8px 14px",
+                            borderRadius: "8px",
+                            border: "none",
+                            background: "#22c55e",
+                            color: "#07111f",
+                            fontWeight: 800,
+                            cursor: "pointer",
+                          }}
+                        >
+                          Update Result
+                        </button>
                       </div>
                     </div>
                   );
