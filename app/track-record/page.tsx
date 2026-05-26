@@ -604,7 +604,7 @@ export default function TrackRecordPage() {
                             ? `🔴 UNPLACED (${r.result || "?"})`
                             : "🟡 PENDING"}
                         </span>
-{r.placed === true && !(r.place_dividend || r.dividend) && (
+{(!r.result || r.result === "pending" || r.placed === true) && !(r.place_dividend || r.dividend) && (
   <div
     style={{
       marginTop: "10px",
