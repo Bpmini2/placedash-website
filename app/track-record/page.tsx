@@ -87,6 +87,11 @@ export default function TrackRecordPage() {
 
   function downloadCSV() {
     const headers = [
+      function downloadCSV() {
+  const headers = [
+    "Date",
+    "Track",
+    "Race Number",
       "Date",
       "Track",
       "Race Number",
