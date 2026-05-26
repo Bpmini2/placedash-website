@@ -63,7 +63,7 @@ export async function POST(request: Request) {
       const bankAfterBet = money(bankBeforeBet + profitLoss);
 
       updateData = {
-        result: "Placed",
+        result: pick.result && pick.result !== "pending" ? pick.result : "placed",
         placed: true,
         place_dividend: placeDividend,
         dividend: placeDividend,
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
       const bankAfterBet = money(bankBeforeBet + profitLoss);
 
       updateData = {
-        result: "Unplaced",
+        result: pick.result && pick.result !== "pending" ? pick.result : "unplaced",
         placed: false,
         place_dividend: null,
         dividend: null,
@@ -124,6 +124,13 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+
+    await supabase
+      .from("strategy_settings")
+      .update({
+        current_bank: updateData.bank_after_bet,
+      })
+      .eq("id", pick.strategy_id);
 
     return NextResponse.json({
       ok: true,
