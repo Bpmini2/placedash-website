@@ -86,29 +86,24 @@ export default function TrackRecordPage() {
   const currentFilterTitle = filterTitles[activeFilter] || "All AI Picks";
 
   function downloadCSV() {
-    const headers = [
-      function downloadCSV() {
   const headers = [
     "Date",
     "Track",
     "Race Number",
-      "Date",
-      "Track",
-      "Race Number",
-      "Race Time",
-      "Horse Number",
-      "Horse Name",
-      "Confidence",
-      "AI Score",
-      "Result",
-      "Placed Status",
-      "Place Dividend",
-      "Bet Size",
-      "Return Amount",
-      "Profit Loss",
-      "Bank Before Bet",
-      "Bank After Bet",
-    ];
+    "Race Time",
+    "Horse Number",
+    "Horse Name",
+    "Confidence",
+    "AI Score",
+    "Result",
+    "Placed Status",
+    "Place Dividend",
+    "Bet Size",
+    "Return Amount",
+    "Profit Loss",
+    "Bank Before Bet",
+    "Bank After Bet",
+  ];
 
     const rows = filteredPicks.map((r: any) => [
       r.race_date || "",
