@@ -360,8 +360,10 @@ const scoredRunner = {
         console.error("Failed loading Racing API odds", err);
       }
     } catch (err) {
-      console.error("Failed loading races", err);
-    }
+  console.error("Failed loading races", err);
+} finally {
+  setLoading(false);
+}
   }
 
   loadRaces();
