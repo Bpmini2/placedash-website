@@ -17,20 +17,57 @@ export async function GET() {
 
     const auth = Buffer.from(`${username}:${password}`).toString("base64");
 
-    const res = await fetch("https://api.theracingapi.com/v1/australia/meets/met_aus_848240947048/races", {
-      headers: {
-        Authorization: `Basic ${auth}`,
-        Accept: "application/json",
-      },
-      cache: "no-store",
-    });
+    const meetId = "met_aus_848240947048";
+
+    const res = await fetch(
+      `https://api.theracingapi.com/v1/australia/meets/${meetId}/races`,
+      {
+        headers: {
+          Authorization: `Basic ${auth}`,
+          Accept: "application/json",
+        },
+        cache: "no-store",
+      }
+    );
 
     const data = await res.json();
 
+    const races = data?.races || [];
+
+    const oddsView = races.map((race: any) => ({
+      course: race.course,
+      race_number: race.race_number,
+      race_name: race.race_name,
+      race_status: race.race_status,
+      off_time: race.off_time,
+      distance: race.distance,
+      going: race.going,
+      runners: (race.runners || []).map((runner: any) => ({
+        number: runner.number,
+        horse: runner.horse,
+        position: runner.position,
+        scratched: runner.scratched,
+        sportsbet_win:
+          runner.odds?.find((o: any) => o.bookmaker === "Sportsbet")?.win_odds ||
+          null,
+        sportsbet_place:
+          runner.odds?.find((o: any) => o.bookmaker === "Sportsbet")?.place_odds ||
+          null,
+        ladbrokes_win:
+          runner.odds?.find((o: any) => o.bookmaker === "Ladbrokes")?.win_odds ||
+          null,
+        ladbrokes_place:
+          runner.odds?.find((o: any) => o.bookmaker === "Ladbrokes")?.place_odds ||
+          null,
+      })),
+    }));
+
     return NextResponse.json({
-      ok: res.ok,
+      ok: true,
       status: res.status,
-      sample: data,
+      meetId,
+      raceCount: oddsView.length,
+      oddsView,
     });
   } catch (error) {
     return NextResponse.json({
