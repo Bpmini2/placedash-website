@@ -17,7 +17,7 @@ export async function GET() {
 
     const auth = Buffer.from(`${username}:${password}`).toString("base64");
 
-    const res = await fetch("https://api.theracingapi.com/v1/racecards/standard", {
+    const res = await fetch("https://api.theracingapi.com/v1/australia/meets", {
       headers: {
         Authorization: `Basic ${auth}`,
         Accept: "application/json",
