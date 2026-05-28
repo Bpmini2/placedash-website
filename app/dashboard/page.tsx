@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 
 export default function Dashboard() {
   const [races, setRaces] = useState<any[]>([]);
+  const [liveOdds, setLiveOdds] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [selectedRace, setSelectedRace] = useState<any | null>(null);
 
@@ -302,54 +303,69 @@ const scoredRunner = {
   }
 
   useEffect(() => {
-    async function loadRaces() {
-      try {
-        const res = await fetch("/api/formfav");
-        const data = await res.json();
-
-        setRaces(data.racecards || []);
-       if (data.racecards?.length) {
-  for (const race of data.racecards) {
-    const topPick = getBestRunner(race);
-
-if (!topPick) continue;
-
+  async function loadRaces() {
     try {
-      await fetch("/api/saved-picks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          race_date: new Date().toISOString().split("T")[0],
-          course: race.course,
-          race_number: race.raceNumber,
-          race_time: race.raceTime,
-          horse_number: topPick.number,
-          horse_name: topPick.name,
-          confidence: topPick.confidence,
-          ai_score: topPick.score,
-          reasoning: topPick.reasoning,
-          distance: race.distance,
-          condition: race.condition,
-          runner_count: race.runners?.length || 0,
-          state: race.state,
-        }),
-      });
+      const res = await fetch("/api/formfav");
+      const data = await res.json();
+
+      setRaces(data.racecards || []);
+
+      if (data.racecards?.length) {
+        for (const race of data.racecards) {
+          const topPick = getBestRunner(race);
+
+          if (!topPick) continue;
+
+          try {
+            await fetch("/api/saved-picks", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                race,
+                bestRunner: topPick,
+              }),
+            });
+          } catch (err) {
+            console.error("Failed saving pick", err);
+          }
+        }
+      }
+
+      // Racing API Odds
+      try {
+        const oddsRes = await fetch("/api/racing-api-test");
+        const oddsData = await oddsRes.json();
+
+        if (oddsData?.oddsView) {
+          const mappedOdds: any = {};
+
+          oddsData.oddsView.forEach((race: any) => {
+            race.runners.forEach((runner: any) => {
+              mappedOdds[
+                `${race.course}-${race.race_number}-${runner.number}`
+              ] = {
+                sportsbet_place: runner.sportsbet_place,
+                sportsbet_win: runner.sportsbet_win,
+                ladbrokes_place: runner.ladbrokes_place,
+                ladbrokes_win: runner.ladbrokes_win,
+              };
+            });
+          });
+
+          setLiveOdds(mappedOdds);
+        }
+      } catch (err) {
+        console.error("Failed loading Racing API odds", err);
+      }
     } catch (err) {
-      console.error("Failed to save pick", err);
+      console.error("Failed loading races", err);
     }
   }
-} 
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setLoading(false);
-      }
-    }
 
-    loadRaces();
-  }, []);
+  loadRaces();
+}, []);
 
   const displayRaces = races
   .filter((race: any) => {
