@@ -15,11 +15,22 @@ export async function GET() {
       });
     }
 
+    const auth = Buffer.from(`${username}:${password}`).toString("base64");
+
+    const res = await fetch("https://api.theracingapi.com/v1/racecards/standard", {
+      headers: {
+        Authorization: `Basic ${auth}`,
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    });
+
+    const data = await res.json();
+
     return NextResponse.json({
-      ok: true,
-      message: "Racing API environment variables are loaded.",
-      usernameFound: true,
-      passwordFound: true,
+      ok: res.ok,
+      status: res.status,
+      sample: data,
     });
   } catch (error) {
     return NextResponse.json({
