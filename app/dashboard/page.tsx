@@ -620,8 +620,6 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
     </ul>
   </div>
 )}
-</ul>
-</div>
 
 {(() => {
   const odds =
