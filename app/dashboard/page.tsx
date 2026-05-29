@@ -593,6 +593,50 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
                 <p style={{ marginTop: "10px" }}>
   Selection: <strong>{visibleHorse}</strong>
 </p>
+                {bestRunner && (() => {
+  const raceNumber = race.race_number || race.raceNumber;
+  const runnerNumber = bestRunner.number;
+
+  const directOdds =
+    liveOdds[`${race.course}-${raceNumber}-${runnerNumber}`];
+
+  const fallbackOdds = Object.entries(liveOdds).find(([key]) => {
+    const lowerKey = key.toLowerCase();
+    const lowerCourse = String(race.course || "").toLowerCase();
+
+    return (
+      lowerKey.includes(lowerCourse) &&
+      key.endsWith(`-${raceNumber}-${runnerNumber}`)
+    );
+  })?.[1] as any;
+
+  const odds = directOdds || fallbackOdds;
+
+  if (!odds) return null;
+
+  return (
+    <div
+      style={{
+        marginTop: "10px",
+        padding: "10px",
+        borderRadius: "10px",
+        background: "rgba(34,197,94,0.08)",
+        border: "1px solid rgba(34,197,94,0.2)",
+        fontSize: "13px",
+      }}
+    >
+      <div style={{ color: "#22c55e", fontWeight: 800 }}>
+        SB Place: ${odds.sportsbet_place || "-"} · LB Place: $
+        {odds.ladbrokes_place || "-"}
+      </div>
+
+      <div style={{ marginTop: "4px", color: "#94a3b8", fontSize: "12px" }}>
+        SB Win: ${odds.sportsbet_win || "-"} · LB Win: $
+        {odds.ladbrokes_win || "-"}
+      </div>
+    </div>
+  );
+})()}
 
 <div style={{ color: "#afacc15", fontSize: "13px", marginTop: "8px", fontWeight: "700" }}>
   Click to view full race card
