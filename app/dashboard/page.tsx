@@ -295,14 +295,14 @@ const scoredRunner = {
   }
 
   function getScoredRunners(race: any) {
-  if (!race?.runners || race.runners.length === 0) return [];
+    if (!race?.runners || race.runners.length === 0) return [];
 
-  return race.runners
-    .map((runner: any) => scoreRunner(runner))
-    .sort((a: any, b: any) => b.score - a.score);
-}
+    return race.runners
+      .map((runner: any) => scoreRunner(runner))
+      .sort((a: any, b: any) => b.score - a.score);
+  }
 
-useEffect(() => {
+  useEffect(() => {
   async function loadRaces() {
     try {
       const res = await fetch("/api/formfav");
@@ -323,24 +323,24 @@ useEffect(() => {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                race_date: new Date().toLocaleDateString("en-CA", {
-                  timeZone: "Australia/Melbourne",
-                }),
-                course: race.course,
-                race_number: race.race_number || race.raceNumber,
-                race_time: race.off_time || race.raceTime,
-                horse_number: topPick.number,
-                horse_name: topPick.horse,
-                confidence: topPick.confidence,
-                ai_score: topPick.score,
-                reasoning: Array.isArray(topPick.reasoning)
-                  ? topPick.reasoning.join(", ")
-                  : String(topPick.reasoning || ""),
-                distance: race.distance,
-                condition: race.condition,
-                runner_count: race.runners?.length || 0,
-                state: race.state,
-              }),
+  race_date: new Date().toLocaleDateString("en-CA", {
+    timeZone: "Australia/Melbourne",
+  }),
+  course: race.course,
+  race_number: race.race_number || race.raceNumber,
+  race_time: race.off_time || race.raceTime,
+  horse_number: topPick.number,
+  horse_name: topPick.horse,
+  confidence: topPick.confidence,
+  ai_score: topPick.score,
+  reasoning: Array.isArray(topPick.reasoning)
+    ? topPick.reasoning.join(", ")
+    : String(topPick.reasoning || ""),
+  distance: race.distance,
+  condition: race.condition,
+  runner_count: race.runners?.length || 0,
+  state: race.state,
+}),
             });
           } catch (err) {
             console.error("Failed saving pick", err);
@@ -348,6 +348,7 @@ useEffect(() => {
         }
       }
 
+      // Racing API Odds
       try {
         const oddsRes = await fetch("/api/racing-api-odds");
         const oddsData = await oddsRes.json();
@@ -374,16 +375,16 @@ useEffect(() => {
         console.error("Failed loading Racing API odds", err);
       }
     } catch (err) {
-      console.error("Failed loading races", err);
-    } finally {
-      setLoading(false);
-    }
+  console.error("Failed loading races", err);
+} finally {
+  setLoading(false);
+}
   }
 
   loadRaces();
 }, []);
-  
-const displayRaces = races
+
+  const displayRaces = races
   .filter((race: any) => {
     const runnerCount = race.runners?.length || 0;
     return runnerCount >= 8 && runnerCount <= 11;
@@ -395,7 +396,6 @@ const displayRaces = races
 
 const selectedBestRunner = selectedRace ? getBestRunner(selectedRace) : null;
 const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
-  
   return (
     <main
       style={{
@@ -621,25 +621,8 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
   </div>
 )}
 
-
-
-<div
-  style={{
-    display: "inline-block",
-    marginTop: "10px",
-    padding: "6px 10px",
-    borderRadius: "8px",
-    fontSize: "12px",
-    fontWeight: "600",
-    background:
-      bestRunner?.confidence === "HIGH"
-        ? "rgba(34,197,94,0.15)"
-        : "rgba(250,204,21,0.15)",
-    color: bestRunner?.confidence === "HIGH" ? "#22c55e" : "#facc15",
-  }}
->
-  {`${bestRunner?.confidence || "LOW"} CONFIDENCE`}
-</div>
+                <div style={{ display: "inline-block", marginTop: "10px", padding: "6px 10px", borderRadius: "8px", fontSize: "12px", fontWeight: "600", background: bestRunner?.confidence === "HIGH" ? "rgba(34,197,94,0.15)" : "rgba(250,204,21,0.15)", color: bestRunner?.confidence === "HIGH" ? "#22c55e" : "#facc15" }}>
+                  {`${bestRunner?.confidence || "LOW"} CONFIDENCE`}
                 </div>
               </div>
             );
