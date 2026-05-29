@@ -395,6 +395,7 @@ const displayRaces = races
 
 const selectedBestRunner = selectedRace ? getBestRunner(selectedRace) : null;
 const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
+  
   return (
     <main
       style={{
