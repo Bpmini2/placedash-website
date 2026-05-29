@@ -645,13 +645,7 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
         {odds.ladbrokes_place || "-"}
       </div>
 
-      <div
-        style={{
-          marginTop: "4px",
-          color: "#94a3b8",
-          fontSize: "12px",
-        }}
-      >
+      <div style={{ marginTop: "4px", color: "#94a3b8", fontSize: "12px" }}>
         SB Win: {odds.sportsbet_win || "-"} • LB Win:{" "}
         {odds.ladbrokes_win || "-"}
       </div>
@@ -659,9 +653,23 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
   );
 })()}
 
-<div style={{ display: "inline-block", marginTop: "10px"
-                <div style={{ display: "inline-block", marginTop: "10px", padding: "6px 10px", borderRadius: "8px", fontSize: "12px", fontWeight: "600", background: bestRunner?.confidence === "HIGH" ? "rgba(34,197,94,0.15)" : "rgba(250,204,21,0.15)", color: bestRunner?.confidence === "HIGH" ? "#22c55e" : "#facc15" }}>
-                  {`${bestRunner?.confidence || "LOW"} CONFIDENCE`}
+<div
+  style={{
+    display: "inline-block",
+    marginTop: "10px",
+    padding: "6px 10px",
+    borderRadius: "8px",
+    fontSize: "12px",
+    fontWeight: "600",
+    background:
+      bestRunner?.confidence === "HIGH"
+        ? "rgba(34,197,94,0.15)"
+        : "rgba(250,204,21,0.15)",
+    color: bestRunner?.confidence === "HIGH" ? "#22c55e" : "#facc15",
+  }}
+>
+  {`${bestRunner?.confidence || "LOW"} CONFIDENCE`}
+</div>
                 </div>
               </div>
             );
