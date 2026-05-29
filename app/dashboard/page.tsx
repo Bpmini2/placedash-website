@@ -350,7 +350,7 @@ const scoredRunner = {
 
       // Racing API Odds
       try {
-        const oddsRes = await fetch("/api/racing-api-test");
+        const oddsRes = await fetch("/api/racing-api-odds");
         const oddsData = await oddsRes.json();
 
         if (oddsData?.oddsView) {
