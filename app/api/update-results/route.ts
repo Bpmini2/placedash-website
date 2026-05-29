@@ -188,7 +188,7 @@ export async function GET() {
     const { data: pendingPicks, error: pendingError } = await supabase
       .from("saved_picks")
       .select("*")
-      .eq("result", "pending")
+      .in("result", ["pending", "needs_dividend"])
       .lte("race_date", today)
       .order("race_date", { ascending: true })
       .order("race_time", { ascending: true })
