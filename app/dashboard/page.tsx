@@ -359,13 +359,17 @@ const scoredRunner = {
           oddsData.oddsView.forEach((race: any) => {
             race.runners.forEach((runner: any) => {
               mappedOdds[
-                `${race.course}-${race.race_number}-${runner.number}`
-              ] = {
-                sportsbet_place: runner.sportsbet_place,
-                sportsbet_win: runner.sportsbet_win,
-                ladbrokes_place: runner.ladbrokes_place,
-                ladbrokes_win: runner.ladbrokes_win,
-              };
+  `${race.course}-${race.race_number}-${runner.number}`
+] = {
+  course: race.course,
+  state: race.state || null,
+  race_number: race.race_number,
+  runner_number: runner.number,
+  sportsbet_place: runner.sportsbet_place,
+  sportsbet_win: runner.sportsbet_win,
+  ladbrokes_place: runner.ladbrokes_place,
+  ladbrokes_win: runner.ladbrokes_win,
+};
             });
           });
 
@@ -600,15 +604,24 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
   const directOdds =
     liveOdds[`${race.course}-${raceNumber}-${runnerNumber}`];
 
-  const fallbackOdds = Object.entries(liveOdds).find(([key]) => {
-    const lowerKey = key.toLowerCase();
-    const lowerCourse = String(race.course || "").toLowerCase();
+  const fallbackOdds = Object.entries(liveOdds).find(([key, value]: any) => {
+  const lowerKey = key.toLowerCase();
+  const lowerCourse = String(race.course || "").toLowerCase();
 
-    return (
-      lowerKey.includes(lowerCourse) &&
-      key.endsWith(`-${raceNumber}-${runnerNumber}`)
-    );
-  })?.[1] as any;
+  const courseMatch =
+    lowerKey.includes(lowerCourse) ||
+    lowerCourse.includes(String(value?.course || "").toLowerCase());
+
+  const stateMatch =
+    value?.state &&
+    race.state &&
+    String(value.state).toLowerCase() === String(race.state).toLowerCase();
+
+  const raceMatch = Number(value?.race_number) === Number(raceNumber);
+  const runnerMatch = Number(value?.runner_number) === Number(runnerNumber);
+
+  return (courseMatch || stateMatch) && raceMatch && runnerMatch;
+})?.[1] as any;
 
   const odds = directOdds || fallbackOdds;
 
