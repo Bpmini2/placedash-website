@@ -65,12 +65,13 @@ const todaysMeets = (meetsData?.meets || []).filter((meet: any) =>
 
       for (const race of racesData?.races || []) {
         allRaceOdds.push({
-          course: race.course,
-          race_number: race.race_number,
-          race_name: race.race_name,
-          race_status: race.race_status,
-          off_time: race.off_time,
-          runners: (race.runners || []).map((runner: any) => {
+  course: race.course,
+  state: meet.state || race.state || null,
+  race_number: race.race_number,
+  race_name: race.race_name,
+  race_status: race.race_status,
+  off_time: race.off_time,
+  runners: (race.runners || []).map((runner: any) => {
             const sportsbet = runner.odds?.find(
               (o: any) => o.bookmaker === "Sportsbet"
             );
