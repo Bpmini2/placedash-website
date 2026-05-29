@@ -604,10 +604,10 @@ export default function TrackRecordPage() {
                         </span>
 
                         {r.placed === true && (r.place_dividend || r.dividend) && (
-                          <span style={{ marginLeft: "10px", color: "#22c55e", fontWeight: 800 }}>
-                            Place Price: ${r.place_dividend || r.dividend}
-                          </span>
-                        )}
+  <span style={{ marginLeft: "10px", color: "#22c55e", fontWeight: 800 }}>
+    Paid ${r.place_dividend || r.dividend}
+  </span>
+)}
 
                         <button
                           onClick={(e) => {
