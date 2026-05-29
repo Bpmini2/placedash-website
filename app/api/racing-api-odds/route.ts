@@ -3,8 +3,11 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-function getMelbourneDate() {
-  return new Date().toLocaleDateString("en-CA", {
+function getMelbourneDateOffset(offsetDays = 0) {
+  const date = new Date();
+  date.setDate(date.getDate() + offsetDays);
+
+  return date.toLocaleDateString("en-CA", {
     timeZone: "Australia/Melbourne",
   });
 }
@@ -32,11 +35,16 @@ export async function GET() {
     });
 
     const meetsData = await meetsRes.json();
-    const today = getMelbourneDate();
 
-    const todaysMeets = (meetsData?.meets || []).filter(
-      (meet: any) => meet.date === today
-    );
+const today = getMelbourneDateOffset(0);
+const yesterday = getMelbourneDateOffset(-1);
+const tomorrow = getMelbourneDateOffset(1);
+
+const targetDates = [today, yesterday, tomorrow];
+
+const todaysMeets = (meetsData?.meets || []).filter((meet: any) =>
+  targetDates.includes(meet.date)
+);
 
     const allRaceOdds: any[] = [];
 
@@ -85,12 +93,16 @@ export async function GET() {
     }
 
     return NextResponse.json({
-      ok: true,
-      date: today,
-      meetCount: todaysMeets.length,
-      raceCount: allRaceOdds.length,
-      oddsView: allRaceOdds,
-    });
+  ok: true,
+  date: today,
+  targetDates,
+  availableDates: Array.from(
+    new Set((meetsData?.meets || []).map((meet: any) => meet.date))
+  ),
+  meetCount: todaysMeets.length,
+  raceCount: allRaceOdds.length,
+  oddsView: allRaceOdds,
+});
   } catch (error) {
     return NextResponse.json({
       ok: false,
