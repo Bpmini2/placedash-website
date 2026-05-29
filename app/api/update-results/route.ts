@@ -35,7 +35,40 @@ function getRunnerPosition(runner: any) {
 }
 
 function getRunnerDividend(runner: any) {
-  return null;
+  const directDividend =
+    runner.place_dividend ??
+    runner.placeDividend ??
+    runner.place_odds ??
+    runner.placeOdds ??
+    runner.dividend ??
+    runner.price ??
+    null;
+
+  if (directDividend) {
+    const parsed = Number(String(directDividend).replace(/[^0-9.]/g, ""));
+    return parsed > 0 ? parsed : null;
+  }
+
+  const odds = Array.isArray(runner.odds) ? runner.odds : [];
+
+  const sportsbet = odds.find(
+    (odd: any) => String(odd.bookmaker || "").toLowerCase() === "sportsbet"
+  );
+
+  const ladbrokes = odds.find(
+    (odd: any) => String(odd.bookmaker || "").toLowerCase() === "ladbrokes"
+  );
+
+  const sportsbetPlace = sportsbet?.place_odds ?? sportsbet?.placeOdds;
+  const ladbrokesPlace = ladbrokes?.place_odds ?? ladbrokes?.placeOdds;
+
+  const preferredPlace = sportsbetPlace || ladbrokesPlace;
+
+  if (!preferredPlace) return null;
+
+  const parsed = Number(String(preferredPlace).replace(/[^0-9.]/g, ""));
+
+  return parsed > 0 ? parsed : null;
 }
 
 function isScratchedRunner(runner: any) {
