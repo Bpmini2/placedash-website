@@ -330,7 +330,7 @@ const scoredRunner = {
   race_number: race.race_number || race.raceNumber,
   race_time: race.off_time || race.raceTime,
   horse_number: topPick.number,
-  horse_name: topPick.horse,
+  horse_name: topPick.horse || topPick.name,
   confidence: topPick.confidence,
   ai_score: topPick.score,
   reasoning: Array.isArray(topPick.reasoning)
