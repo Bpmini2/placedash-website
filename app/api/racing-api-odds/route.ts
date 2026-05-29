@@ -25,8 +25,13 @@ export async function GET() {
     }
 
     const auth = Buffer.from(`${username}:${password}`).toString("base64");
+    const today = getMelbourneDateOffset(0);
+const yesterday = getMelbourneDateOffset(-1);
+const tomorrow = getMelbourneDateOffset(1);
 
-    const meetsRes = await fetch("https://api.theracingapi.com/v1/australia/meets", {
+    const meetsRes = await fetch(
+  `https://api.theracingapi.com/v1/australia/meets?date=${today}`,
+  {
       headers: {
         Authorization: `Basic ${auth}`,
         Accept: "application/json",
@@ -35,10 +40,6 @@ export async function GET() {
     });
 
     const meetsData = await meetsRes.json();
-
-const today = getMelbourneDateOffset(0);
-const yesterday = getMelbourneDateOffset(-1);
-const tomorrow = getMelbourneDateOffset(1);
 
 const targetDates = [today, yesterday, tomorrow];
 
