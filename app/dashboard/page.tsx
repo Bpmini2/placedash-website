@@ -323,9 +323,24 @@ const scoredRunner = {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                race,
-                bestRunner: topPick,
-              }),
+  race_date: new Date().toLocaleDateString("en-CA", {
+    timeZone: "Australia/Melbourne",
+  }),
+  course: race.course,
+  race_number: race.race_number || race.raceNumber,
+  race_time: race.off_time || race.raceTime,
+  horse_number: topPick.number,
+  horse_name: topPick.horse,
+  confidence: topPick.confidence,
+  ai_score: topPick.score,
+  reasoning: Array.isArray(topPick.reasoning)
+    ? topPick.reasoning.join(", ")
+    : String(topPick.reasoning || ""),
+  distance: race.distance,
+  condition: race.condition,
+  runner_count: race.runners?.length || 0,
+  state: race.state,
+}),
             });
           } catch (err) {
             console.error("Failed saving pick", err);
