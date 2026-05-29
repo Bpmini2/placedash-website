@@ -42,8 +42,8 @@ export async function POST(request: Request) {
   .from("saved_picks")
   .select("id")
   .eq("race_date", pick.race_date)
-  .eq("course", pick.course)
-  .eq("race_number", pick.race_number)
+.eq("course", pick.course)
+.eq("race_number", pick.race_number)
   .maybeSingle();
 
     if (existingPick) {
