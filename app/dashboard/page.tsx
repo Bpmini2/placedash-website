@@ -620,7 +620,48 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
     </ul>
   </div>
 )}
+</ul>
+</div>
 
+{(() => {
+  const odds =
+    liveOdds[
+      `${race.course}-${race.race_number || race.raceNumber}-${bestRunner.number}`
+    ];
+
+  if (!odds) return null;
+
+  return (
+    <div
+      style={{
+        marginTop: "10px",
+        padding: "10px",
+        borderRadius: "10px",
+        background: "rgba(34,197,94,0.08)",
+        border: "1px solid rgba(34,197,94,0.2)",
+        fontSize: "14px",
+      }}
+    >
+      <div style={{ color: "#22c55e", fontWeight: 800 }}>
+        SB Place: {odds.sportsbet_place || "-"} • LB Place:{" "}
+        {odds.ladbrokes_place || "-"}
+      </div>
+
+      <div
+        style={{
+          marginTop: "4px",
+          color: "#94a3b8",
+          fontSize: "12px",
+        }}
+      >
+        SB Win: {odds.sportsbet_win || "-"} • LB Win:{" "}
+        {odds.ladbrokes_win || "-"}
+      </div>
+    </div>
+  );
+})()}
+
+<div style={{ display: "inline-block", marginTop: "10px"
                 <div style={{ display: "inline-block", marginTop: "10px", padding: "6px 10px", borderRadius: "8px", fontSize: "12px", fontWeight: "600", background: bestRunner?.confidence === "HIGH" ? "rgba(34,197,94,0.15)" : "rgba(250,204,21,0.15)", color: bestRunner?.confidence === "HIGH" ? "#22c55e" : "#facc15" }}>
                   {`${bestRunner?.confidence || "LOW"} CONFIDENCE`}
                 </div>
