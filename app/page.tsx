@@ -215,7 +215,9 @@ export default function HomePage() {
             </a>
           </div>
         </section>
-
+<p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "24px", lineHeight: 1.5, textAlign: "center" }}>
+  Gamble responsibly. PlaceDash provides racing analysis and information only — it is not betting advice and does not guarantee results. If gambling is becoming a problem, contact Gambling Help Online on 1800 858 858 or visit BetStop for self-exclusion support.
+</p>
         <footer style={{ padding: "40px 0", textAlign: "center", color: "#bfdbfe", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
           <p>© 2026 PlaceDash. Information and data-analysis service only.</p>
           <a href="/privacy" style={{ color: "#bfdbfe", marginRight: "16px" }}>Privacy Policy</a>
