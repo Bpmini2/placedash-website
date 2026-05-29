@@ -542,6 +542,9 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
         <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "8px" }}>
           Race times are shown in the local track timezone.
         </p>
+        <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "4px" }}>
+  SB = Sportsbet odds · LB = Ladbrokes odds. Odds are live bookmaker prices and may change before race start.
+</p>
 
         <div style={{ marginTop: "28px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "28px" }}>
           {loading && (
