@@ -35,11 +35,10 @@ export async function GET() {
     const today = getMelbourneDate();
 
     const pakenhamMeet = (meetsData?.meets || []).find((meet: any) => {
-      return (
-        String(meet.course || "").toLowerCase() === "pakenham" &&
-        meet.date === today
-      );
-    });
+  const courseName = String(meet.course || "").toLowerCase();
+
+  return courseName.includes("pakenham") && meet.date === today;
+});
 
     if (!pakenhamMeet) {
       return NextResponse.json({
