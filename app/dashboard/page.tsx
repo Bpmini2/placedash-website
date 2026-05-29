@@ -545,6 +545,9 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
         <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "4px" }}>
   SB = Sportsbet odds · LB = Ladbrokes odds. Odds are live bookmaker prices and may change before race start.
 </p>
+        <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "4px", lineHeight: 1.5 }}>
+  Gamble responsibly. PlaceDash provides racing analysis and information only — it is not betting advice and does not guarantee results. If gambling is becoming a problem, contact Gambling Help Online on 1800 858 858 or visit BetStop for self-exclusion support.
+</p>
 
         <div style={{ marginTop: "28px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "28px" }}>
           {loading && (
