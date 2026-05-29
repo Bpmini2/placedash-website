@@ -382,7 +382,8 @@ useEffect(() => {
 
   loadRaces();
 }, []);
-
+  
+});
 const displayRaces = races
   .filter((race: any) => {
     const runnerCount = race.runners?.length || 0;
