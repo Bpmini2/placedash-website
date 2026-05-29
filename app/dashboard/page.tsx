@@ -621,37 +621,7 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
   </div>
 )}
 
-{(() => {
-  const odds =
-    liveOdds[
-      `${race.course}-${race.race_number || race.raceNumber}-${bestRunner.number}`
-    ];
 
-  if (!odds) return null;
-
-  return (
-    <div
-      style={{
-        marginTop: "10px",
-        padding: "10px",
-        borderRadius: "10px",
-        background: "rgba(34,197,94,0.08)",
-        border: "1px solid rgba(34,197,94,0.2)",
-        fontSize: "14px",
-      }}
-    >
-      <div style={{ color: "#22c55e", fontWeight: 800 }}>
-        SB Place: {odds.sportsbet_place || "-"} • LB Place:{" "}
-        {odds.ladbrokes_place || "-"}
-      </div>
-
-      <div style={{ marginTop: "4px", color: "#94a3b8", fontSize: "12px" }}>
-        SB Win: {odds.sportsbet_win || "-"} • LB Win:{" "}
-        {odds.ladbrokes_win || "-"}
-      </div>
-    </div>
-  );
-})()}
 
 <div
   style={{
