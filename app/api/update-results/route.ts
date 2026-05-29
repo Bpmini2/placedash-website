@@ -456,8 +456,8 @@ export async function GET() {
             bet_percentage: betPercentage,
             bank_before_bet: Number(bankBeforeBet.toFixed(2)),
             bank_after_bet: Number(bankAfterBet.toFixed(2)),
-            dividend,
-            place_dividend: dividend,
+            dividend: placed === true ? dividend : null,
+place_dividend: placed === true ? dividend : null,
             return_amount:
               profitLoss !== null
                 ? Number((betSize + profitLoss).toFixed(2))
