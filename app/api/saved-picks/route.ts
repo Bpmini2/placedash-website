@@ -39,13 +39,12 @@ export async function POST(request: Request) {
     const pick = await request.json();
 
     const { data: existingPick } = await supabase
-      .from("saved_picks")
-      .select("id")
-      .eq("race_date", pick.race_date)
-      .eq("course", pick.course)
-      .eq("race_number", pick.race_number)
-      .eq("horse_number", pick.horse_number)
-      .maybeSingle();
+  .from("saved_picks")
+  .select("id")
+  .eq("race_date", pick.race_date)
+  .eq("course", pick.course)
+  .eq("race_number", pick.race_number)
+  .maybeSingle();
 
     if (existingPick) {
       return NextResponse.json({
