@@ -276,6 +276,9 @@ export default function TrackRecordPage() {
             })}
           </div>
         </div>
+        <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "8px", lineHeight: 1.5 }}>
+  Gamble responsibly. PlaceDash provides racing analysis and information only — it is not betting advice and does not guarantee results. If gambling is becoming a problem, contact Gambling Help Online on 1800 858 858 or visit BetStop for self-exclusion support.
+</p>
 
         {summary && (
           <div
