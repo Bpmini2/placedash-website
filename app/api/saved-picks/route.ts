@@ -37,13 +37,19 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const pick = await request.json();
+    const raceDate = pick.race_date || new Date().toLocaleDateString("en-CA", {
+  timeZone: "Australia/Melbourne",
+});
+
+const course = pick.course || pick.race?.course;
+const raceNumber = pick.race_number || pick.raceNumber || pick.race?.race_number || pick.race?.raceNumber;
 
     const { data: existingPick } = await supabase
   .from("saved_picks")
   .select("id")
-  .eq("race_date", pick.race_date)
-.eq("course", pick.course)
-.eq("race_number", pick.race_number)
+  .eq("race_date", raceDate)
+.eq("course", course)
+.eq("race_number", raceNumber)
   .maybeSingle();
 
     if (existingPick) {
