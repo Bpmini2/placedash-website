@@ -101,13 +101,13 @@ export default function HomePage() {
               <a href="#method" style={{ color: "#ffffff", padding: "16px 28px", borderRadius: "16px", fontWeight: 800, textDecoration: "none", border: "1px solid rgba(255,255,255,0.25)" }}>
                 See The PlaceDash Method
               </a>
-              <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "14px", lineHeight: 1.5, maxWidth: "760px" }}>
-  Gamble responsibly. PlaceDash provides racing analysis and information only — it is not betting advice and does not guarantee results. If gambling is becoming a problem, contact Gambling Help Online on 1800 858 858 or visit BetStop for self-exclusion support.
-</p>
+              
             </div>
           </div>
         </section>
-
+<p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "14px", lineHeight: 1.5, maxWidth: "760px" }}>
+  Gamble responsibly. PlaceDash provides racing analysis and information only — it is not betting advice and does not guarantee results. If gambling is becoming a problem, contact Gambling Help Online on 1800 858 858 or visit BetStop for self-exclusion support.
+</p>
         <section id="predictions" style={{ padding: "80px 24px", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
           <div style={{ color: "#22c55e", fontSize: "14px", fontWeight: 900, letterSpacing: "0.14em", marginBottom: "18px" }}>
             TODAY&apos;S PREDICTIONS
