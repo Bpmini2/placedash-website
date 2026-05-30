@@ -2,6 +2,38 @@
 // Admin mode enabled for Track Record testing
 
 import React, { useEffect, useState } from "react";
+function getRaceTimes(r: any) {
+  const rawTime = r.race_time || r.off_time || r.raceTime || "TBA";
+  const state = r.state || "";
+
+  if (rawTime === "TBA") {
+    return {
+      melbourneTime: "TBA",
+      localTime: "TBA",
+    };
+  }
+
+  let melbourneTime = rawTime;
+  let localLabel = rawTime;
+
+  if (state === "WA") {
+    localLabel = `${rawTime} AWST`;
+    melbourneTime = `${rawTime} + 2 hours`;
+  } else if (state === "NT") {
+    localLabel = `${rawTime} ACST`;
+    melbourneTime = `${rawTime} + 30 minutes`;
+  } else if (state === "SA") {
+    localLabel = `${rawTime} ACST/ACDT`;
+    melbourneTime = `${rawTime} + 30 minutes`;
+  } else {
+    localLabel = `${rawTime} Local`;
+    melbourneTime = rawTime;
+  }
+
+  return {
+    melbourneTime,
+    localTime: localLabel,
+  };
 
 export default function TrackRecordPage() {
   const [picks, setPicks] = useState<any[]>([]);
@@ -146,38 +178,6 @@ link.click();
 document.body.removeChild(link);
 }
 
-function getRaceTimes(r: any) {
-  const rawTime = r.race_time || r.off_time || r.raceTime || "TBA";
-  const state = r.state || "";
-
-  if (rawTime === "TBA") {
-    return {
-      melbourneTime: "TBA",
-      localTime: "TBA",
-    };
-  }
-
-  let melbourneTime = rawTime;
-  let localLabel = rawTime;
-
-  if (state === "WA") {
-    localLabel = `${rawTime} AWST`;
-    melbourneTime = `${rawTime} + 2 hours`;
-  } else if (state === "NT") {
-    localLabel = `${rawTime} ACST`;
-    melbourneTime = `${rawTime} + 30 minutes`;
-  } else if (state === "SA") {
-    localLabel = `${rawTime} ACST/ACDT`;
-    melbourneTime = `${rawTime} + 30 minutes`;
-  } else {
-    localLabel = `${rawTime} Local`;
-    melbourneTime = rawTime;
-  }
-
-  return {
-    melbourneTime,
-    localTime: localLabel,
-  };
 }
   return (
     <main
