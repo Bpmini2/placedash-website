@@ -452,7 +452,12 @@ function getBestRunner(race: any) {
       const res = await fetch("/api/formfav");
       const data = await res.json();
 
-      setRaces(data.racecards || []);
+      const officialBetRaces = (data.racecards || []).filter((race: any) => {
+  const topPick = getBestRunner(race);
+  return topPick?.decision === "BET";
+});
+
+setRaces(officialBetRaces);
 
       if (data.racecards?.length) {
         for (const race of data.racecards) {
