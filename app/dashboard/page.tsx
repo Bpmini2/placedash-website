@@ -811,10 +811,10 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
             </button>
 
             <div style={{ marginTop: "14px", padding: "12px", borderRadius: "12px", background: "rgba(34,197,94,0.10)", border: "1px solid rgba(34,197,94,0.18)" }}>
-              <strong style={{ color: "#22c55e" }}>Top Rated Selection: </strong>
-              {selectedBestRunner?.number ? `${selectedBestRunner.number}. ` : ""}
-              {selectedBestRunner?.horse || "No selection"} · {selectedBestRunner?.confidence || "LOW"} confidence · Score {selectedBestRunner?.score || 0}
-            </div>
+  <strong style={{ color: "#22c55e" }}>Value Selection:</strong>
+  {selectedBestRunner?.number ? ` ${selectedBestRunner.number}. ` : ""}
+  {selectedBestRunner?.horse || "No selection"} · {selectedBestRunner?.decision || "WATCH"} · {selectedBestRunner?.confidence || "LOW"} confidence · Score {selectedBestRunner?.score || 0}
+</div>
 
             <div style={{ overflowX: "auto", marginTop: "18px" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
