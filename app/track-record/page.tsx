@@ -142,8 +142,9 @@ export default function TrackRecordPage() {
     link.setAttribute("download", `placedash-track-record-${dateMode}-${selectedDate}.csv`);
 
     document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+link.click();
+document.body.removeChild(link);
+}
 
 function getRaceTimes(r: any) {
   const rawTime = r.race_time || r.off_time || r.raceTime || "TBA";
