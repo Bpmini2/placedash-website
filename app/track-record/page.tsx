@@ -734,7 +734,25 @@ document.body.removeChild(link);
                           <option value="Unplaced" style={{ color: "#07111f" }}>Unplaced</option>
                           <option value="Scratched/Void" style={{ color: "#07111f" }}>Scratched/Void</option>
                         </select>
-
+<input
+  type="number"
+  step="1"
+  min="1"
+  placeholder="Position"
+  defaultValue={
+    r.result && r.result !== "pending" && r.result !== "scratched"
+      ? r.result
+      : ""
+  }
+  style={{
+    padding: "8px 10px",
+    borderRadius: "8px",
+    border: "1px solid rgba(255,255,255,0.12)",
+    background: "rgba(255,255,255,0.05)",
+    color: "#fff",
+    width: "100px",
+  }}
+/>
                         <input
                           type="number"
                           step="0.01"
@@ -754,11 +772,15 @@ document.body.removeChild(link);
                           onClick={async (e) => {
                             const container = e.currentTarget.parentElement;
 
-                            const input = container?.querySelector("input") as HTMLInputElement;
-                            const select = container?.querySelector("select") as HTMLSelectElement;
+                            const inputs = container?.querySelectorAll("input");
+const select = container?.querySelector("select") as HTMLSelectElement;
 
-                            const selectedResult = select?.value || "Placed";
-                            const placeDividend = input?.value;
+const positionInput = inputs?.[0] as HTMLInputElement;
+const dividendInput = inputs?.[1] as HTMLInputElement;
+
+const selectedResult = select?.value || "Placed";
+const position = positionInput?.value;
+const placeDividend = dividendInput?.value;
 
                             if (selectedResult === "Placed" && !placeDividend) {
                               alert("Please enter a place dividend.");
@@ -771,11 +793,12 @@ document.body.removeChild(link);
                                 "Content-Type": "application/json",
                               },
                               body: JSON.stringify({
-                                id: r.id,
-                                result: selectedResult,
-                                place_dividend:
-                                  selectedResult === "Placed" ? placeDividend : null,
-                              }),
+  id: r.id,
+  result: selectedResult,
+  position: position,
+  place_dividend:
+    selectedResult === "Placed" ? placeDividend : null,
+}),
                             });
 
                             const data = await res.json();
