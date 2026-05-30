@@ -144,7 +144,7 @@ export default function TrackRecordPage() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  }
+
 function getRaceTimes(r: any) {
   const rawTime = r.race_time || r.off_time || r.raceTime || "TBA";
   const state = r.state || "";
