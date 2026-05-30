@@ -411,7 +411,12 @@ function getBestRunner(race: any) {
         for (const race of data.racecards) {
           const topPick = getBestRunner(race);
 
-          if (!topPick) continue;
+if (!topPick) continue;
+
+// AI LOGIC:
+// Only official BET selections should be saved to Track Record.
+// WATCH / LOW VALUE / AVOID are shown on the Dashboard, but are not counted as official bets.
+if (topPick.decision !== "BET") continue;
 
           try {
             await fetch("/api/saved-picks", {
