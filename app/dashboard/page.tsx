@@ -392,12 +392,31 @@ function getBestRunner(race: any) {
 }
 
   function getScoredRunners(race: any) {
-    if (!race?.runners || race.runners.length === 0) return [];
+  if (!race?.runners || race.runners.length === 0) return [];
 
-    return race.runners
-      .map((runner: any) => scoreRunner(runner))
-      .sort((a: any, b: any) => b.score - a.score);
-  }
+  return race.runners
+    .filter((runner: any) => countStarts(runner) >= 3)
+    .filter((runner: any) => !runner.scratched)
+    .map((runner: any) => {
+      const scoredRunner = scoreRunner(runner);
+
+      const runnerWithOdds = {
+        ...runner,
+        ...scoredRunner,
+      };
+
+      const valueDecision = getValueDecision(runnerWithOdds);
+
+      return {
+        ...runnerWithOdds,
+        decision: valueDecision.decision,
+        placeOdds: valueDecision.placeOdds,
+        valueScore: valueDecision.valueScore,
+        valueReason: valueDecision.valueReason,
+      };
+    })
+    .sort((a: any, b: any) => b.valueScore - a.valueScore);
+}
 
   useEffect(() => {
   async function loadRaces() {
