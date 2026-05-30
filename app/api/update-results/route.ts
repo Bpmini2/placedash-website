@@ -126,7 +126,22 @@ async function findPuntingFormMeetingId(date: string, course: string) {
   const savedCourse = normaliseText(course);
 
   const matched = meetings.find((meeting: any) => {
-    const meetingName = meeting?.track?.name || meeting?.name || meeting?.track;
+    const meetingName =
+      meeting?.track?.name ||
+      meeting?.trackName ||
+      meeting?.track_name ||
+      meeting?.course ||
+      meeting?.courseName ||
+      meeting?.course_name ||
+      meeting?.venue ||
+      meeting?.venueName ||
+      meeting?.venue_name ||
+      meeting?.meetingName ||
+      meeting?.meeting_name ||
+      meeting?.name ||
+      meeting?.track ||
+      "";
+
     const apiCourse = normaliseText(meetingName);
 
     return (
@@ -136,7 +151,7 @@ async function findPuntingFormMeetingId(date: string, course: string) {
     );
   });
 
-  return matched?.meetingId || null;
+  return matched?.meetingId || matched?.meeting_id || matched?.id || null;
 }
 
 async function fetchPuntingFormRaceResult(
