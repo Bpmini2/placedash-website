@@ -231,18 +231,48 @@ async function fetchRacingApiRaceResult(
   const savedCourse = normaliseText(course);
 
   const meet = (meetsData?.meets || []).find((meet: any) => {
-    const apiCourse = normaliseText(meet.course || "");
+    const apiCourseRaw =
+      meet?.course ||
+      meet?.course_name ||
+      meet?.courseName ||
+      meet?.track ||
+      meet?.track_name ||
+      meet?.trackName ||
+      meet?.venue ||
+      meet?.venue_name ||
+      meet?.venueName ||
+      meet?.name ||
+      meet?.meeting_name ||
+      meet?.meetingName ||
+      "";
+
+    const apiCourse = normaliseText(apiCourseRaw);
+
+    const apiDateRaw =
+      meet?.date ||
+      meet?.meet_date ||
+      meet?.meeting_date ||
+      meet?.race_date ||
+      "";
+
+    const apiDate = String(apiDateRaw).slice(0, 10);
 
     return (
-      meet.date === date &&
-      (apiCourse.includes(savedCourse) || savedCourse.includes(apiCourse))
+      apiDate === date &&
+      (apiCourse === savedCourse ||
+        apiCourse.includes(savedCourse) ||
+        savedCourse.includes(apiCourse))
     );
   });
 
   if (!meet) return null;
 
+  const meetId = meet.meet_id || meet.meeting_id || meet.id;
+
+  if (!meetId) return null;
+
   const racesRes = await fetch(
-    `https://api.theracingapi.com/v1/australia/meets/${meet.meet_id}/races`,
+    `https://api.theracingapi.com/v1/australia/meets/${meetId}/races`,
     {
       headers: {
         Authorization: `Basic ${auth}`,
@@ -257,7 +287,14 @@ async function fetchRacingApiRaceResult(
   if (!racesRes.ok) return null;
 
   const raceResult = (racesData?.races || []).find((race: any) => {
-    return Number(race.race_number) === Number(raceNumber);
+    const apiRaceNumber =
+      race?.race_number ||
+      race?.raceNumber ||
+      race?.number ||
+      race?.race_no ||
+      race?.raceNo;
+
+    return Number(apiRaceNumber) === Number(raceNumber);
   });
 
   if (!raceResult) return null;
@@ -267,8 +304,6 @@ async function fetchRacingApiRaceResult(
     raceResult,
   };
 }
-
-function getRaceRunners(raceResult: any) {
   return raceResult?.runners || raceResult?.results || [];
 }
 
