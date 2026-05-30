@@ -584,7 +584,9 @@ function getRaceTimes(r: any) {
                       <div style={{ fontWeight: 800, fontSize: "17px" }}>
                         {r.course} Race {r.race_number || r.raceNumber}
                         {r.state ? ` (${r.state})` : ""} ·{" "}
-                        Melbourne Time: {r.race_time || r.off_time || r.raceTime || "TBA"}
+                        {getRaceTimes(r).melbourneTime}
+                        <div style={{ color: "#94a3b8", fontSize: "13px", marginTop: "4px" }}>
+  Local Track Time: {getRaceTimes(r).localTime}
                       </div>
 
                       <div style={{ display: "flex", justifyContent: "space-between", gap: "18px", marginTop: "8px" }}>
