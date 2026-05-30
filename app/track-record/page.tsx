@@ -34,7 +34,7 @@ function getRaceTimes(r: any) {
     melbourneTime,
     localTime: localLabel,
   };
-
+}
 export default function TrackRecordPage() {
   const [picks, setPicks] = useState<any[]>([]);
   const [summary, setSummary] = useState<any>(null);
