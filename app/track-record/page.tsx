@@ -552,7 +552,7 @@ export default function TrackRecordPage() {
                       <div style={{ fontWeight: 800, fontSize: "17px" }}>
                         {r.course} Race {r.race_number || r.raceNumber}
                         {r.state ? ` (${r.state})` : ""} ·{" "}
-                        {r.race_time || r.off_time || r.raceTime || "TBA"}
+                        Melbourne Time: {r.race_time || r.off_time || r.raceTime || "TBA"}
                       </div>
 
                       <div style={{ display: "flex", justifyContent: "space-between", gap: "18px", marginTop: "8px" }}>
