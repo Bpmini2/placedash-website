@@ -282,17 +282,114 @@ const scoredRunner = {
     };
   };
 
-  function getBestRunner(race: any) {
-    if (!race.runners || race.runners.length === 0) return null;
+  function getRunnerBestPlaceOdds(runner: any) {
+  const possiblePlaceOdds = [
+    runner?.sportsbetPlaceOdds,
+    runner?.sportsbet_place_odds,
+    runner?.sportsbet_place,
+    runner?.sbPlaceOdds,
+    runner?.sb_place_odds,
+    runner?.ladbrokesPlaceOdds,
+    runner?.ladbrokes_place_odds,
+    runner?.ladbrokes_place,
+    runner?.lbPlaceOdds,
+    runner?.lb_place_odds,
+    runner?.placeOdds,
+    runner?.place_odds,
+    runner?.place_price,
+    runner?.placePrice,
+  ];
 
-    return (
-      race.runners
-        .filter((runner: any) => countStarts(runner) >= 3)
-        .filter((runner: any) => !runner.scratched)
-        .map((runner: any) => scoreRunner(runner))
-        .sort((a: any, b: any) => b.score - a.score)[0] || null
-    );
+  const validOdds = possiblePlaceOdds
+    .map((odd: any) => Number(odd))
+    .filter((odd: number) => !Number.isNaN(odd) && odd > 1);
+
+  if (validOdds.length === 0) return null;
+
+  return Math.max(...validOdds);
+}
+
+function getValueDecision(scoredRunner: any) {
+  const placeOdds = getRunnerBestPlaceOdds(scoredRunner);
+
+  if (!placeOdds) {
+    return {
+      decision: "WATCH",
+      placeOdds: null,
+      valueScore: scoredRunner.score - 5,
+      valueReason: "No live place odds available yet",
+    };
   }
+
+  if (placeOdds < 1.3) {
+    return {
+      decision: "LOW VALUE",
+      placeOdds,
+      valueScore: scoredRunner.score - 25,
+      valueReason: "Place odds are too short for value",
+    };
+  }
+
+  if (scoredRunner.confidence === "LOW") {
+    return {
+      decision: "AVOID",
+      placeOdds,
+      valueScore: scoredRunner.score - 30,
+      valueReason: "Low AI confidence",
+    };
+  }
+
+  if (scoredRunner.confidence === "HIGH" && placeOdds >= 1.3) {
+    return {
+      decision: "BET",
+      placeOdds,
+      valueScore: scoredRunner.score + 10,
+      valueReason: "Strong AI rating with acceptable place odds",
+    };
+  }
+
+  if (scoredRunner.confidence === "MEDIUM" && placeOdds >= 1.5) {
+    return {
+      decision: "BET",
+      placeOdds,
+      valueScore: scoredRunner.score + 5,
+      valueReason: "Reasonable AI rating with fair place odds",
+    };
+  }
+
+  return {
+    decision: "WATCH",
+    placeOdds,
+    valueScore: scoredRunner.score,
+    valueReason: "Acceptable runner but not a clear value bet",
+  };
+}
+
+function getBestRunner(race: any) {
+  if (!race.runners || race.runners.length === 0) return null;
+
+  const scoredRunners = race.runners
+    .filter((runner: any) => countStarts(runner) >= 3)
+    .filter((runner: any) => !runner.scratched)
+    .map((runner: any) => {
+      const scoredRunner = scoreRunner(runner);
+      const valueDecision = getValueDecision(scoredRunner);
+
+      return {
+        ...scoredRunner,
+        decision: valueDecision.decision,
+        placeOdds: valueDecision.placeOdds,
+        valueScore: valueDecision.valueScore,
+        valueReason: valueDecision.valueReason,
+      };
+    })
+    .sort((a: any, b: any) => b.valueScore - a.valueScore);
+
+  const betRunner = scoredRunners.find((runner: any) => runner.decision === "BET");
+  const watchRunner = scoredRunners.find((runner: any) => runner.decision === "WATCH");
+
+  return betRunner || watchRunner || scoredRunners[0] || null;
+}
 
   function getScoredRunners(race: any) {
     if (!race?.runners || race.runners.length === 0) return [];
