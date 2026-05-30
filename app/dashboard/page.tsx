@@ -264,6 +264,22 @@ if (lastRun >= 8 || runner.scratched) {
   betStatus = "WATCH";
 }
 
+// AI LOGIC:
+// Horses with fewer than 3 starts can still appear in the full race table,
+// but they must never be HIGH confidence or official BET selections.
+// Best possible label for under-3-start runners is MEDIUM · WATCH.
+if (starts < 3) {
+  score = Math.min(score, 69);
+
+  if (confidence === "HIGH") {
+    confidence = "MEDIUM";
+  }
+
+  if (betStatus === "BET") {
+    betStatus = "WATCH";
+  }
+}
+
 const scoredRunner = {
   ...runner,
   score: Math.round(score),
@@ -311,6 +327,18 @@ const scoredRunner = {
 
 function getValueDecision(scoredRunner: any) {
   const placeOdds = getRunnerBestPlaceOdds(scoredRunner);
+    const runnerStarts = countStarts(scoredRunner);
+
+  // AI LOGIC SAFETY RULE:
+  // Under-3-start runners can be displayed, but cannot become official BET selections.
+  if (runnerStarts < 3) {
+    return {
+      decision: "WATCH",
+      placeOdds,
+      valueScore: Math.min(scoredRunner.score || 0, 69),
+      valueReason: "Watch only - fewer than 3 career starts",
+    };
+  }
 
   if (!placeOdds) {
     return {
