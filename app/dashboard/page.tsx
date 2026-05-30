@@ -117,36 +117,39 @@ export default function Dashboard() {
     const starts = Number(runner.starts || 0);
     const placePercent = Number(runner.displayPlacePercent || 0);
     const score = Number(runner.score || 0);
-    const betStatus = String(runner.betStatus || "");
-    const horsePlacePercent = Number(runner.placePercentage || runner.placePercent || runner.place_rate || 0);
+    const betStatus = String(runner.decision || runner.betStatus || "");
+    const horsePlacePercent = Number(
+      runner.placePercentage || runner.placePercent || runner.place_rate || 0
+    );
+
     const lastRun = Number(
-  String(runner.form || "")
-    .replace(/[^0-9]/g, "")
-    .slice(0, 1)
-);
+      String(runner.form || "")
+        .replace(/[^0-9]/g, "")
+        .slice(0, 1)
+    );
 
     if (placePercent >= 55) reasons.push("Strong overall place record");
     else if (placePercent >= 40) reasons.push("Solid overall place record");
 
-    const hasRecentPlace =
-  String(runner.form || "")
-    .replace(/[^0-9]/g, "")
-    .slice(0, 4)
-    .split("")
-    .some((n) => ["1", "2", "3"].includes(n));
+    const hasRecentPlace = String(runner.form || "")
+      .replace(/[^0-9]/g, "")
+      .slice(0, 4)
+      .split("")
+      .some((n) => ["1", "2", "3"].includes(n));
 
-if (runner.recentFormScore >= 65 && hasRecentPlace) {
-  reasons.push("Strong recent form");
-} else if (runner.recentFormScore >= 45 && hasRecentPlace) {
-  reasons.push("Recent form support");
-} else if (!hasRecentPlace) {
-  reasons.push("No recent placing support");
-} else {
-  reasons.push("Recent form concern");
-}
+    if (runner.recentFormScore >= 65 && hasRecentPlace) {
+      reasons.push("Strong recent form");
+    } else if (runner.recentFormScore >= 45 && hasRecentPlace) {
+      reasons.push("Recent form support");
+    } else if (!hasRecentPlace) {
+      reasons.push("No recent placing support");
+    } else {
+      reasons.push("Recent form concern");
+    }
 
     if (starts >= 10) reasons.push("Experienced runner");
     else if (starts >= 3) reasons.push("Meets minimum race experience");
+    else if (starts > 0) reasons.push("Limited race experience");
 
     if (runner.draw && Number(runner.draw) > 0 && Number(runner.draw) <= 6) {
       reasons.push("Favourable barrier");
@@ -165,23 +168,30 @@ if (runner.recentFormScore >= 65 && hasRecentPlace) {
     if (score >= 70) reasons.push("High PlaceDash score");
     else if (score >= 50) reasons.push("Medium PlaceDash score");
 
-    if (reasons.length === 0) reasons.push("Limited data available");
-if (betStatus === "BET") {
-  reasons.unshift("Bet-qualified profile");
-} else if (betStatus === "WATCH") {
-  reasons.unshift("Watch only - not strong enough for official bet");
-} else if (betStatus === "AVOID") {
-  reasons.unshift("Avoid profile");
-}
     if (horsePlacePercent > 0 && horsePlacePercent < 40) {
-  reasons.push("Low overall place strike rate");
-}
+      reasons.push("Low overall place strike rate");
+    }
+
     if (lastRun >= 8) {
-  reasons.push("Last start concern");
-}
+      reasons.push("Last start concern");
+    }
+
+    if (betStatus === "BET") {
+      reasons.unshift("Bet-qualified profile");
+    } else if (betStatus === "WATCH") {
+      reasons.unshift("Watch only - not strong enough for official bet");
+    } else if (betStatus === "LOW VALUE") {
+      reasons.unshift("Low value at current place odds");
+    } else if (betStatus === "AVOID") {
+      reasons.unshift("Avoid profile");
+    }
+
+    if (reasons.length === 0) reasons.push("Limited data available");
+
     return Array.from(new Set(reasons)).slice(0, 5);
   }
-    function scoreRunner(runner: any) {
+
+  function scoreRunner(runner: any) {
     const starts = countStarts(runner);
     const wins = Number(runner.wins || 0);
     const places = Number(runner.places || 0);
@@ -226,65 +236,65 @@ if (betStatus === "BET") {
     score = Math.min(100, Math.max(0, score));
 
     let confidence = "LOW";
-if (score >= 70) confidence = "HIGH";
-else if (score >= 55) confidence = "MEDIUM";
+    if (score >= 70) confidence = "HIGH";
+    else if (score >= 55) confidence = "MEDIUM";
 
-let betStatus = "AVOID";
+    let betStatus = "AVOID";
 
-const hasRecentPlace =
-  String(runner.form || "")
-    .replace(/[^0-9]/g, "")
-    .slice(0, 4)
-    .split("")
-    .some((n) => ["1", "2", "3"].includes(n));
+    const hasRecentPlace = String(runner.form || "")
+      .replace(/[^0-9]/g, "")
+      .slice(0, 4)
+      .split("")
+      .some((n) => ["1", "2", "3"].includes(n));
 
-const hasRecentBadRun =
-  String(runner.form || "")
-    .replace(/[^0-9]/g, "")
-    .slice(0, 3)
-    .split("")
-    .some((n) => Number(n) >= 8);
+    const hasRecentBadRun = String(runner.form || "")
+      .replace(/[^0-9]/g, "")
+      .slice(0, 3)
+      .split("")
+      .some((n) => Number(n) >= 8);
 
-const lastRun = Number(
-  String(runner.form || "")
-    .replace(/[^0-9]/g, "")
-    .slice(0, 1)
-);
-const lowPlaceRecord = horsePlacePercent < 40;
-if (lastRun >= 8 || runner.scratched) {
-  betStatus = "AVOID";
-} else if (
-  score >= 62 &&
-  horsePlacePercent >= 40 &&
-  hasRecentPlace &&
-  !hasRecentBadRun
-) {
-  betStatus = "BET";
-} else if (score >= 55 && !lowPlaceRecord && hasRecentPlace) {
-  betStatus = "WATCH";
-}
+    const lastRun = Number(
+      String(runner.form || "")
+        .replace(/[^0-9]/g, "")
+        .slice(0, 1)
+    );
 
-// AI LOGIC:
-// Horses with fewer than 3 starts can still appear in the full race table,
-// but they must never be HIGH confidence or official BET selections.
-// Best possible label for under-3-start runners is MEDIUM · WATCH.
-if (starts < 3) {
-  score = Math.min(score, 69);
+    const lowPlaceRecord = horsePlacePercent < 40;
 
-  if (confidence === "HIGH") {
-    confidence = "MEDIUM";
-  }
+    if (lastRun >= 8 || runner.scratched) {
+      betStatus = "AVOID";
+    } else if (
+      score >= 62 &&
+      horsePlacePercent >= 40 &&
+      hasRecentPlace &&
+      !hasRecentBadRun
+    ) {
+      betStatus = "BET";
+    } else if (score >= 55 && !lowPlaceRecord && hasRecentPlace) {
+      betStatus = "WATCH";
+    }
 
-  if (betStatus === "BET") {
-    betStatus = "WATCH";
-  }
-}
+    // AI LOGIC:
+    // Horses with fewer than 3 starts can still appear in the full race table,
+    // but they must never be HIGH confidence or official BET selections.
+    // Best possible label for under-3-start runners is MEDIUM · WATCH.
+    if (starts < 3) {
+      score = Math.min(score, 69);
 
-const scoredRunner = {
-  ...runner,
-  score: Math.round(score),
-  confidence,
-  betStatus,
+      if (confidence === "HIGH") {
+        confidence = "MEDIUM";
+      }
+
+      if (betStatus === "BET") {
+        betStatus = "WATCH";
+      }
+    }
+
+    const scoredRunner = {
+      ...runner,
+      score: Math.round(score),
+      confidence,
+      betStatus,
       starts,
       recentFormScore: recentForm,
       displayPlacePercent: Math.round(horsePlacePercent),
@@ -296,286 +306,320 @@ const scoredRunner = {
       ...scoredRunner,
       reasoning: getRunnerReasoning(scoredRunner),
     };
-  };
+  }
 
   function getRunnerBestPlaceOdds(runner: any) {
-  const possiblePlaceOdds = [
-    runner?.sportsbetPlaceOdds,
-    runner?.sportsbet_place_odds,
-    runner?.sportsbet_place,
-    runner?.sbPlaceOdds,
-    runner?.sb_place_odds,
-    runner?.ladbrokesPlaceOdds,
-    runner?.ladbrokes_place_odds,
-    runner?.ladbrokes_place,
-    runner?.lbPlaceOdds,
-    runner?.lb_place_odds,
-    runner?.placeOdds,
-    runner?.place_odds,
-    runner?.place_price,
-    runner?.placePrice,
-  ];
+    const possiblePlaceOdds = [
+      runner?.sportsbetPlaceOdds,
+      runner?.sportsbet_place_odds,
+      runner?.sportsbet_place,
+      runner?.sbPlaceOdds,
+      runner?.sb_place_odds,
+      runner?.ladbrokesPlaceOdds,
+      runner?.ladbrokes_place_odds,
+      runner?.ladbrokes_place,
+      runner?.lbPlaceOdds,
+      runner?.lb_place_odds,
+      runner?.placeOdds,
+      runner?.place_odds,
+      runner?.place_price,
+      runner?.placePrice,
+    ];
 
-  const validOdds = possiblePlaceOdds
-    .map((odd: any) => Number(odd))
-    .filter((odd: number) => !Number.isNaN(odd) && odd > 1);
+    const validOdds = possiblePlaceOdds
+      .map((odd: any) => Number(odd))
+      .filter((odd: number) => !Number.isNaN(odd) && odd > 1);
 
-  if (validOdds.length === 0) return null;
+    if (validOdds.length === 0) return null;
 
-  return Math.max(...validOdds);
-}
+    return Math.max(...validOdds);
+  }
 
-function getValueDecision(scoredRunner: any) {
-  const placeOdds = getRunnerBestPlaceOdds(scoredRunner);
+  function getValueDecision(scoredRunner: any) {
+    const placeOdds = getRunnerBestPlaceOdds(scoredRunner);
     const runnerStarts = countStarts(scoredRunner);
 
-  // AI LOGIC SAFETY RULE:
-  // Under-3-start runners can be displayed, but cannot become official BET selections.
-  if (runnerStarts < 3) {
-    return {
-      decision: "WATCH",
-      placeOdds,
-      valueScore: Math.min(scoredRunner.score || 0, 69),
-      valueReason: "Watch only - fewer than 3 career starts",
-    };
-  }
-
-  if (!placeOdds) {
-    return {
-      decision: "WATCH",
-      placeOdds: null,
-      valueScore: scoredRunner.score - 5,
-      valueReason: "No live place odds available yet",
-    };
-  }
-
-  if (placeOdds < 1.3) {
-    return {
-      decision: "LOW VALUE",
-      placeOdds,
-      valueScore: scoredRunner.score - 25,
-      valueReason: "Place odds are too short for value",
-    };
-  }
-
-  if (scoredRunner.confidence === "LOW") {
-    return {
-      decision: "AVOID",
-      placeOdds,
-      valueScore: scoredRunner.score - 30,
-      valueReason: "Low AI confidence",
-    };
-  }
-
-  if (scoredRunner.confidence === "HIGH" && placeOdds >= 1.3) {
-    return {
-      decision: "BET",
-      placeOdds,
-      valueScore: scoredRunner.score + 10,
-      valueReason: "Strong AI rating with acceptable place odds",
-    };
-  }
-
-  if (scoredRunner.confidence === "MEDIUM" && placeOdds >= 1.5) {
-    return {
-      decision: "BET",
-      placeOdds,
-      valueScore: scoredRunner.score + 5,
-      valueReason: "Reasonable AI rating with fair place odds",
-    };
-  }
-
-  return {
-    decision: "WATCH",
-    placeOdds,
-    valueScore: scoredRunner.score,
-    valueReason: "Acceptable runner but not a clear value bet",
-  };
-}
-
-function getBestRunner(race: any) {
-  if (!race.runners || race.runners.length === 0) return null;
-
-  const scoredRunners = race.runners
-    .filter((runner: any) => countStarts(runner) >= 3)
-    .filter((runner: any) => !runner.scratched)
-    .map((runner: any) => {
-      const scoredRunner = scoreRunner(runner);
-      const valueDecision = getValueDecision(scoredRunner);
-
+    // AI LOGIC SAFETY RULE:
+    // Under-3-start runners can be displayed, but cannot become official BET selections.
+    if (runnerStarts < 3) {
       return {
-        ...scoredRunner,
-        decision: valueDecision.decision,
-        placeOdds: valueDecision.placeOdds,
-        valueScore: valueDecision.valueScore,
-        valueReason: valueDecision.valueReason,
+        decision: "WATCH",
+        placeOdds,
+        valueScore: Math.min(scoredRunner.score || 0, 69),
+        valueReason: "Watch only - fewer than 3 career starts",
       };
-    })
-    .sort((a: any, b: any) => b.valueScore - a.valueScore);
+    }
 
-  const betRunner = scoredRunners.find((runner: any) => runner.decision === "BET");
-  const watchRunner = scoredRunners.find((runner: any) => runner.decision === "WATCH");
+    if (!placeOdds) {
+      return {
+        decision: "WATCH",
+        placeOdds: null,
+        valueScore: scoredRunner.score - 5,
+        valueReason: "No live place odds available yet",
+      };
+    }
 
-  return betRunner || watchRunner || scoredRunners[0] || null;
-}
+    if (placeOdds < 1.3) {
+      return {
+        decision: "LOW VALUE",
+        placeOdds,
+        valueScore: scoredRunner.score - 25,
+        valueReason: "Place odds are too short for value",
+      };
+    }
 
-  const racesWithOdds = rawRaces.map((race: any) => {
-  const raceNumber = race.race_number || race.raceNumber;
+    if (scoredRunner.confidence === "LOW") {
+      return {
+        decision: "AVOID",
+        placeOdds,
+        valueScore: scoredRunner.score - 30,
+        valueReason: "Low AI confidence",
+      };
+    }
 
-  const runnersWithOdds = (race.runners || []).map((runner: any) => {
-    const runnerNumber = runner.number || runner.runner_number || runner.tabNo;
-
-    const directOdds = mappedOdds[`${race.course}-${raceNumber}-${runnerNumber}`];
-
-    const fallbackOdds = Object.entries(mappedOdds).find(([key, value]: any) => {
-      const lowerKey = key.toLowerCase();
-      const lowerCourse = String(race.course || "").toLowerCase();
-
-      const courseMatch =
-        lowerKey.includes(lowerCourse) ||
-        lowerCourse.includes(String(value?.course || "").toLowerCase());
-
-      const stateMatch =
-        value?.state &&
-        race.state &&
-        String(value.state).toLowerCase() === String(race.state).toLowerCase();
-
-      const raceMatch = Number(value?.race_number) === Number(raceNumber);
-      const runnerMatch = Number(value?.runner_number) === Number(runnerNumber);
-
-      return (courseMatch || stateMatch) && raceMatch && runnerMatch;
-    })?.[1] as any;
-
-    const odds = directOdds || fallbackOdds || {};
+    if (scoredRunner.confidence === "HIGH" && placeOdds >= 1.3) {
+      return {
+        decision: "BET",
+        placeOdds,
+        valueScore: scoredRunner.score + 10,
+        valueReason: "Strong AI rating with acceptable place odds",
+      };
+    }
 
     return {
-      ...runner,
-      sportsbet_place: odds.sportsbet_place ?? runner.sportsbet_place,
-      sportsbet_win: odds.sportsbet_win ?? runner.sportsbet_win,
-      ladbrokes_place: odds.ladbrokes_place ?? runner.ladbrokes_place,
-      ladbrokes_win: odds.ladbrokes_win ?? runner.ladbrokes_win,
+      decision: "WATCH",
+      placeOdds,
+      valueScore: scoredRunner.score,
+      valueReason: "Acceptable runner but not a clear value bet",
     };
-  });
+  }
 
-  return {
-    ...race,
-    runners: runnersWithOdds,
-  };
-});
+  function applyValueDecision(runner: any) {
+    const scoredRunner = scoreRunner(runner);
 
-const officialBetRaces = racesWithOdds.filter((race: any) => {
-  const topPick = getBestRunner(race);
-  return topPick?.decision === "BET";
-});
+    // Keep original runner odds attached so value logic can see live SB/LB place prices.
+    const runnerWithOdds = {
+      ...runner,
+      ...scoredRunner,
+    };
 
-setRaces(officialBetRaces);
-  async function loadRaces() {
-    try {
-      const res = await fetch("/api/formfav");
-      const data = await res.json();
+    const valueDecision = getValueDecision(runnerWithOdds);
 
-      const officialBetRaces = (data.racecards || []).filter((race: any) => {
-  const topPick = getBestRunner(race);
-  return topPick?.decision === "BET";
-});
+    const valuedRunner = {
+      ...runnerWithOdds,
+      decision: valueDecision.decision,
+      betStatus: valueDecision.decision,
+      placeOdds: valueDecision.placeOdds,
+      valueScore: valueDecision.valueScore,
+      valueReason: valueDecision.valueReason,
+    };
 
-setRaces(officialBetRaces);
+    return {
+      ...valuedRunner,
+      reasoning: Array.from(
+        new Set([
+          valueDecision.valueReason,
+          ...getRunnerReasoning(valuedRunner),
+        ])
+      )
+        .filter(Boolean)
+        .slice(0, 5),
+    };
+  }
 
-      if (data.racecards?.length) {
-        for (const race of data.racecards) {
-          const topPick = getBestRunner(race);
+  function getBestRunner(race: any) {
+    if (!race.runners || race.runners.length === 0) return null;
 
-if (!topPick) continue;
+    const scoredRunners = race.runners
+      .filter((runner: any) => countStarts(runner) >= 3)
+      .filter((runner: any) => !runner.scratched)
+      .map((runner: any) => applyValueDecision(runner))
+      .sort((a: any, b: any) => b.valueScore - a.valueScore);
 
-// AI LOGIC:
-// Only official BET selections should be saved to Track Record.
-// WATCH / LOW VALUE / AVOID are shown on the Dashboard, but are not counted as official bets.
-if (topPick.decision !== "BET") continue;
+    const betRunner = scoredRunners.find(
+      (runner: any) => runner.decision === "BET"
+    );
+    const watchRunner = scoredRunners.find(
+      (runner: any) => runner.decision === "WATCH"
+    );
 
-          try {
-            await fetch("/api/saved-picks", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-  race_date: new Date().toLocaleDateString("en-CA", {
-    timeZone: "Australia/Melbourne",
-  }),
-  course: race.course,
-  race_number: race.race_number || race.raceNumber,
-  race_time: race.off_time || race.raceTime,
-  horse_number: topPick.number,
-  horse_name: topPick.horse || topPick.name,
-  confidence: topPick.confidence,
-  ai_score: topPick.score,
-  reasoning: Array.isArray(topPick.reasoning)
-    ? topPick.reasoning.join(", ")
-    : String(topPick.reasoning || ""),
-  distance: race.distance,
-  condition: race.condition,
-  runner_count: race.runners?.length || 0,
-  state: race.state,
-}),
-            });
-          } catch (err) {
-            console.error("Failed saving pick", err);
-          }
-        }
-      }
+    return betRunner || watchRunner || scoredRunners[0] || null;
+  }
 
-      // Racing API Odds
+  function getScoredRunners(race: any) {
+    if (!race?.runners || race.runners.length === 0) return [];
+
+    // Full race table must show every runner.
+    // AI Logic still prevents under-3-start runners from becoming official BET selections.
+    return race.runners
+      .map((runner: any) => applyValueDecision(runner))
+      .sort((a: any, b: any) => b.valueScore - a.valueScore);
+  }
+
+  useEffect(() => {
+    async function loadRaces() {
       try {
-        const oddsRes = await fetch("/api/racing-api-odds");
-        const oddsData = await oddsRes.json();
+        const res = await fetch("/api/formfav");
+        const data = await res.json();
 
-        if (oddsData?.oddsView) {
-          const mappedOdds: any = {};
+        const rawRaces = data.racecards || [];
+        let mappedOdds: any = {};
 
-          oddsData.oddsView.forEach((race: any) => {
-            race.runners.forEach((runner: any) => {
-              mappedOdds[
-  `${race.course}-${race.race_number}-${runner.number}`
-] = {
-  course: race.course,
-  state: race.state || null,
-  race_number: race.race_number,
-  runner_number: runner.number,
-  sportsbet_place: runner.sportsbet_place,
-  sportsbet_win: runner.sportsbet_win,
-  ladbrokes_place: runner.ladbrokes_place,
-  ladbrokes_win: runner.ladbrokes_win,
-};
+        // Racing API Odds
+        try {
+          const oddsRes = await fetch("/api/racing-api-odds");
+          const oddsData = await oddsRes.json();
+
+          if (oddsData?.oddsView) {
+            oddsData.oddsView.forEach((race: any) => {
+              race.runners.forEach((runner: any) => {
+                mappedOdds[
+                  `${race.course}-${race.race_number}-${runner.number}`
+                ] = {
+                  course: race.course,
+                  state: race.state || null,
+                  race_number: race.race_number,
+                  runner_number: runner.number,
+                  sportsbet_place: runner.sportsbet_place,
+                  sportsbet_win: runner.sportsbet_win,
+                  ladbrokes_place: runner.ladbrokes_place,
+                  ladbrokes_win: runner.ladbrokes_win,
+                };
+              });
             });
+
+            setLiveOdds(mappedOdds);
+          }
+        } catch (err) {
+          console.error("Failed loading Racing API odds", err);
+        }
+
+        const racesWithOdds = rawRaces.map((race: any) => {
+          const raceNumber = race.race_number || race.raceNumber;
+
+          const runnersWithOdds = (race.runners || []).map((runner: any) => {
+            const runnerNumber =
+              runner.number || runner.runner_number || runner.tabNo;
+
+            const directOdds =
+              mappedOdds[`${race.course}-${raceNumber}-${runnerNumber}`];
+
+            const fallbackOdds = Object.entries(mappedOdds).find(
+              ([key, value]: any) => {
+                const lowerKey = key.toLowerCase();
+                const lowerCourse = String(race.course || "").toLowerCase();
+
+                const courseMatch =
+                  lowerKey.includes(lowerCourse) ||
+                  lowerCourse.includes(
+                    String(value?.course || "").toLowerCase()
+                  );
+
+                const stateMatch =
+                  value?.state &&
+                  race.state &&
+                  String(value.state).toLowerCase() ===
+                    String(race.state).toLowerCase();
+
+                const raceMatch =
+                  Number(value?.race_number) === Number(raceNumber);
+
+                const runnerMatch =
+                  Number(value?.runner_number) === Number(runnerNumber);
+
+                return (courseMatch || stateMatch) && raceMatch && runnerMatch;
+              }
+            )?.[1] as any;
+
+            const odds = directOdds || fallbackOdds || {};
+
+            return {
+              ...runner,
+              sportsbet_place: odds.sportsbet_place ?? runner.sportsbet_place,
+              sportsbet_win: odds.sportsbet_win ?? runner.sportsbet_win,
+              ladbrokes_place: odds.ladbrokes_place ?? runner.ladbrokes_place,
+              ladbrokes_win: odds.ladbrokes_win ?? runner.ladbrokes_win,
+            };
           });
 
-          setLiveOdds(mappedOdds);
+          return {
+            ...race,
+            runners: runnersWithOdds,
+          };
+        });
+
+        const officialBetRaces = racesWithOdds.filter((race: any) => {
+          const topPick = getBestRunner(race);
+          return topPick?.decision === "BET";
+        });
+
+        setRaces(officialBetRaces);
+
+        if (officialBetRaces.length) {
+          for (const race of officialBetRaces) {
+            const topPick = getBestRunner(race);
+
+            if (!topPick) continue;
+
+            // AI LOGIC:
+            // Only official BET selections should be saved to Track Record.
+            // WATCH / LOW VALUE / AVOID are shown on the Dashboard, but are not counted as official bets.
+            if (topPick.decision !== "BET") continue;
+
+            try {
+              await fetch("/api/saved-picks", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  race_date: new Date().toLocaleDateString("en-CA", {
+                    timeZone: "Australia/Melbourne",
+                  }),
+                  course: race.course,
+                  race_number: race.race_number || race.raceNumber,
+                  race_time: race.off_time || race.raceTime,
+                  horse_number: topPick.number,
+                  horse_name: topPick.horse || topPick.name,
+                  confidence: topPick.confidence,
+                  ai_score: topPick.score,
+                  reasoning: Array.isArray(topPick.reasoning)
+                    ? topPick.reasoning.join(", ")
+                    : String(topPick.reasoning || ""),
+                  distance: race.distance,
+                  condition: race.condition,
+                  runner_count: race.runners?.length || 0,
+                  state: race.state,
+                }),
+              });
+            } catch (err) {
+              console.error("Failed saving pick", err);
+            }
+          }
         }
       } catch (err) {
-        console.error("Failed loading Racing API odds", err);
+        console.error("Failed loading races", err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-  console.error("Failed loading races", err);
-} finally {
-  setLoading(false);
-}
-  }
+    }
 
-  loadRaces();
-}, []);
+    loadRaces();
+  }, []);
 
   const displayRaces = races
-  .filter((race: any) => {
-    const runnerCount = race.runners?.length || 0;
-    return runnerCount >= 8 && runnerCount <= 11;
-  })
-  .filter((race: any) => {
-    const best = getBestRunner(race);
-    return best && (best.confidence === "HIGH" || best.confidence === "MEDIUM");
-  });
+    .filter((race: any) => {
+      const runnerCount = race.runners?.length || 0;
+      return runnerCount >= 8 && runnerCount <= 11;
+    })
+    .filter((race: any) => {
+      const best = getBestRunner(race);
+      return best?.decision === "BET";
+    });
 
-const selectedBestRunner = selectedRace ? getBestRunner(selectedRace) : null;
-const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
+  const selectedBestRunner = selectedRace ? getBestRunner(selectedRace) : null;
+  const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
+
   return (
     <main
       style={{
@@ -644,16 +688,44 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
             </div>
 
             <nav style={{ display: "flex", gap: "46px" }}>
-              <a href="/" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
+              <a
+                href="/"
+                style={{
+                  color: "#07111f",
+                  fontWeight: 700,
+                  textDecoration: "none",
+                }}
+              >
                 Home
               </a>
-              <a href="/track-record" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
+              <a
+                href="/track-record"
+                style={{
+                  color: "#07111f",
+                  fontWeight: 700,
+                  textDecoration: "none",
+                }}
+              >
                 Track Record
               </a>
-              <a href="/admin-picks" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
-  Admin
-</a>
-              <a href="/#pricing" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>
+              <a
+                href="/admin-picks"
+                style={{
+                  color: "#07111f",
+                  fontWeight: 700,
+                  textDecoration: "none",
+                }}
+              >
+                Admin
+              </a>
+              <a
+                href="/#pricing"
+                style={{
+                  color: "#07111f",
+                  fontWeight: 700,
+                  textDecoration: "none",
+                }}
+              >
                 Pricing
               </a>
             </nav>
@@ -676,7 +748,8 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
             </a>
           </div>
         </header>
-              <div style={{ marginBottom: "26px" }}>
+
+        <div style={{ marginBottom: "26px" }}>
           <div
             style={{
               display: "inline-block",
@@ -707,11 +780,29 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
           </h1>
         </div>
 
-        <p style={{ color: "#b7c5d8", fontSize: "17px", marginTop: "-12px", marginBottom: "18px" }}>
+        <p
+          style={{
+            color: "#b7c5d8",
+            fontSize: "17px",
+            marginTop: "-12px",
+            marginBottom: "18px",
+          }}
+        >
           AI-powered place selections for Australian racing.
         </p>
 
-        <div style={{ display: "inline-block", marginTop: "10px", padding: "6px 10px", borderRadius: "999px", background: "rgba(34,197,94,0.12)", color: "#22c55e", fontSize: "12px", fontWeight: "600" }}>
+        <div
+          style={{
+            display: "inline-block",
+            marginTop: "10px",
+            padding: "6px 10px",
+            borderRadius: "999px",
+            background: "rgba(34,197,94,0.12)",
+            color: "#22c55e",
+            fontSize: "12px",
+            fontWeight: "600",
+          }}
+        >
           Last Updated: {new Date().toLocaleString("en-AU")}
         </div>
 
@@ -719,37 +810,75 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
           Race times are shown in the local track timezone.
         </p>
         <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "4px" }}>
-  SB = Sportsbet odds · LB = Ladbrokes odds. Odds are live bookmaker prices and may change before race start.
-</p>
-        <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "4px", lineHeight: 1.5 }}>
-  Gamble responsibly. PlaceDash provides racing analysis and information only — it is not betting advice and does not guarantee results. If gambling is becoming a problem, contact Gambling Help Online on 1800 858 858 or visit BetStop for self-exclusion support.
-</p>
+          SB = Sportsbet odds · LB = Ladbrokes odds. Odds are live bookmaker
+          prices and may change before race start.
+        </p>
+        <p
+          style={{
+            color: "#94a3b8",
+            fontSize: "12px",
+            marginTop: "4px",
+            lineHeight: 1.5,
+          }}
+        >
+          Gamble responsibly. PlaceDash provides racing analysis and information
+          only — it is not betting advice and does not guarantee results. If
+          gambling is becoming a problem, contact Gambling Help Online on 1800
+          858 858 or visit BetStop for self-exclusion support.
+        </p>
 
-        <div style={{ marginTop: "28px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "28px" }}>
+        <div
+          style={{
+            marginTop: "28px",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: "28px",
+          }}
+        >
           {loading && (
-            <div style={{ padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px", color: "#94a3b8" }}>
+            <div
+              style={{
+                padding: "20px",
+                border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: "16px",
+                color: "#94a3b8",
+              }}
+            >
               Loading today’s race cards...
             </div>
           )}
 
           {!loading && displayRaces.length === 0 && (
-            <div style={{ padding: "26px", background: "rgba(15,23,42,0.58)", border: "1px solid rgba(255,255,255,0.16)", borderRadius: "22px", boxShadow: "0 18px 45px rgba(0,0,0,0.28)", backdropFilter: "blur(14px)", color: "#b7c5d8" }}>
+            <div
+              style={{
+                padding: "26px",
+                background: "rgba(15,23,42,0.58)",
+                border: "1px solid rgba(255,255,255,0.16)",
+                borderRadius: "22px",
+                boxShadow: "0 18px 45px rgba(0,0,0,0.28)",
+                backdropFilter: "blur(14px)",
+                color: "#b7c5d8",
+              }}
+            >
               <strong style={{ color: "#ffffff", fontSize: "18px" }}>
-                No qualifying races found right now.
+                No official BET races found right now.
               </strong>
               <p style={{ marginTop: "10px", lineHeight: 1.6 }}>
-                PlaceDash only shows Australian races with 8–11 active runners, no first starters, and races that have not already started.
+                PlaceDash is currently only showing races with a value-qualified
+                BET selection.
               </p>
               <p style={{ marginTop: "10px", color: "#94a3b8", lineHeight: 1.6 }}>
-                Live qualifying races will appear automatically when available.
+                WATCH, LOW VALUE, and AVOID races are not saved as official
+                Track Record selections.
               </p>
             </div>
           )}
 
           {displayRaces.map((race: any, index: number) => {
-            const isFreePick = index === 0;
             const bestRunner = getBestRunner(race);
-            const visibleHorse = `${bestRunner?.number ? bestRunner.number + ". " : ""}${bestRunner?.horse || "No selection"}`;
+            const visibleHorse = `${bestRunner?.number ? bestRunner.number + ". " : ""}${
+              bestRunner?.horse || "No selection"
+            }`;
 
             return (
               <div
@@ -773,199 +902,267 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
                 </h3>
 
                 <p style={{ color: "#94a3b8" }}>
-                  {race.off_time} {race.timezone_label || ""} • {race.runners?.length || 0} runners
+                  {race.off_time} {race.timezone_label || ""} •{" "}
+                  {race.runners?.length || 0} runners
                 </p>
 
                 <p style={{ marginTop: "10px" }}>
-  Selection: <strong>{visibleHorse}</strong>
-</p>
+                  Selection: <strong>{visibleHorse}</strong>
+                </p>
+
                 {bestRunner && (() => {
-  const raceNumber = race.race_number || race.raceNumber;
-  const runnerNumber = bestRunner.number;
+                  const raceNumber = race.race_number || race.raceNumber;
+                  const runnerNumber = bestRunner.number;
 
-  const directOdds =
-    liveOdds[`${race.course}-${raceNumber}-${runnerNumber}`];
+                  const directOdds =
+                    liveOdds[`${race.course}-${raceNumber}-${runnerNumber}`];
 
-  const fallbackOdds = Object.entries(liveOdds).find(([key, value]: any) => {
-  const lowerKey = key.toLowerCase();
-  const lowerCourse = String(race.course || "").toLowerCase();
+                  const fallbackOdds = Object.entries(liveOdds).find(
+                    ([key, value]: any) => {
+                      const lowerKey = key.toLowerCase();
+                      const lowerCourse = String(race.course || "").toLowerCase();
 
-  const courseMatch =
-    lowerKey.includes(lowerCourse) ||
-    lowerCourse.includes(String(value?.course || "").toLowerCase());
+                      const courseMatch =
+                        lowerKey.includes(lowerCourse) ||
+                        lowerCourse.includes(
+                          String(value?.course || "").toLowerCase()
+                        );
 
-  const stateMatch =
-    value?.state &&
-    race.state &&
-    String(value.state).toLowerCase() === String(race.state).toLowerCase();
+                      const stateMatch =
+                        value?.state &&
+                        race.state &&
+                        String(value.state).toLowerCase() ===
+                          String(race.state).toLowerCase();
 
-  const raceMatch = Number(value?.race_number) === Number(raceNumber);
-  const runnerMatch = Number(value?.runner_number) === Number(runnerNumber);
+                      const raceMatch =
+                        Number(value?.race_number) === Number(raceNumber);
+                      const runnerMatch =
+                        Number(value?.runner_number) === Number(runnerNumber);
 
-  return (courseMatch || stateMatch) && raceMatch && runnerMatch;
-})?.[1] as any;
+                      return (courseMatch || stateMatch) && raceMatch && runnerMatch;
+                    }
+                  )?.[1] as any;
 
-  const odds = directOdds || fallbackOdds;
+                  const odds = directOdds || fallbackOdds;
 
-  if (!odds) return null;
+                  if (!odds) return null;
 
-  return (
-    <div
-      style={{
-        marginTop: "10px",
-        padding: "10px",
-        borderRadius: "10px",
-        background: "rgba(34,197,94,0.08)",
-        border: "1px solid rgba(34,197,94,0.2)",
-        fontSize: "13px",
-      }}
-    >
-      <div style={{ color: "#22c55e", fontWeight: 800 }}>
-        SB Place: ${odds.sportsbet_place || "-"} · LB Place: $
-        {odds.ladbrokes_place || "-"}
-      </div>
+                  return (
+                    <div
+                      style={{
+                        marginTop: "10px",
+                        padding: "10px",
+                        borderRadius: "10px",
+                        background: "rgba(34,197,94,0.08)",
+                        border: "1px solid rgba(34,197,94,0.2)",
+                        fontSize: "13px",
+                      }}
+                    >
+                      <div style={{ color: "#22c55e", fontWeight: 800 }}>
+                        SB Place: ${odds.sportsbet_place || "-"} · LB Place: $
+                        {odds.ladbrokes_place || "-"}
+                      </div>
 
-      <div style={{ marginTop: "4px", color: "#94a3b8", fontSize: "12px" }}>
-        SB Win: ${odds.sportsbet_win || "-"} · LB Win: $
-        {odds.ladbrokes_win || "-"}
-      </div>
-    </div>
-  );
-})()}
+                      <div
+                        style={{
+                          marginTop: "4px",
+                          color: "#94a3b8",
+                          fontSize: "12px",
+                        }}
+                      >
+                        SB Win: ${odds.sportsbet_win || "-"} · LB Win: $
+                        {odds.ladbrokes_win || "-"}
+                      </div>
+                    </div>
+                  );
+                })()}
 
-<div style={{ color: "#afacc15", fontSize: "13px", marginTop: "8px", fontWeight: "700" }}>
-  Click to view full race card
-</div>
+                <div
+                  style={{
+                    color: "#afacc15",
+                    fontSize: "13px",
+                    marginTop: "8px",
+                    fontWeight: "700",
+                  }}
+                >
+                  Click to view full race card
+                </div>
 
-{bestRunner?.reasoning && (
-  <div
-    style={{
-      marginTop: "14px",
-      padding: "14px",
-      borderRadius: "15px",
-      background: "rgba(255,255,255,0.05)",
-      border: "1px solid rgba(255,255,255,0.08)",
-      color: "#cbd5e1",
-      fontSize: "13px",
-      lineHeight: "1.6",
-    }}
-  >
-    <strong style={{ color: "#ffffff" }}>AI Reasoning</strong>
+                {bestRunner?.reasoning && (
+                  <div
+                    style={{
+                      marginTop: "14px",
+                      padding: "14px",
+                      borderRadius: "15px",
+                      background: "rgba(255,255,255,0.05)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      color: "#cbd5e1",
+                      fontSize: "13px",
+                      lineHeight: "1.6",
+                    }}
+                  >
+                    <strong style={{ color: "#ffffff" }}>AI Reasoning</strong>
 
-    <ul style={{ margin: "6px 0 0 15px", padding: 0 }}>
-      {bestRunner.reasoning.map((reason: string, reasonIndex: number) => (
-        <li key={reasonIndex}>{reason}</li>
-      ))}
-    </ul>
-  </div>
-)}
+                    <ul style={{ margin: "6px 0 0 15px", padding: 0 }}>
+                      {bestRunner.reasoning.map(
+                        (reason: string, reasonIndex: number) => (
+                          <li key={reasonIndex}>{reason}</li>
+                        )
+                      )}
+                    </ul>
+                  </div>
+                )}
 
-                <div style={{ display: "inline-block", marginTop: "10px", padding: "6px 10px", borderRadius: "8px", fontSize: "12px", fontWeight: "600", background: bestRunner?.confidence === "HIGH" ? "rgba(34,197,94,0.15)" : "rgba(250,204,21,0.15)", color: bestRunner?.confidence === "HIGH" ? "#22c55e" : "#facc15" }}>
-                  {`${bestRunner?.confidence || "LOW"} CONFIDENCE`}
+                <div
+                  style={{
+                    display: "inline-block",
+                    marginTop: "10px",
+                    padding: "6px 10px",
+                    borderRadius: "8px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    background:
+                      bestRunner?.confidence === "HIGH"
+                        ? "rgba(34,197,94,0.15)"
+                        : "rgba(250,204,21,0.15)",
+                    color:
+                      bestRunner?.confidence === "HIGH" ? "#22c55e" : "#facc15",
+                  }}
+                >
+                  {`${bestRunner?.decision || "WATCH"} · ${
+                    bestRunner?.confidence || "LOW"
+                  } CONFIDENCE`}
                 </div>
               </div>
             );
           })}
-</div>
-          
+        </div>
 
         {selectedRace && (
-          <div style={{ marginTop: "40px", padding: "20px", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "16px", background: "rgba(2,8,18,0.72)" }}>
+          <div
+            style={{
+              marginTop: "40px",
+              padding: "20px",
+              border: "1px solid rgba(255,255,255,0.12)",
+              borderRadius: "16px",
+              background: "rgba(2,8,18,0.72)",
+            }}
+          >
             <h2>
               {selectedRace.course} Race {selectedRace.race_number}
               {selectedRace.state ? ` (${selectedRace.state})` : ""}
             </h2>
 
             <p style={{ color: "#94a3b8" }}>
-              {selectedRace.off_time} {selectedRace.timezone_label || ""} · {selectedRace.runners?.length || 0} runners · {selectedRace.distance || "Distance TBA"}
+              {selectedRace.off_time} {selectedRace.timezone_label || ""} ·{" "}
+              {selectedRace.runners?.length || 0} runners ·{" "}
+              {selectedRace.distance || "Distance TBA"}
             </p>
 
-            <button onClick={() => setSelectedRace(null)} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.18)", background: "rgba(255,255,255,0.04)", color: "#ffffff", cursor: "pointer" }}>
+            <button
+              onClick={() => setSelectedRace(null)}
+              style={{
+                padding: "8px 12px",
+                borderRadius: "8px",
+                border: "1px solid rgba(255,255,255,0.18)",
+                background: "rgba(255,255,255,0.04)",
+                color: "#ffffff",
+                cursor: "pointer",
+              }}
+            >
               Close
             </button>
 
-            <div style={{ marginTop: "14px", padding: "12px", borderRadius: "12px", background: "rgba(34,197,94,0.10)", border: "1px solid rgba(34,197,94,0.18)" }}>
-  <strong style={{ color: "#22c55e" }}>Value Selection:</strong>
-  {selectedBestRunner?.number ? ` ${selectedBestRunner.number}. ` : ""}
-  {selectedBestRunner?.horse || "No selection"} · {selectedBestRunner?.decision || "WATCH"} · {selectedBestRunner?.confidence || "LOW"} confidence · Score {selectedBestRunner?.score || 0}
-</div>
+            <div
+              style={{
+                marginTop: "14px",
+                padding: "12px",
+                borderRadius: "12px",
+                background: "rgba(34,197,94,0.10)",
+                border: "1px solid rgba(34,197,94,0.18)",
+              }}
+            >
+              <strong style={{ color: "#22c55e" }}>Value Selection:</strong>
+              {selectedBestRunner?.number ? ` ${selectedBestRunner.number}. ` : ""}
+              {selectedBestRunner?.horse || "No selection"} ·{" "}
+              {selectedBestRunner?.decision || "WATCH"} ·{" "}
+              {selectedBestRunner?.confidence || "LOW"} confidence · Score{" "}
+              {selectedBestRunner?.score || 0}
+            </div>
 
             <div style={{ overflowX: "auto", marginTop: "18px" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  fontSize: "13px",
+                }}
+              >
                 <thead>
                   <tr style={{ color: "#94a3b8", textAlign: "left" }}>
-                  
                     <th style={{ padding: "10px" }}>Rank</th>
-<th style={{ padding: "10px" }}>No.</th>
-<th style={{ padding: "10px" }}>Horse</th>
-<th style={{ padding: "10px" }}>Jockey</th>
-<th style={{ padding: "10px" }}>Trainer</th>
-<th style={{ padding: "10px" }}>Barrier</th>
-<th style={{ padding: "10px" }}>Weight</th>
-<th style={{ padding: "10px" }}>Form</th>
-<th style={{ padding: "10px" }}>Starts</th>
-<th style={{ padding: "10px" }}>Place %</th>
-<th style={{ padding: "10px" }}>AI</th>
-<th style={{ padding: "10px" }}>Reasoning</th>
-                      </tr>
-</thead>
+                    <th style={{ padding: "10px" }}>No.</th>
+                    <th style={{ padding: "10px" }}>Horse</th>
+                    <th style={{ padding: "10px" }}>Jockey</th>
+                    <th style={{ padding: "10px" }}>Trainer</th>
+                    <th style={{ padding: "10px" }}>Barrier</th>
+                    <th style={{ padding: "10px" }}>Weight</th>
+                    <th style={{ padding: "10px" }}>Form</th>
+                    <th style={{ padding: "10px" }}>Starts</th>
+                    <th style={{ padding: "10px" }}>Place %</th>
+                    <th style={{ padding: "10px" }}>AI</th>
+                    <th style={{ padding: "10px" }}>Reasoning</th>
+                  </tr>
+                </thead>
 
-<tbody>
-  {scoredRunners.map((runner: any, index: number) => (
-    <tr key={`${runner.number}-${runner.horse}`} style={{ color: "#cbd5e1" }}>
+                <tbody>
+                  {scoredRunners.map((runner: any, index: number) => (
+                    <tr
+                      key={`${runner.number}-${runner.horse}`}
+                      style={{ color: "#cbd5e1" }}
+                    >
                       <td style={{ padding: "10px" }}>#{index + 1}</td>
                       <td style={{ padding: "10px" }}>{runner.number || "-"}</td>
+                      <td style={{ padding: "10px" }}>{runner.horse}</td>
+                      <td style={{ padding: "10px" }}>{runner.jockey || "-"}</td>
+                      <td style={{ padding: "10px" }}>{runner.trainer || "-"}</td>
+                      <td style={{ padding: "10px" }}>{runner.draw || "-"}</td>
+                      <td style={{ padding: "10px" }}>
+                        {runner.weight || runner.lbs || "-"}
+                      </td>
+                      <td style={{ padding: "10px" }}>{runner.form || "-"}</td>
+                      <td style={{ padding: "10px" }}>{runner.starts || "-"}</td>
+                      <td style={{ padding: "10px" }}>
+                        {runner.displayPlacePercent || 0}%
+                      </td>
 
-<td style={{ padding: "10px" }}>
-  {runner.horse}
-</td>
+                      <td
+                        style={{
+                          padding: "10px",
+                          color:
+                            runner.decision === "BET"
+                              ? "#22c55e"
+                              : runner.decision === "WATCH"
+                              ? "#facc15"
+                              : runner.decision === "LOW VALUE"
+                              ? "#fb923c"
+                              : "#ef4444",
+                          fontWeight: 800,
+                        }}
+                      >
+                        {runner.confidence} · {runner.decision} · {runner.score}
+                      </td>
 
-<td style={{ padding: "10px" }}>
-  {runner.jockey || "-"}
-</td>
-
-<td style={{ padding: "10px" }}>
-  {runner.trainer || "-"}
-</td>
-
-<td style={{ padding: "10px" }}>
-  {runner.draw || "-"}
-</td>
-
-<td style={{ padding: "10px" }}>
-  {runner.weight || runner.lbs || "-"}
-</td>
-
-<td style={{ padding: "10px" }}>
-  {runner.form || "-"}
-</td>
-
-<td style={{ padding: "10px" }}>
-  {runner.starts || "-"}
-</td>
-
-<td style={{ padding: "10px" }}>
-  {runner.displayPlacePercent || 0}%
-</td>
-
-<td
-  style={{
-    padding: "10px",
-    color:
-  runner.betStatus === "BET"
-    ? "#22c55e"
-    : runner.betStatus === "WATCH"
-    ? "#facc15"
-    : "#ef4444",
-    fontWeight: 800,
-  }}
->
-  {runner.confidence} · {runner.betStatus} · {runner.score}
-</td>
-
-<td style={{ padding: "10px", minWidth: "220px", color: "#94a3b8" }}>
-  {runner.betStatus} • {runner.reasoning?.slice(0, 2).join(" • ") || "-"}
-</td>
+                      <td
+                        style={{
+                          padding: "10px",
+                          minWidth: "220px",
+                          color: "#94a3b8",
+                        }}
+                      >
+                        {runner.decision} •{" "}
+                        {runner.reasoning?.slice(0, 2).join(" • ") || "-"}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -974,22 +1171,48 @@ const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
           </div>
         )}
 
-        <div style={{ marginTop: "40px", padding: "20px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px", background: "rgba(2,8,18,0.45)", textAlign: "center" }}>
+        <div
+          style={{
+            marginTop: "40px",
+            padding: "20px",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: "16px",
+            background: "rgba(2,8,18,0.45)",
+            textAlign: "center",
+          }}
+        >
           <h2 style={{ marginBottom: "12px" }}>Track Record</h2>
           <p style={{ color: "#94a3b8", marginBottom: "18px" }}>
-            View historical AI picks, saved races, and future performance tracking.
+            View historical AI picks, saved races, and future performance
+            tracking.
           </p>
-          <a href="/track-record" style={{ display: "inline-block", background: "#22c55e", color: "#07111f", padding: "14px 28px", borderRadius: "12px", fontWeight: 800, textDecoration: "none", boxShadow: "0 10px 25px rgba(34,197,94,0.35)" }}>
+          <a
+            href="/track-record"
+            style={{
+              display: "inline-block",
+              background: "#22c55e",
+              color: "#07111f",
+              padding: "14px 28px",
+              borderRadius: "12px",
+              fontWeight: 800,
+              textDecoration: "none",
+              boxShadow: "0 10px 25px rgba(34,197,94,0.35)",
+            }}
+          >
             View Full Track Record
           </a>
         </div>
 
         <div style={{ marginTop: "40px", fontSize: "12px", color: "#94a3b8" }}>
-          <a href="/privacy" style={{ marginRight: "10px" }}>Privacy Policy</a>
-          <a href="/terms" style={{ marginRight: "10px" }}>Terms</a>
+          <a href="/privacy" style={{ marginRight: "10px" }}>
+            Privacy Policy
+          </a>
+          <a href="/terms" style={{ marginRight: "10px" }}>
+            Terms
+          </a>
           <a href="/disclaimer">Disclaimer</a>
         </div>
       </div>
     </main>
   );
-}  
+}
