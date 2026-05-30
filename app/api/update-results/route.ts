@@ -123,9 +123,17 @@ async function getPuntingFormMeetings(date: string) {
 async function findPuntingFormMeetingId(date: string, course: string) {
   const meetings = await getPuntingFormMeetings(date);
 
+  const savedCourse = normaliseText(course);
+
   const matched = meetings.find((meeting: any) => {
     const meetingName = meeting?.track?.name || meeting?.name || meeting?.track;
-    return normaliseText(meetingName) === normaliseText(course);
+    const apiCourse = normaliseText(meetingName);
+
+    return (
+      apiCourse === savedCourse ||
+      apiCourse.includes(savedCourse) ||
+      savedCourse.includes(apiCourse)
+    );
   });
 
   return matched?.meetingId || null;
