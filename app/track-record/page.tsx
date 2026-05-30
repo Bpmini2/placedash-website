@@ -178,7 +178,6 @@ link.click();
 document.body.removeChild(link);
 }
 
-}
   return (
     <main
       style={{
