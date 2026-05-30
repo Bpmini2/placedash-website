@@ -419,34 +419,56 @@ function getBestRunner(race: any) {
   return betRunner || watchRunner || scoredRunners[0] || null;
 }
 
-  function getScoredRunners(race: any) {
-  if (!race?.runners || race.runners.length === 0) return [];
+  const racesWithOdds = rawRaces.map((race: any) => {
+  const raceNumber = race.race_number || race.raceNumber;
 
-  return race.runners
-    .filter((runner: any) => countStarts(runner) >= 3)
-    .filter((runner: any) => !runner.scratched)
-    .map((runner: any) => {
-      const scoredRunner = scoreRunner(runner);
+  const runnersWithOdds = (race.runners || []).map((runner: any) => {
+    const runnerNumber = runner.number || runner.runner_number || runner.tabNo;
 
-      const runnerWithOdds = {
-        ...runner,
-        ...scoredRunner,
-      };
+    const directOdds = mappedOdds[`${race.course}-${raceNumber}-${runnerNumber}`];
 
-      const valueDecision = getValueDecision(runnerWithOdds);
+    const fallbackOdds = Object.entries(mappedOdds).find(([key, value]: any) => {
+      const lowerKey = key.toLowerCase();
+      const lowerCourse = String(race.course || "").toLowerCase();
 
-      return {
-        ...runnerWithOdds,
-        decision: valueDecision.decision,
-        placeOdds: valueDecision.placeOdds,
-        valueScore: valueDecision.valueScore,
-        valueReason: valueDecision.valueReason,
-      };
-    })
-    .sort((a: any, b: any) => b.valueScore - a.valueScore);
-}
+      const courseMatch =
+        lowerKey.includes(lowerCourse) ||
+        lowerCourse.includes(String(value?.course || "").toLowerCase());
 
-  useEffect(() => {
+      const stateMatch =
+        value?.state &&
+        race.state &&
+        String(value.state).toLowerCase() === String(race.state).toLowerCase();
+
+      const raceMatch = Number(value?.race_number) === Number(raceNumber);
+      const runnerMatch = Number(value?.runner_number) === Number(runnerNumber);
+
+      return (courseMatch || stateMatch) && raceMatch && runnerMatch;
+    })?.[1] as any;
+
+    const odds = directOdds || fallbackOdds || {};
+
+    return {
+      ...runner,
+      sportsbet_place: odds.sportsbet_place ?? runner.sportsbet_place,
+      sportsbet_win: odds.sportsbet_win ?? runner.sportsbet_win,
+      ladbrokes_place: odds.ladbrokes_place ?? runner.ladbrokes_place,
+      ladbrokes_win: odds.ladbrokes_win ?? runner.ladbrokes_win,
+    };
+  });
+
+  return {
+    ...race,
+    runners: runnersWithOdds,
+  };
+});
+
+const officialBetRaces = racesWithOdds.filter((race: any) => {
+  const topPick = getBestRunner(race);
+  return topPick?.decision === "BET";
+});
+
+setRaces(officialBetRaces);
   async function loadRaces() {
     try {
       const res = await fetch("/api/formfav");
