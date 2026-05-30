@@ -582,14 +582,16 @@ document.body.removeChild(link);
                       }}
                     >
                       <div style={{ fontWeight: 800, fontSize: "17px" }}>
-                        {r.course} Race {r.race_number || r.raceNumber}
-                        {r.state ? ` (${r.state})` : ""} ·{" "}
-                        {getRaceTimes(r).melbourneTime}
-                        <div style={{ color: "#94a3b8", fontSize: "13px", marginTop: "4px" }}>
-  Local Track Time: {getRaceTimes(r).localTime}
-                      </div>
+  {r.course} Race {r.race_number || r.raceNumber}
+  {r.state ? ` (${r.state})` : ""} ·{" "}
+  Melbourne Time: {getRaceTimes(r).melbourneTime}
 
-                      <div style={{ display: "flex", justifyContent: "space-between", gap: "18px", marginTop: "8px" }}>
+  <div style={{ color: "#94a3b8", fontSize: "13px", marginTop: "4px" }}>
+    Local Track Time: {getRaceTimes(r).localTime}
+  </div>
+</div>
+
+<div style={{ display: "flex", justifyContent: "space-between", gap: "18px", marginTop: "8px" }}>
                         <span>
                           AI Pick: {`${r.horse_number || r.horseNumber}. ${r.horse_name || r.horseName}`}
                         </span>
