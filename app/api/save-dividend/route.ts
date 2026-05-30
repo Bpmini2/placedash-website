@@ -15,59 +15,95 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     const id = body.id;
-    const result = body.result;
+    const selectedResult = body.result;
+
+    const position =
+      body.position === "" || body.position == null
+        ? null
+        : Number(body.position);
+
     const placeDividend =
       body.place_dividend === "" || body.place_dividend == null
         ? null
         : Number(body.place_dividend);
 
     if (!id) {
-      return NextResponse.json({ ok: false, error: "Missing pick id" }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: "Missing pick id" },
+        { status: 400 }
+      );
     }
+
+    if (selectedResult !== "Scratched/Void" && !position) {
+      return NextResponse.json(
+        { ok: false, error: "Please enter the finishing position" },
+        { status: 400 }
+      );
+    }
+
+    const { data: picks, error: fetchError } = await supabase
+      .from("saved_picks")
+      .select("*")
+      .eq("id", id)
+      .limit(1);
+
+    if (fetchError || !picks || picks.length === 0) {
+      return NextResponse.json(
+        { ok: false, error: fetchError?.message || "Pick not found" },
+        { status: 404 }
+      );
+    }
+
+    const pick = picks[0];
+
+    const betSize = Number(pick.bet_size || 0);
+    const bankBeforeBet = Number(
+      pick.bank_before_bet || pick.running_bank || 1000
+    );
 
     let updateData: any = {};
 
-    if (result === "Placed") {
-      if (!placeDividend || placeDividend <= 0) {
+    if (selectedResult === "Scratched/Void") {
+      updateData = {
+        result: "scratched",
+        placed: null,
+        place_dividend: null,
+        dividend: null,
+        return_amount: betSize,
+        profit_loss: 0,
+        bank_after_bet: bankBeforeBet,
+        running_bank: bankBeforeBet,
+        settlement_status: "void",
+      };
+    } else {
+      const isPlaced = position <= 3;
+
+      if (isPlaced && (!placeDividend || placeDividend <= 0)) {
         return NextResponse.json(
           { ok: false, error: "Place dividend required for placed result" },
           { status: 400 }
         );
       }
 
+      const returnAmount = isPlaced ? money(betSize * placeDividend!) : 0;
+
+      const profitLoss = isPlaced
+        ? money(returnAmount - betSize)
+        : money(0 - betSize);
+
+      const bankAfterBet = money(bankBeforeBet + profitLoss);
+
       updateData = {
-        placed: true,
-        place_dividend: placeDividend,
-        dividend: placeDividend,
+        result: String(position),
+        placed: isPlaced,
+        place_dividend: isPlaced ? placeDividend : null,
+        dividend: isPlaced ? placeDividend : null,
+        return_amount: returnAmount,
+        profit_loss: profitLoss,
+        bank_after_bet: bankAfterBet,
+        running_bank: bankAfterBet,
         settlement_status: "settled",
       };
-    }
-
-    if (result === "Unplaced") {
-      updateData = {
-        result: "unplaced",
-        placed: false,
-        place_dividend: null,
-        dividend: null,
-        return_amount: 0,
-        settlement_status: "settled",
-      };
-    }
-
-    if (result === "Scratched/Void") {
-      updateData = {
-        result: "scratched",
-        placed: null,
-        place_dividend: null,
-        dividend: null,
-        return_amount: 0,
-        profit_loss: 0,
-        settlement_status: "void",
-      };
-    }
-
-    if (!updateData.settlement_status) {
-      return NextResponse.json({ ok: false, error: "Invalid result selected" }, { status: 400 });
     }
 
     const { error: updateError } = await supabase
@@ -76,93 +112,16 @@ export async function POST(request: Request) {
       .eq("id", id);
 
     if (updateError) {
-      return NextResponse.json({ ok: false, error: updateError.message }, { status: 500 });
+      return NextResponse.json(
+        { ok: false, error: updateError.message },
+        { status: 500 }
+      );
     }
-
-    const { data: strategy, error: strategyError } = await supabase
-      .from("strategy_settings")
-      .select("*")
-      .order("created_at", { ascending: true })
-      .limit(1)
-      .single();
-
-    if (strategyError) {
-      return NextResponse.json({ ok: false, error: strategyError.message }, { status: 500 });
-    }
-
-    let runningBank = Number(strategy.starting_bank || 1000);
-    const betPercentage = Number(strategy.bet_percentage || 10);
-
-    const { data: settledPicks, error: picksError } = await supabase
-      .from("saved_picks")
-      .select("*")
-      .neq("result", "pending")
-      .order("race_date", { ascending: true })
-      .order("race_time", { ascending: true })
-      .order("created_at", { ascending: true });
-
-    if (picksError) {
-      return NextResponse.json({ ok: false, error: picksError.message }, { status: 500 });
-    }
-
-    for (const pick of settledPicks || []) {
-      const bankBeforeBet = money(runningBank);
-      const betSize = money(bankBeforeBet * (betPercentage / 100));
-
-      let returnAmount = 0;
-      let profitLoss = 0;
-      let bankAfterBet = bankBeforeBet;
-
-      if (pick.settlement_status === "void" || pick.result === "scratched") {
-        returnAmount = 0;
-        profitLoss = 0;
-        bankAfterBet = bankBeforeBet;
-      } else if (pick.placed === true) {
-        const dividend = Number(pick.place_dividend || pick.dividend || 0);
-
-        if (dividend > 0) {
-          returnAmount = money(betSize * dividend);
-          profitLoss = money(returnAmount - betSize);
-          bankAfterBet = money(bankBeforeBet + profitLoss);
-        } else {
-          returnAmount = 0;
-          profitLoss = 0;
-          bankAfterBet = bankBeforeBet;
-        }
-      } else if (pick.placed === false) {
-        returnAmount = 0;
-        profitLoss = money(0 - betSize);
-        bankAfterBet = money(bankBeforeBet + profitLoss);
-      }
-
-      runningBank = bankAfterBet;
-
-      await supabase
-        .from("saved_picks")
-        .update({
-          bet_size: betSize,
-          bank_before_bet: bankBeforeBet,
-          return_amount: returnAmount,
-          profit_loss: profitLoss,
-          bank_after_bet: bankAfterBet,
-          running_bank: bankAfterBet,
-          bank_start: Number(strategy.starting_bank || 1000),
-          bet_percentage: betPercentage,
-        })
-        .eq("id", pick.id);
-    }
-
-    await supabase
-      .from("strategy_settings")
-      .update({
-        current_bank: money(runningBank),
-      })
-      .eq("id", strategy.id);
 
     return NextResponse.json({
       ok: true,
       id,
-      recalculated_bank: money(runningBank),
+      ...updateData,
     });
   } catch (error: any) {
     return NextResponse.json(
