@@ -304,6 +304,7 @@ async function fetchRacingApiRaceResult(
     raceResult,
   };
 }
+  function getRaceRunners(raceResult: any) {
   return raceResult?.runners || raceResult?.results || [];
 }
 
