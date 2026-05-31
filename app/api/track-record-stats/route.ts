@@ -13,14 +13,45 @@ function money(value: number) {
   return Math.round(value * 100) / 100;
 }
 
+function isVoidPick(pick: any) {
+  return (
+    pick.result === "abandoned" ||
+    pick.result === "scratched" ||
+    pick.settlement_status === "void"
+  );
+}
+
+function isPendingPick(pick: any) {
+  return !pick.result || pick.result === "pending";
+}
+
+function calculateProfitLoss(pick: any) {
+  const betSize = Number(pick.bet_size || 0);
+  const dividend = Number(pick.place_dividend || pick.dividend || 0);
+
+  if (isVoidPick(pick)) {
+    return 0;
+  }
+
+  if (pick.placed === true) {
+    return money(betSize * dividend - betSize);
+  }
+
+  if (pick.placed === false) {
+    return money(0 - betSize);
+  }
+
+  return 0;
+}
+
 export async function GET() {
   try {
     const { data: picks, error } = await supabase
-  .from("saved_picks")
-  .select("*")
-  .eq("logic_version", "v2_value_bet")
-  .order("race_date", { ascending: false })
-  .order("race_time", { ascending: false });
+      .from("saved_picks")
+      .select("*")
+      .eq("logic_version", "v2_value_bet")
+      .order("race_date", { ascending: false })
+      .order("race_time", { ascending: false });
 
     if (error) {
       return NextResponse.json(
@@ -31,27 +62,25 @@ export async function GET() {
 
     const allPicks = picks || [];
 
-    const voidPicks = allPicks.filter(
-  (pick: any) =>
-    pick.result === "abandoned" ||
-    pick.result === "scratched" ||
-    pick.settlement_status === "void"
-);
+    const voidPicks = allPicks.filter((pick: any) => isVoidPick(pick));
 
-const bettingResultPicks = allPicks.filter(
-  (pick: any) =>
-    pick.result &&
-    pick.result !== "pending" &&
-    pick.result !== "abandoned" &&
-    pick.result !== "scratched" &&
-    pick.settlement_status !== "void"
-);
+    const pendingPicks = allPicks.filter(
+      (pick: any) => isPendingPick(pick) && !isVoidPick(pick)
+    );
 
-const completedPicks = bettingResultPicks;
+    const completedPicks = allPicks.filter(
+      (pick: any) =>
+        !isPendingPick(pick) &&
+        !isVoidPick(pick)
+    );
 
-const placedPicks = bettingResultPicks.filter(
-  (pick: any) => pick.placed === true
-);
+    const placedPicks = completedPicks.filter(
+      (pick: any) => pick.placed === true
+    );
+
+    const unplacedPicks = completedPicks.filter(
+      (pick: any) => pick.placed === false
+    );
 
     const highConfidencePicks = completedPicks.filter(
       (pick: any) => pick.confidence === "HIGH"
@@ -60,10 +89,6 @@ const placedPicks = bettingResultPicks.filter(
     const highConfidencePlaced = highConfidencePicks.filter(
       (pick: any) => pick.placed === true
     );
-
-    const moneySettledPicks = bettingResultPicks.filter(
-  (pick: any) => pick.settlement_status === "settled"
-);
 
     const strikeRate =
       completedPicks.length > 0
@@ -77,31 +102,20 @@ const placedPicks = bettingResultPicks.filter(
           )
         : 0;
 
-    const totalBetSize = moneySettledPicks.reduce(
+    const totalBetSize = completedPicks.reduce(
       (sum: number, pick: any) => sum + Number(pick.bet_size || 0),
       0
     );
 
-    const sortedBankPicks = [...moneySettledPicks]
-      .filter((pick: any) => pick.bank_after_bet || pick.running_bank)
-      .sort((a: any, b: any) => {
-        const dateA = `${a.race_date || ""} ${a.race_time || ""}`;
-        const dateB = `${b.race_date || ""} ${b.race_time || ""}`;
-        return dateA.localeCompare(dateB);
-      });
-
-    const latestBankPick = sortedBankPicks[sortedBankPicks.length - 1];
+    const totalProfitLoss = money(
+      completedPicks.reduce(
+        (sum: number, pick: any) => sum + calculateProfitLoss(pick),
+        0
+      )
+    );
 
     const startingBank = 1000;
-
-const totalProfitLoss = money(
-  moneySettledPicks.reduce(
-    (sum: number, pick: any) => sum + Number(pick.profit_loss || 0),
-    0
-  )
-);
-
-const currentBank = money(startingBank + totalProfitLoss);
+    const currentBank = money(startingBank + totalProfitLoss);
 
     const roi =
       totalBetSize > 0 ? Math.round((totalProfitLoss / totalBetSize) * 100) : 0;
@@ -114,14 +128,15 @@ const currentBank = money(startingBank + totalProfitLoss);
         summary: {
           totalPicks: allPicks.length,
           completedPicks: completedPicks.length,
-          pendingPicks: allPicks.length - completedPicks.length,
+          pendingPicks: pendingPicks.length,
           placedPicks: placedPicks.length,
-          unplacedPicks: completedPicks.length - placedPicks.length,
+          unplacedPicks: unplacedPicks.length,
+          voidPicks: voidPicks.length,
           strikeRate,
           highConfidencePicks: highConfidencePicks.length,
           highConfidencePlaced: highConfidencePlaced.length,
           highConfidenceStrikeRate,
-          moneySettledPicks: moneySettledPicks.length,
+          moneySettledPicks: completedPicks.length,
           totalBetSize,
           totalProfitLoss,
           roi,
