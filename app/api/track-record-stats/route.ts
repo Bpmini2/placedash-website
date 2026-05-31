@@ -16,10 +16,11 @@ function money(value: number) {
 export async function GET() {
   try {
     const { data: picks, error } = await supabase
-      .from("saved_picks")
-      .select("*")
-      .order("race_date", { ascending: false })
-      .order("race_time", { ascending: false });
+  .from("saved_picks")
+  .select("*")
+  .eq("logic_version", "v2_value_bet")
+  .order("race_date", { ascending: false })
+  .order("race_time", { ascending: false });
 
     if (error) {
       return NextResponse.json(
