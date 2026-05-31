@@ -651,7 +651,62 @@ const pendingPicks = Array.from(
             position = matchedRunner ? getRunnerPosition(matchedRunner) : null;
           }
         }
+const abandonedRace = resultData?.raceResult
+  ? isAbandonedRace(resultData.raceResult)
+  : false;
 
+if (abandonedRace) {
+  const bankBeforeBet = runningBank;
+  const betSize = Number(
+    (bankBeforeBet * (betPercentage / 100)).toFixed(2)
+  );
+
+  const { error: updateError } = await supabase
+    .from("saved_picks")
+    .update({
+      result: "abandoned",
+      placed: null,
+      bet_size: betSize,
+      profit_loss: 0,
+      bank_start: Number(strategy.starting_bank || 1000),
+      bet_percentage: betPercentage,
+      bank_before_bet: Number(bankBeforeBet.toFixed(2)),
+      bank_after_bet: Number(bankBeforeBet.toFixed(2)),
+      dividend: null,
+      place_dividend: null,
+      return_amount: betSize,
+      running_bank: Number(bankBeforeBet.toFixed(2)),
+      settlement_status: "void",
+    })
+    .eq("id", pick.id);
+
+  if (updateError) {
+    failed.push({
+      id: pick.id,
+      reason: updateError.message,
+    });
+    continue;
+  }
+
+  updated.push({
+    id: pick.id,
+    source: resultSource,
+    course: pick.course,
+    race_number: pick.race_number,
+    horse_name: pick.horse_name,
+    result: "abandoned",
+    placed: null,
+    bet_size: betSize,
+    dividend: null,
+    profit_loss: 0,
+    bank_before_bet: Number(bankBeforeBet.toFixed(2)),
+    bank_after_bet: Number(bankBeforeBet.toFixed(2)),
+    settlement_status: "void",
+    reason: "Race abandoned - void/no bet",
+  });
+
+  continue;
+}
         if (
           !resultData?.raceResult ||
           !Array.isArray(runners) ||
