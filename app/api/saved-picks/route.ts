@@ -88,6 +88,7 @@ const raceNumber = pick.race_number || pick.raceNumber || pick.race?.race_number
         settlement_status: "pending",
         bank_start: 1000,
         bet_percentage: 10,
+        race_card_json: pick.race_card_json || pick.race?.runners || pick.runners || null,
         source: "dashboard",
       })
       .select()
