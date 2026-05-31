@@ -123,7 +123,7 @@ export default function TrackRecordPage() {
     if (activeFilter === "placed") return pick.placed === true;
     if (activeFilter === "unplaced") return pick.placed === false;
     if (activeFilter === "scratched") {
-      return pick.result === "scratched" || pick.settlement_status === "void";
+      return pick.result === "scratched";
     }
     if (activeFilter === "high") return pick.confidence === "HIGH";
 
@@ -663,13 +663,17 @@ document.body.removeChild(link);
                             fontWeight: 700,
                           }}
                         >
-                          {r.result === "scratched" || r.settlement_status === "void"
-                            ? "⚪ SCRATCHED · VOID / NO BET"
-                            : r.placed === true
-                            ? `🟢 PLACED (${r.result || "?"})`
-                            : r.placed === false
-                            ? `🔴 UNPLACED (${r.result || "?"})`
-                            : "🟡 PENDING"}
+                          {r.result === "abandoned"
+  ? "⚪ ABANDONED · VOID / NO BET"
+  : r.result === "scratched"
+  ? "⚪ SCRATCHED · VOID"
+  : r.settlement_status === "void"
+  ? "⚪ VOID / NO BET"
+  : r.placed === true
+  ? `🟢 PLACED (${r.result || "?"})`
+  : r.placed === false
+  ? `🔴 UNPLACED (${r.result || "?"})`
+  : "🟡 PENDING"}
                         </span>
 
                         {r.placed === true && (r.place_dividend || r.dividend) && (
