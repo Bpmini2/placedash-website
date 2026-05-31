@@ -843,9 +843,7 @@ const placeDividend = dividendInput?.value;
                         </button>
                       </div>
 
-</div>
-
-{expandedRaceId === (r.id || i) && (
+                      {expandedRaceId === (r.id || i) && (
   <div
     style={{
       marginTop: "14px",
@@ -870,10 +868,8 @@ const placeDividend = dividendInput?.value;
       Official PlaceDash pick only counts toward Track Record stats, ROI, strike rate, and bank tracking.
     </div>
   </div>
-)}
+                      )}
 
-</div>
-);
                     </div>
                   );
                 })
