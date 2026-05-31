@@ -31,13 +31,27 @@ export async function GET() {
 
     const allPicks = picks || [];
 
-    const completedPicks = allPicks.filter(
-      (pick: any) => pick.result && pick.result !== "pending"
-    );
+    const voidPicks = allPicks.filter(
+  (pick: any) =>
+    pick.result === "abandoned" ||
+    pick.result === "scratched" ||
+    pick.settlement_status === "void"
+);
 
-    const placedPicks = completedPicks.filter(
-      (pick: any) => pick.placed === true
-    );
+const bettingResultPicks = allPicks.filter(
+  (pick: any) =>
+    pick.result &&
+    pick.result !== "pending" &&
+    pick.result !== "abandoned" &&
+    pick.result !== "scratched" &&
+    pick.settlement_status !== "void"
+);
+
+const completedPicks = bettingResultPicks;
+
+const placedPicks = bettingResultPicks.filter(
+  (pick: any) => pick.placed === true
+);
 
     const highConfidencePicks = completedPicks.filter(
       (pick: any) => pick.confidence === "HIGH"
@@ -47,11 +61,9 @@ export async function GET() {
       (pick: any) => pick.placed === true
     );
 
-    const moneySettledPicks = completedPicks.filter(
-      (pick: any) =>
-        pick.settlement_status === "settled" ||
-        pick.settlement_status === "void"
-    );
+    const moneySettledPicks = bettingResultPicks.filter(
+  (pick: any) => pick.settlement_status === "settled"
+);
 
     const strikeRate =
       completedPicks.length > 0
@@ -70,7 +82,7 @@ export async function GET() {
       0
     );
 
-    const sortedBankPicks = [...allPicks]
+    const sortedBankPicks = [...moneySettledPicks]
       .filter((pick: any) => pick.bank_after_bet || pick.running_bank)
       .sort((a: any, b: any) => {
         const dateA = `${a.race_date || ""} ${a.race_time || ""}`;
@@ -80,15 +92,16 @@ export async function GET() {
 
     const latestBankPick = sortedBankPicks[sortedBankPicks.length - 1];
 
-    const currentBank = Number(
-      latestBankPick?.bank_after_bet ||
-        latestBankPick?.running_bank ||
-        1000
-    );
+    const startingBank = 1000;
 
-    const startingBank = Number(latestBankPick?.bank_start || 1000);
+const totalProfitLoss = money(
+  moneySettledPicks.reduce(
+    (sum: number, pick: any) => sum + Number(pick.profit_loss || 0),
+    0
+  )
+);
 
-    const totalProfitLoss = money(currentBank - startingBank);
+const currentBank = money(startingBank + totalProfitLoss);
 
     const roi =
       totalBetSize > 0 ? Math.round((totalProfitLoss / totalBetSize) * 100) : 0;
