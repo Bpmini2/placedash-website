@@ -591,6 +591,7 @@ export default function Dashboard() {
                   runner_count: race.runners?.length || 0,
                   state: race.state,
                   race_card_json: race.runners || [],
+                  logic_version: "v2_value_bet",
                 }),
               });
             } catch (err) {
