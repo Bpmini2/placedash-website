@@ -842,7 +842,7 @@ const placeDividend = dividendInput?.value;
                           Update Result
                         </button>
                       </div>
-                      </button>
+
 </div>
 
 {expandedRaceId === (r.id || i) && (
