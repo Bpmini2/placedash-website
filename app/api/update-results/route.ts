@@ -22,16 +22,104 @@ function money(value: number) {
   return Math.round(value * 100) / 100;
 }
 
+function safeKeys(value: any) {
+  if (!value || typeof value !== "object") return [];
+  return Object.keys(value).slice(0, 60);
+}
+
+function getMeetingName(meeting: any) {
+  return (
+    meeting?.track?.name ||
+    meeting?.trackName ||
+    meeting?.track_name ||
+    meeting?.course ||
+    meeting?.courseName ||
+    meeting?.course_name ||
+    meeting?.venue ||
+    meeting?.venueName ||
+    meeting?.venue_name ||
+    meeting?.meetingName ||
+    meeting?.meeting_name ||
+    meeting?.name ||
+    meeting?.track ||
+    ""
+  );
+}
+
+function courseMatches(apiCourseRaw: string, savedCourseRaw: string) {
+  const apiCourse = normaliseText(apiCourseRaw);
+  const savedCourse = normaliseText(savedCourseRaw);
+
+  if (!apiCourse || !savedCourse) return false;
+
+  return (
+    apiCourse === savedCourse ||
+    apiCourse.includes(savedCourse) ||
+    savedCourse.includes(apiCourse)
+  );
+}
+
+function getRunnerName(runner: any) {
+  return (
+    runner?.runner ||
+    runner?.name ||
+    runner?.horse ||
+    runner?.horseName ||
+    runner?.horse_name ||
+    runner?.runnerName ||
+    runner?.runner_name ||
+    ""
+  );
+}
+
+function getRunnerNumber(runner: any) {
+  return (
+    runner?.tabNo ??
+    runner?.tab_no ??
+    runner?.number ??
+    runner?.runnerNumber ??
+    runner?.runner_number ??
+    runner?.horse_number ??
+    runner?.saddlecloth ??
+    runner?.cloth_number ??
+    null
+  );
+}
+
+function getPositionCandidates(runner: any) {
+  return [
+    runner?.position,
+    runner?.pos,
+    runner?.finishingPosition,
+    runner?.finishing_position,
+    runner?.finishPosition,
+    runner?.finish_position,
+    runner?.finishedPosition,
+    runner?.finished_position,
+    runner?.result,
+    runner?.result_position,
+    runner?.resultPosition,
+    runner?.place,
+    runner?.placing,
+    runner?.placingNumber,
+    runner?.placing_number,
+    runner?.officialPosition,
+    runner?.official_position,
+    runner?.finish,
+    runner?.finishing,
+    runner?.result?.position,
+    runner?.result?.pos,
+    runner?.result?.finishingPosition,
+    runner?.result?.finishing_position,
+    runner?.result?.place,
+    runner?.result?.placing,
+  ];
+}
+
 function getRunnerPosition(runner: any) {
-  const rawPosition =
-    runner.position ??
-    runner.finishingPosition ??
-    runner.finishing_position ??
-    runner.result ??
-    runner.finishPosition ??
-    runner.finish_position ??
-    runner.place ??
-    runner.placing;
+  const rawPosition = getPositionCandidates(runner).find(
+    (value) => value !== undefined && value !== null && String(value).trim() !== ""
+  );
 
   const parsed = Number(String(rawPosition || "").replace(/[^0-9]/g, ""));
 
@@ -68,7 +156,11 @@ function getRunnerDividend(runner: any) {
     runner.placeDividend ??
     runner.place_odds ??
     runner.placeOdds ??
+    runner.place_price ??
+    runner.placePrice ??
     runner.dividend ??
+    runner.tote_place ??
+    runner.totePlace ??
     null;
 
   if (directDividend) {
@@ -123,32 +215,8 @@ async function getPuntingFormMeetings(date: string) {
 async function findPuntingFormMeetingId(date: string, course: string) {
   const meetings = await getPuntingFormMeetings(date);
 
-  const savedCourse = normaliseText(course);
-
   const matched = meetings.find((meeting: any) => {
-    const meetingName =
-      meeting?.track?.name ||
-      meeting?.trackName ||
-      meeting?.track_name ||
-      meeting?.course ||
-      meeting?.courseName ||
-      meeting?.course_name ||
-      meeting?.venue ||
-      meeting?.venueName ||
-      meeting?.venue_name ||
-      meeting?.meetingName ||
-      meeting?.meeting_name ||
-      meeting?.name ||
-      meeting?.track ||
-      "";
-
-    const apiCourse = normaliseText(meetingName);
-
-    return (
-      apiCourse === savedCourse ||
-      apiCourse.includes(savedCourse) ||
-      savedCourse.includes(apiCourse)
-    );
+    return courseMatches(getMeetingName(meeting), course);
   });
 
   return matched?.meetingId || matched?.meeting_id || matched?.id || null;
@@ -185,12 +253,23 @@ async function fetchPuntingFormRaceResult(
     ? data.payLoad[0]
     : data?.payLoad;
 
-  const raceResults = meetingResult?.raceResults || meetingResult?.races || [];
+  const raceResults =
+    meetingResult?.raceResults ||
+    meetingResult?.races ||
+    meetingResult?.results ||
+    [];
 
   const raceResult = Array.isArray(raceResults)
-    ? raceResults.find(
-        (race: any) => Number(race.raceNumber) === Number(raceNumber)
-      ) || raceResults[0]
+    ? raceResults.find((race: any) => {
+        const apiRaceNumber =
+          race?.raceNumber ??
+          race?.race_number ??
+          race?.number ??
+          race?.race_no ??
+          race?.raceNo;
+
+        return Number(apiRaceNumber) === Number(raceNumber);
+      }) || raceResults[0]
     : raceResults || meetingResult;
 
   if (!raceResult) return null;
@@ -201,15 +280,11 @@ async function fetchPuntingFormRaceResult(
   };
 }
 
-async function fetchRacingApiRaceResult(
-  date: string,
-  course: string,
-  raceNumber: number
-) {
+async function getRacingApiMeets() {
   const username = process.env.RACING_API_USERNAME;
   const password = process.env.RACING_API_PASSWORD;
 
-  if (!username || !password) return null;
+  if (!username || !password) return [];
 
   const auth = Buffer.from(`${username}:${password}`).toString("base64");
 
@@ -226,11 +301,26 @@ async function fetchRacingApiRaceResult(
 
   const meetsData = await meetsRes.json();
 
-  if (!meetsRes.ok) return null;
+  if (!meetsRes.ok) return [];
 
-  const savedCourse = normaliseText(course);
+  return meetsData?.meets || [];
+}
 
-  const meet = (meetsData?.meets || []).find((meet: any) => {
+async function fetchRacingApiRaceResult(
+  date: string,
+  course: string,
+  raceNumber: number
+) {
+  const username = process.env.RACING_API_USERNAME;
+  const password = process.env.RACING_API_PASSWORD;
+
+  if (!username || !password) return null;
+
+  const auth = Buffer.from(`${username}:${password}`).toString("base64");
+
+  const meets = await getRacingApiMeets();
+
+  const meet = (meets || []).find((meet: any) => {
     const apiCourseRaw =
       meet?.course ||
       meet?.course_name ||
@@ -246,8 +336,6 @@ async function fetchRacingApiRaceResult(
       meet?.meetingName ||
       "";
 
-    const apiCourse = normaliseText(apiCourseRaw);
-
     const apiDateRaw =
       meet?.date ||
       meet?.meet_date ||
@@ -257,12 +345,7 @@ async function fetchRacingApiRaceResult(
 
     const apiDate = String(apiDateRaw).slice(0, 10);
 
-    return (
-      apiDate === date &&
-      (apiCourse === savedCourse ||
-        apiCourse.includes(savedCourse) ||
-        savedCourse.includes(apiCourse))
-    );
+    return apiDate === date && courseMatches(apiCourseRaw, course);
   });
 
   if (!meet) return null;
@@ -286,16 +369,18 @@ async function fetchRacingApiRaceResult(
 
   if (!racesRes.ok) return null;
 
-  const raceResult = (racesData?.races || []).find((race: any) => {
-    const apiRaceNumber =
-      race?.race_number ||
-      race?.raceNumber ||
-      race?.number ||
-      race?.race_no ||
-      race?.raceNo;
+  const raceResult = (racesData?.races || racesData?.results || []).find(
+    (race: any) => {
+      const apiRaceNumber =
+        race?.race_number ??
+        race?.raceNumber ??
+        race?.number ??
+        race?.race_no ??
+        race?.raceNo;
 
-    return Number(apiRaceNumber) === Number(raceNumber);
-  });
+      return Number(apiRaceNumber) === Number(raceNumber);
+    }
+  );
 
   if (!raceResult) return null;
 
@@ -304,30 +389,123 @@ async function fetchRacingApiRaceResult(
     raceResult,
   };
 }
-  function getRaceRunners(raceResult: any) {
-  return raceResult?.runners || raceResult?.results || [];
+
+function getRaceRunners(raceResult: any) {
+  return (
+    raceResult?.runners ||
+    raceResult?.results ||
+    raceResult?.runnerResults ||
+    raceResult?.runner_results ||
+    raceResult?.finalPlacings ||
+    raceResult?.final_placings ||
+    raceResult?.placings ||
+    raceResult?.horses ||
+    []
+  );
 }
 
 function findMatchedRunner(runners: any[], pick: any) {
-  return runners.find((runner: any) => {
-    const runnerName =
-      runner.runner ||
-      runner.name ||
-      runner.horse ||
-      runner.horseName ||
-      "";
-
-    const runnerNumber =
-      runner.tabNo ||
-      runner.number ||
-      runner.runnerNumber ||
-      runner.horse_number;
-
-    return (
-      normaliseText(runnerName) === normaliseText(pick.horse_name) ||
-      Number(runnerNumber) === Number(pick.horse_number)
-    );
+  const horseNameMatch = runners.find((runner: any) => {
+    return normaliseText(getRunnerName(runner)) === normaliseText(pick.horse_name);
   });
+
+  if (horseNameMatch) return horseNameMatch;
+
+  return runners.find((runner: any) => {
+    return Number(getRunnerNumber(runner)) === Number(pick.horse_number);
+  });
+}
+
+function buildDebugInfo(params: {
+  pick: any;
+  resultData: any;
+  runners: any[];
+  matchedRunner: any;
+  position: number | null;
+  resultSource: string;
+}) {
+  const { pick, resultData, runners, matchedRunner, position, resultSource } =
+    params;
+
+  return {
+    result_source_used: resultSource,
+    race_result_found: Boolean(resultData?.raceResult),
+    race_result_keys: safeKeys(resultData?.raceResult),
+    runner_count: Array.isArray(runners) ? runners.length : 0,
+    matched_runner_found: Boolean(matchedRunner),
+    matched_runner_keys: safeKeys(matchedRunner),
+    matched_runner_name: matchedRunner ? getRunnerName(matchedRunner) : null,
+    matched_runner_number: matchedRunner ? getRunnerNumber(matchedRunner) : null,
+    position,
+    raw_position_candidates: matchedRunner
+      ? getPositionCandidates(matchedRunner).map((value) =>
+          value === undefined || value === null ? null : String(value)
+        )
+      : [],
+    available_runners: Array.isArray(runners)
+      ? runners.slice(0, 12).map((runner: any) => ({
+          name: getRunnerName(runner),
+          number: getRunnerNumber(runner),
+          keys: safeKeys(runner).slice(0, 20),
+        }))
+      : [],
+    saved_pick: {
+      id: pick.id,
+      course: pick.course,
+      race_number: pick.race_number,
+      race_date: pick.race_date,
+      horse_name: pick.horse_name,
+      horse_number: pick.horse_number,
+      logic_version: pick.logic_version,
+      result: pick.result,
+    },
+  };
+}
+
+async function getApiMeetingDebug(date: string, course: string) {
+  const puntingFormMeetings = await getPuntingFormMeetings(date);
+  const racingApiMeets = await getRacingApiMeets();
+
+  return {
+    punting_form_meetings: puntingFormMeetings.slice(0, 40).map((meeting: any) => ({
+      name: getMeetingName(meeting),
+      meeting_id: meeting?.meetingId || meeting?.meeting_id || meeting?.id || null,
+      keys: safeKeys(meeting).slice(0, 20),
+      course_match: courseMatches(getMeetingName(meeting), course),
+    })),
+    racing_api_meets: racingApiMeets.slice(0, 40).map((meet: any) => {
+      const courseName =
+        meet?.course ||
+        meet?.course_name ||
+        meet?.courseName ||
+        meet?.track ||
+        meet?.track_name ||
+        meet?.trackName ||
+        meet?.venue ||
+        meet?.venue_name ||
+        meet?.venueName ||
+        meet?.name ||
+        meet?.meeting_name ||
+        meet?.meetingName ||
+        "";
+
+      const apiDateRaw =
+        meet?.date ||
+        meet?.meet_date ||
+        meet?.meeting_date ||
+        meet?.race_date ||
+        "";
+
+      return {
+        name: courseName,
+        date: String(apiDateRaw).slice(0, 10),
+        meet_id: meet?.meet_id || meet?.meeting_id || meet?.id || null,
+        keys: safeKeys(meet).slice(0, 20),
+        course_match: courseMatches(courseName, course),
+        date_match: String(apiDateRaw).slice(0, 10) === date,
+      };
+    }),
+  };
 }
 
 async function getStrategySettings() {
@@ -358,8 +536,10 @@ async function updateStrategyBank(strategyId: string, newBank: number) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const url = new URL(request.url);
+    const debugMode = url.searchParams.get("debug") === "1";
     const today = getMelbourneDate();
 
     const strategy = await getStrategySettings();
@@ -373,6 +553,7 @@ export async function GET() {
     const { data: pendingPicks, error: pendingError } = await supabase
       .from("saved_picks")
       .select("*")
+      .eq("logic_version", "v2_value_bet")
       .in("result", ["pending", "needs_dividend"])
       .lte("race_date", today)
       .order("race_date", { ascending: true })
@@ -409,21 +590,24 @@ export async function GET() {
         let position = matchedRunner ? getRunnerPosition(matchedRunner) : null;
 
         if (!matchedRunner || !position) {
-          resultData = await fetchRacingApiRaceResult(
+          const racingApiResultData = await fetchRacingApiRaceResult(
             pick.race_date,
             pick.course,
             Number(pick.race_number)
           );
 
-          resultSource = "The Racing API";
+          if (racingApiResultData?.raceResult) {
+            resultData = racingApiResultData;
+            resultSource = "The Racing API";
 
-          runners = resultData ? getRaceRunners(resultData.raceResult) : [];
+            runners = getRaceRunners(resultData.raceResult);
 
-          matchedRunner = Array.isArray(runners)
-            ? findMatchedRunner(runners, pick)
-            : null;
+            matchedRunner = Array.isArray(runners)
+              ? findMatchedRunner(runners, pick)
+              : null;
 
-          position = matchedRunner ? getRunnerPosition(matchedRunner) : null;
+            position = matchedRunner ? getRunnerPosition(matchedRunner) : null;
+          }
         }
 
         if (
@@ -436,7 +620,13 @@ export async function GET() {
             course: pick.course,
             race_number: pick.race_number,
             horse_name: pick.horse_name,
+            logic_version: pick.logic_version,
             reason: "No race result found from Punting Form or The Racing API",
+            debug: debugMode
+              ? {
+                  ...(await getApiMeetingDebug(pick.race_date, pick.course)),
+                }
+              : undefined,
           });
           continue;
         }
@@ -447,7 +637,18 @@ export async function GET() {
             course: pick.course,
             race_number: pick.race_number,
             horse_name: pick.horse_name,
+            logic_version: pick.logic_version,
             reason: "Runner not found in result",
+            debug: debugMode
+              ? buildDebugInfo({
+                  pick,
+                  resultData,
+                  runners,
+                  matchedRunner,
+                  position,
+                  resultSource,
+                })
+              : undefined,
           });
           continue;
         }
@@ -499,7 +700,18 @@ export async function GET() {
             course: pick.course,
             race_number: pick.race_number,
             horse_name: pick.horse_name,
+            logic_version: pick.logic_version,
             reason: "No finishing position found",
+            debug: debugMode
+              ? buildDebugInfo({
+                  pick,
+                  resultData,
+                  runners,
+                  matchedRunner,
+                  position,
+                  resultSource,
+                })
+              : undefined,
           });
           continue;
         }
@@ -516,7 +728,7 @@ export async function GET() {
             bank_before_bet: Number(bankBeforeBet.toFixed(2)),
             bank_after_bet: Number(bankAfterBet.toFixed(2)),
             dividend: placed === true ? dividend : null,
-place_dividend: placed === true ? dividend : null,
+            place_dividend: placed === true ? dividend : null,
             return_amount:
               profitLoss !== null
                 ? Number((betSize + profitLoss).toFixed(2))
@@ -544,6 +756,7 @@ place_dividend: placed === true ? dividend : null,
           course: pick.course,
           race_number: pick.race_number,
           horse_name: pick.horse_name,
+          logic_version: pick.logic_version,
           result: resultValue,
           placed,
           bet_size: betSize,
@@ -559,6 +772,7 @@ place_dividend: placed === true ? dividend : null,
           course: pick.course,
           race_number: pick.race_number,
           horse_name: pick.horse_name,
+          logic_version: pick.logic_version,
           reason: String(error),
         });
       }
@@ -567,6 +781,7 @@ place_dividend: placed === true ? dividend : null,
     return NextResponse.json({
       ok: true,
       source: "Punting Form with The Racing API fallback",
+      official_logic_version: "v2_value_bet",
       checked: pendingPicks?.length || 0,
       updated,
       notReady,
@@ -576,6 +791,7 @@ place_dividend: placed === true ? dividend : null,
         current_bank: Number(runningBank.toFixed(2)),
         bet_percentage: betPercentage,
       },
+      debug_mode: debugMode,
     });
   } catch (error) {
     return NextResponse.json({
