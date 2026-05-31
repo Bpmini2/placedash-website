@@ -69,6 +69,7 @@ export default function TrackRecordPage() {
   const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [expandedRaceId, setExpandedRaceId] = useState<string | number | null>(null);
 
   const today = new Date().toLocaleDateString("en-CA", {
     timeZone: "Australia/Melbourne",
@@ -700,6 +701,23 @@ document.body.removeChild(link);
                         >
                           Edit
                         </button>
+                        <button
+  onClick={() =>
+    setExpandedRaceId(expandedRaceId === (r.id || i) ? null : (r.id || i))
+  }
+  style={{
+    marginLeft: "10px",
+    padding: "5px 10px",
+    borderRadius: "8px",
+    border: "1px solid rgba(56,189,248,0.35)",
+    background: "rgba(56,189,248,0.12)",
+    color: "#38bdf8",
+    fontWeight: 800,
+    cursor: "pointer",
+  }}
+>
+  {expandedRaceId === (r.id || i) ? "Hide Race Card" : "View Race Card"}
+</button>
                       </div>
 
                       <div
@@ -824,6 +842,38 @@ const placeDividend = dividendInput?.value;
                           Update Result
                         </button>
                       </div>
+                      </button>
+</div>
+
+{expandedRaceId === (r.id || i) && (
+  <div
+    style={{
+      marginTop: "14px",
+      padding: "14px",
+      borderRadius: "12px",
+      border: "1px solid rgba(56,189,248,0.25)",
+      background: "rgba(56,189,248,0.08)",
+      color: "#cbd5e1",
+      fontSize: "13px",
+      lineHeight: 1.6,
+    }}
+  >
+    <div style={{ color: "#38bdf8", fontWeight: 900, marginBottom: "8px" }}>
+      Full Race Card Detail
+    </div>
+
+    <div>
+      Coming next: all runners, finishing positions, place dividends, Sportsbet/Ladbrokes prices, and the official PlaceDash AI pick highlighted.
+    </div>
+
+    <div style={{ marginTop: "10px", color: "#94a3b8" }}>
+      Official PlaceDash pick only counts toward Track Record stats, ROI, strike rate, and bank tracking.
+    </div>
+  </div>
+)}
+
+</div>
+);
                     </div>
                   );
                 })
