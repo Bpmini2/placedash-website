@@ -357,6 +357,7 @@ document.body.removeChild(link);
               { label: "Pending", value: summary.pendingPicks, color: "#facc15", filter: "pending" },
               { label: "Placed", value: summary.placedPicks, color: "#22c55e", filter: "placed" },
               { label: "Unplaced", value: summary.unplacedPicks, color: "#ef4444", filter: "unplaced" },
+            { label: "Scratched / Abandoned", value: summary.voidPicks || 0, color: "#94a3b8", filter: "scratched" },
               {
                 label: "Place Strike Rate",
                 value: `${summary.strikeRate}% (${summary.placedPicks}/${summary.completedPicks})`,
