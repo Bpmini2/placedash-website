@@ -149,7 +149,24 @@ function isScratchedRunner(runner: any) {
     statusText.includes("withdrawn")
   );
 }
+function isAbandonedRace(raceResult: any) {
+  const statusText = String(
+    raceResult?.race_status ||
+      raceResult?.status ||
+      raceResult?.result ||
+      raceResult?.raceStatus ||
+      raceResult?.race_status_text ||
+      raceResult?.state ||
+      ""
+  ).toLowerCase();
 
+  return (
+    statusText.includes("abnd") ||
+    statusText.includes("aband") ||
+    statusText.includes("abandoned") ||
+    statusText.includes("void")
+  );
+}
 function getRunnerDividend(runner: any) {
   const directDividend =
     runner.place_dividend ??
