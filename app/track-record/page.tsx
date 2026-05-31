@@ -206,7 +206,6 @@ export default function TrackRecordPage() {
     document.body.appendChild(link);
 link.click();
 document.body.removeChild(link);
-}
 
   return (
     <main
