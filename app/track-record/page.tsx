@@ -857,16 +857,118 @@ const placeDividend = dividendInput?.value;
     }}
   >
     <div style={{ color: "#38bdf8", fontWeight: 900, marginBottom: "8px" }}>
-      Full Race Card Detail
-    </div>
+  Full Race Card Detail
+</div>
 
-    <div>
-      Coming next: all runners, finishing positions, place dividends, Sportsbet/Ladbrokes prices, and the official PlaceDash AI pick highlighted.
-    </div>
+{(() => {
+  const runners = Array.isArray(r.race_card_json)
+    ? r.race_card_json
+    : Array.isArray(r.race_card_json?.runners)
+    ? r.race_card_json.runners
+    : [];
 
-    <div style={{ marginTop: "10px", color: "#94a3b8" }}>
-      Official PlaceDash pick only counts toward Track Record stats, ROI, strike rate, and bank tracking.
+  if (!runners.length) {
+    return (
+      <div style={{ color: "#94a3b8" }}>
+        No saved full race card data available for this pick yet. Full race card detail will be available for newer picks saved after race_card_json was added.
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ overflowX: "auto", marginTop: "10px" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
+        <thead>
+          <tr style={{ color: "#93c5fd", textAlign: "left" }}>
+            <th style={{ padding: "8px" }}>No.</th>
+            <th style={{ padding: "8px" }}>Horse</th>
+            <th style={{ padding: "8px" }}>Jockey</th>
+            <th style={{ padding: "8px" }}>Trainer</th>
+            <th style={{ padding: "8px" }}>Barrier</th>
+            <th style={{ padding: "8px" }}>Weight</th>
+            <th style={{ padding: "8px" }}>Form</th>
+            <th style={{ padding: "8px" }}>Starts</th>
+            <th style={{ padding: "8px" }}>Place %</th>
+            <th style={{ padding: "8px" }}>SB</th>
+            <th style={{ padding: "8px" }}>LB</th>
+            <th style={{ padding: "8px" }}>AI</th>
+            <th style={{ padding: "8px" }}>Position</th>
+            <th style={{ padding: "8px" }}>Dividend</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {runners.map((runner: any, index: number) => {
+            const runnerNumber =
+              runner.number || runner.runner_number || runner.no || runner.horse_number || "";
+
+            const runnerHorse =
+              runner.horse || runner.horse_name || runner.name || "";
+
+            const isOfficialPick =
+              String(runnerNumber) === String(r.horse_number || r.horseNumber) ||
+              String(runnerHorse).toLowerCase() ===
+                String(r.horse_name || r.horseName).toLowerCase();
+
+            return (
+              <tr
+                key={`${runnerNumber}-${runnerHorse}-${index}`}
+                style={{
+                  background: isOfficialPick
+                    ? "rgba(34,197,94,0.16)"
+                    : "transparent",
+                  color: isOfficialPick ? "#ffffff" : "#cbd5e1",
+                  borderTop: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                <td style={{ padding: "8px", fontWeight: isOfficialPick ? 900 : 500 }}>
+                  {runnerNumber || "-"}
+                </td>
+                <td style={{ padding: "8px", fontWeight: isOfficialPick ? 900 : 500 }}>
+                  {runnerHorse || "-"}
+                  {isOfficialPick ? " ⭐" : ""}
+                </td>
+                <td style={{ padding: "8px" }}>{runner.jockey || "-"}</td>
+                <td style={{ padding: "8px" }}>{runner.trainer || "-"}</td>
+                <td style={{ padding: "8px" }}>{runner.barrier || "-"}</td>
+                <td style={{ padding: "8px" }}>{runner.weight || "-"}</td>
+                <td style={{ padding: "8px" }}>{runner.form || "-"}</td>
+                <td style={{ padding: "8px" }}>{runner.starts || "-"}</td>
+                <td style={{ padding: "8px" }}>
+                  {runner.displayPlacePercent || runner.place_percent || runner.placePercent || "-"}
+                </td>
+                <td style={{ padding: "8px" }}>
+                  P: {runner.sportsbet_place || runner.sb_place || runner.sportsbetPlace || "-"}
+                  <br />
+                  W: {runner.sportsbet_win || runner.sb_win || runner.sportsbetWin || "-"}
+                </td>
+                <td style={{ padding: "8px" }}>
+                  P: {runner.ladbrokes_place || runner.lb_place || runner.ladbrokesPlace || "-"}
+                  <br />
+                  W: {runner.ladbrokes_win || runner.lb_win || runner.ladbrokesWin || "-"}
+                </td>
+                <td style={{ padding: "8px", fontWeight: 800 }}>
+                  {runner.aiLabel || runner.confidence || runner.label || "-"}
+                  {runner.score || runner.ai_score ? ` · ${runner.score || runner.ai_score}` : ""}
+                </td>
+                <td style={{ padding: "8px" }}>
+                  {runner.position || runner.finishing_position || "Pending / Not available"}
+                </td>
+                <td style={{ padding: "8px" }}>
+                  {runner.place_dividend || runner.dividend || "Pending / Not available"}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      <div style={{ marginTop: "10px", color: "#94a3b8" }}>
+        Official PlaceDash pick only counts toward Track Record stats, ROI, strike rate, and bank tracking.
+      </div>
     </div>
+  );
+})()}
   </div>
                       )}
 
