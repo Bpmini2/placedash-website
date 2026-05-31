@@ -590,6 +590,7 @@ export default function Dashboard() {
                   condition: race.condition,
                   runner_count: race.runners?.length || 0,
                   state: race.state,
+                  race_card_json: race.runners || [],
                 }),
               });
             } catch (err) {
