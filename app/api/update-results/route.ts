@@ -550,15 +550,40 @@ export async function GET(request: Request) {
 
     const betPercentage = Number(strategy.bet_percentage || 10);
 
-    const { data: pendingPicks, error: pendingError } = await supabase
-      .from("saved_picks")
-      .select("*")
-      .eq("logic_version", "v2_value_bet")
-      .in("result", ["pending", "needs_dividend"])
-      .lte("race_date", today)
-      .order("race_date", { ascending: true })
-      .order("race_time", { ascending: true })
-      .limit(100);
+    const pendingResultQuery = supabase
+  .from("saved_picks")
+  .select("*")
+  .eq("logic_version", "v2_value_bet")
+  .in("result", ["pending", "needs_dividend"])
+  .lte("race_date", today)
+  .order("race_date", { ascending: true })
+  .order("race_time", { ascending: true })
+  .limit(100);
+
+const needsDividendQuery = supabase
+  .from("saved_picks")
+  .select("*")
+  .eq("logic_version", "v2_value_bet")
+  .eq("settlement_status", "needs_dividend")
+  .lte("race_date", today)
+  .order("race_date", { ascending: true })
+  .order("race_time", { ascending: true })
+  .limit(100);
+
+const [
+  { data: pendingResultPicks, error: pendingResultError },
+  { data: needsDividendPicks, error: needsDividendError },
+] = await Promise.all([pendingResultQuery, needsDividendQuery]);
+
+const pendingError = pendingResultError || needsDividendError;
+
+const pendingPicks = Array.from(
+  new Map(
+    [...(pendingResultPicks || []), ...(needsDividendPicks || [])].map(
+      (pick: any) => [pick.id, pick]
+    )
+  ).values()
+);
 
     if (pendingError) {
       return NextResponse.json({
