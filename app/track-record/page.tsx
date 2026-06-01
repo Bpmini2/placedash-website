@@ -682,30 +682,31 @@ document.body.removeChild(link);
     Paid ${r.place_dividend || r.dividend}
   </span>
 )}
+{isAdmin && (
+  <button
+    onClick={(e) => {
+      const container = e.currentTarget.parentElement?.parentElement;
+      const editBox = container?.querySelector(".edit-result-box") as HTMLDivElement;
 
-                        <button
-                          onClick={(e) => {
-                            const container = e.currentTarget.parentElement?.parentElement;
-                            const editBox = container?.querySelector(".edit-result-box") as HTMLDivElement;
-
-                            if (editBox) {
-                              editBox.style.display =
-                                editBox.style.display === "none" ? "flex" : "none";
-                            }
-                          }}
-                          style={{
-                            marginLeft: "10px",
-                            padding: "5px 10px",
-                            borderRadius: "8px",
-                            border: "1px solid rgba(34,197,94,0.35)",
-                            background: "rgba(34,197,94,0.12)",
-                            color: "#22c55e",
-                            fontWeight: 800,
-                            cursor: "pointer",
-                          }}
-                        >
-                          Edit
-                        </button>
+      if (editBox) {
+        editBox.style.display =
+          editBox.style.display === "none" ? "flex" : "none";
+      }
+    }}
+    style={{
+      marginLeft: "10px",
+      padding: "5px 10px",
+      borderRadius: "8px",
+      border: "1px solid rgba(34,197,94,0.35)",
+      background: "rgba(34,197,94,0.12)",
+      color: "#22c55e",
+      fontWeight: 800,
+      cursor: "pointer",
+    }}
+  >
+    Edit
+  </button>
+)}
                         <button
   onClick={() =>
     setExpandedRaceId(expandedRaceId === (r.id || i) ? null : (r.id || i))
@@ -724,9 +725,9 @@ document.body.removeChild(link);
   {expandedRaceId === (r.id || i) ? "Hide Race Card" : "View Race Card"}
 </button>
                       </div>
-
+{isAdmin && (
                       <div
-                        className="edit-result-box"
+                className="edit-result-box"                                
                         style={{
                           display: "none",
                           marginTop: "10px",
@@ -847,6 +848,7 @@ const placeDividend = dividendInput?.value;
                           Update Result
                         </button>
                       </div>
+  )}
 
                       {expandedRaceId === (r.id || i) && (
   <div
