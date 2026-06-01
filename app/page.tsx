@@ -54,7 +54,7 @@ export default function HomePage() {
             </div>
 
             <nav style={{ display: "flex", gap: "42px" }}>
-              <a href="/dashboard" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>Predictions</a>
+              <a href="/dashboard" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>Dashboard</a>
               <a href="#method" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>Method</a>
               <a href="#track-record" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>Track Record</a>
               <a href="#pricing" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>Pricing</a>
