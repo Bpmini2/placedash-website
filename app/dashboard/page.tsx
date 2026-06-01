@@ -711,6 +711,16 @@ export default function Dashboard() {
                 Track Record
               </a>
               <a
+  href="/track-record?admin=true"
+  style={{
+    color: "#16a34a",
+    fontWeight: 800,
+    textDecoration: "none",
+  }}
+>
+  Admin Track Record
+</a>
+              <a
                 href="/admin-picks"
                 style={{
                   color: "#07111f",
