@@ -641,14 +641,16 @@ const res = await fetch(formfavUrl);
   }, []);
 
   const displayRaces = races
-    .filter((race: any) => {
-      const runnerCount = race.runners?.length || 0;
-      return runnerCount >= 8 && runnerCount <= 11;
-    })
-    .filter((race: any) => {
-      const best = getBestRunner(race);
-      return best?.decision === "BET";
-    });
+  .filter((race: any) => {
+    const runnerCount = race.runners?.length || 0;
+    return runnerCount >= 8 && runnerCount <= 11;
+  })
+  .filter((race: any) => {
+    if (isPreviewMode) return true;
+
+    const best = getBestRunner(race);
+    return best?.decision === "BET";
+  });
 
   const selectedBestRunner = selectedRace ? getBestRunner(selectedRace) : null;
   const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
