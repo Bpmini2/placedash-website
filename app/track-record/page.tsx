@@ -718,6 +718,7 @@ document.body.removeChild(link);
     border: "1px solid rgba(56,189,248,0.35)",
     background: "rgba(56,189,248,0.12)",
     color: "#38bdf8",
+    boxShadow: "0 0 18px rgba(56,189,248,0.18)",
     fontWeight: 800,
     cursor: "pointer",
   }}
