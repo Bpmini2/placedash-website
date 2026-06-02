@@ -580,7 +580,11 @@ const res = await fetch(formfavUrl);
           return topPick?.decision === "BET";
         });
 
-        setRaces(officialBetRaces);
+        if (usePreview) {
+  setRaces(racesWithOdds);
+} else {
+  setRaces(officialBetRaces);
+}
 
         if (!usePreview && officialBetRaces.length) {
           for (const race of officialBetRaces) {
