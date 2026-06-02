@@ -695,7 +695,7 @@ const res = await fetch(formfavUrl);
                   width: "70px",
                   height: "70px",
                   borderRadius: "18px",
-                  background: "#20c865",
+                  background: "#38bdf8",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -746,7 +746,7 @@ const res = await fetch(formfavUrl);
               <a
   href="/track-record?admin=true"
   style={{
-    color: "#16a34a",
+    color: "##0284c7",
     fontWeight: 800,
     textDecoration: "none",
   }}
@@ -756,7 +756,7 @@ const res = await fetch(formfavUrl);
               <a
                 href="/dashboard?admin=true"
                 style={{
-                  color: "#16a34a",
+                  color: "##0284c7",
                   fontWeight: 700,
                   textDecoration: "none",
                 }}
@@ -778,7 +778,7 @@ const res = await fetch(formfavUrl);
             <a
               href="/"
               style={{
-                background: "#20c865",
+                background: "#38bdf8",
                 color: "#07111f",
                 padding: "18px 34px",
                 borderRadius: "16px",
