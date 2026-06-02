@@ -801,8 +801,8 @@ const res = await fetch(formfavUrl);
               marginBottom: "14px",
               padding: "7px 14px",
               borderRadius: "999px",
-              background: "rgba(34,197,94,0.14)",
-              color: "#22c55e",
+              background: "rgba(56,189,248,0.14)",
+              color: "#38bdf8",
               fontSize: "13px",
               fontWeight: 800,
               letterSpacing: "0.08em",
@@ -842,8 +842,8 @@ const res = await fetch(formfavUrl);
             marginTop: "10px",
             padding: "6px 10px",
             borderRadius: "999px",
-            background: "rgba(34,197,94,0.12)",
-            color: "#22c55e",
+            background: "rgba(56,189,248,0.12)",
+            color: "#38bdf8",
             fontSize: "12px",
             fontWeight: "600",
           }}
@@ -1014,12 +1014,12 @@ const res = await fetch(formfavUrl);
                         marginTop: "10px",
                         padding: "10px",
                         borderRadius: "10px",
-                        background: "rgba(34,197,94,0.08)",
-                        border: "1px solid rgba(34,197,94,0.2)",
+                        background: "rgba(56,189,248,0.08)",
+                        border: "1px solid rgba(56,189,248,0.2)",
                         fontSize: "13px",
                       }}
                     >
-                      <div style={{ color: "#22c55e", fontWeight: 800 }}>
+                      <div style={{ color: "#38bdf8", fontWeight: 800 }}>
                         SB Place: ${odds.sportsbet_place || "-"} · LB Place: $
                         {odds.ladbrokes_place || "-"}
                       </div>
@@ -1084,10 +1084,10 @@ const res = await fetch(formfavUrl);
                     fontWeight: "600",
                     background:
                       bestRunner?.confidence === "HIGH"
-                        ? "rgba(34,197,94,0.15)"
+                        ? "rgba(56,189,248,0.15)"
                         : "rgba(250,204,21,0.15)",
                     color:
-                      bestRunner?.confidence === "HIGH" ? "#22c55e" : "#facc15",
+                      bestRunner?.confidence === "HIGH" ? "#38bdf8" : "#facc15",
                   }}
                 >
                   {`${bestRunner?.decision || "WATCH"} · ${
@@ -1139,11 +1139,11 @@ const res = await fetch(formfavUrl);
                 marginTop: "14px",
                 padding: "12px",
                 borderRadius: "12px",
-                background: "rgba(34,197,94,0.10)",
-                border: "1px solid rgba(34,197,94,0.18)",
+                background: "rgba(56,189,248,0.10)",
+                border: "1px solid rgba(56,189,248,0.18)",
               }}
             >
-              <strong style={{ color: "#22c55e" }}>Value Selection:</strong>
+              <strong style={{ color: "#38bdf8" }}>Value Selection:</strong>
               {selectedBestRunner?.number ? ` ${selectedBestRunner.number}. ` : ""}
               {selectedBestRunner?.horse || "No selection"} ·{" "}
               {selectedBestRunner?.decision || "WATCH"} ·{" "}
@@ -1202,7 +1202,7 @@ const res = await fetch(formfavUrl);
                           padding: "10px",
                           color:
                             runner.decision === "BET"
-                              ? "#22c55e"
+                              ? "#38bdf8"
                               : runner.decision === "WATCH"
                               ? "#facc15"
                               : runner.decision === "LOW VALUE"
@@ -1251,13 +1251,13 @@ const res = await fetch(formfavUrl);
             href="/track-record"
             style={{
               display: "inline-block",
-              background: "#22c55e",
+              background: "#38bdf8",
               color: "#07111f",
               padding: "14px 28px",
               borderRadius: "12px",
               fontWeight: 800,
               textDecoration: "none",
-              boxShadow: "0 10px 25px rgba(34,197,94,0.35)",
+              boxShadow: "0 10px 25px rgba(56,189,248,0.35)",
             }}
           >
             View Full Track Record
