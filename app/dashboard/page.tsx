@@ -756,7 +756,7 @@ const res = await fetch(formfavUrl);
               <a
                 href="/dashboard?admin=true"
                 style={{
-                  color: "#07111f",
+                  color: "#16a34a",
                   fontWeight: 700,
                   textDecoration: "none",
                 }}
