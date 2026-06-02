@@ -43,7 +43,7 @@ export default function HomePage() {
                   fontWeight: 900,
                   fontStyle: "italic",
                   letterSpacing: "-3px",
-                  boxShadow: "0 10px 25px rgba(34,197,94,0.35)",
+                  boxShadow: "0 10px 25px rgba(56,189,248,0.35)",
                 }}
               >
                 123
@@ -63,13 +63,13 @@ export default function HomePage() {
             <a
               href="/dashboard"
               style={{
-                background: "#22c55e",
+                background: "#38bdf8",
                 color: "#07111f",
                 padding: "18px 34px",
                 borderRadius: "16px",
                 fontWeight: 900,
                 textDecoration: "none",
-                boxShadow: "0 16px 35px rgba(34,197,94,0.35)",
+                boxShadow: "0 16px 35px rgba(56,189,248,0.35)",
               }}
             >
               View Today’s Picks
@@ -79,7 +79,7 @@ export default function HomePage() {
 
         <section style={{ padding: "90px 0 120px" }}>
           <div style={{ maxWidth: "760px" }}>
-            <div style={{ display: "inline-block", padding: "10px 18px", borderRadius: "999px", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.35)", color: "#7dd3fc", fontWeight: 700, marginBottom: "24px" }}>
+            <div style={{ display: "inline-block", padding: "10px 18px", borderRadius: "999px", background: "rgba(56,189,248,0.12)", border: "1px solid rgba(56,189,248,0.35)", color: "#7dd3fc", fontWeight: 700, marginBottom: "24px" }}>
               Australian racing only • Place analysis
             </div>
 
@@ -101,7 +101,7 @@ export default function HomePage() {
             </p>
 
             <div style={{ display: "flex", gap: "16px", marginTop: "32px" }}>
-              <a href="/dashboard" style={{ background: "#22c55e", color: "#07111f", padding: "16px 28px", borderRadius: "16px", fontWeight: 900, textDecoration: "none" }}>
+              <a href="/dashboard" style={{ background: "#38bdf8", color: "#07111f", padding: "16px 28px", borderRadius: "16px", fontWeight: 900, textDecoration: "none" }}>
                 View Today’s Best Picks
               </a>
              
@@ -116,7 +116,7 @@ export default function HomePage() {
   Gamble responsibly. PlaceDash provides racing analysis and information only — it is not betting advice and does not guarantee results. If gambling is becoming a problem, contact Gambling Help Online on 1800 858 858 or visit BetStop for self-exclusion support.
 </p>
         <section id="predictions" style={{ padding: "80px 24px", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-          <div style={{ color: "#22c55e", fontSize: "14px", fontWeight: 900, letterSpacing: "0.14em", marginBottom: "18px" }}>
+          <div style={{ color: "#38bdf8", fontSize: "14px", fontWeight: 900, letterSpacing: "0.14em", marginBottom: "18px" }}>
             TODAY&apos;S PREDICTIONS
           </div>
           <h2 style={{ fontSize: "46px", margin: 0 }}>
@@ -126,13 +126,13 @@ export default function HomePage() {
             PlaceDash only displays Australian races that pass the platform filters: 8–11
             active runners, no first starters, and runners with previous race experience.
           </p>
-          <a href="/dashboard" style={{ display: "inline-block", marginTop: "28px", background: "#22c55e", color: "#07111f", padding: "18px 34px", borderRadius: "16px", fontWeight: 900, fontSize: "18px", textDecoration: "none" }}>
+          <a href="/dashboard" style={{ display: "inline-block", marginTop: "28px", background: "#38bdf8", color: "#07111f", padding: "18px 34px", borderRadius: "16px", fontWeight: 900, fontSize: "18px", textDecoration: "none" }}>
             Open Live Dashboard
           </a>
         </section>
 
         <section id="method" style={{ padding: "90px 0", textAlign: "center" }}>
-          <div style={{ color: "#22c55e", fontSize: "14px", fontWeight: 900, letterSpacing: "0.14em" }}>
+          <div style={{ color: "#38bdf8", fontSize: "14px", fontWeight: 900, letterSpacing: "0.14em" }}>
             THE PLACEDASH METHOD
           </div>
           <h2 style={{ fontSize: "42px", marginTop: "14px" }}>
@@ -151,7 +151,7 @@ export default function HomePage() {
               ["Value", "The aim is disciplined analysis and better decision-making."],
             ].map(([title, text]) => (
               <div key={title} style={{ textAlign: "left", padding: "26px", borderRadius: "24px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)" }}>
-                <h3 style={{ color: "#86efac", fontSize: "34px", margin: 0 }}>{title}</h3>
+                <h3 style={{ color: "#7dd3fc", fontSize: "34px", margin: 0 }}>{title}</h3>
                 <p style={{ color: "#bfdbfe", lineHeight: 1.6 }}>{text}</p>
               </div>
             ))}
@@ -159,7 +159,7 @@ export default function HomePage() {
         </section>
 
         <section id="track-record" style={{ padding: "90px 0", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-          <div style={{ color: "#22c55e", fontSize: "14px", fontWeight: 900, letterSpacing: "0.14em" }}>
+          <div style={{ color: "#38bdf8", fontSize: "14px", fontWeight: 900, letterSpacing: "0.14em" }}>
             HOW PLACEDASH WORKS
           </div>
           <h2 style={{ fontSize: "42px", marginTop: "14px" }}>
@@ -177,7 +177,7 @@ export default function HomePage() {
   ["HISTORICAL RESULTS", "View long-term AI selection performance and race history"],
 ].map(([title, text]) => (
               <div key={title} style={{ textAlign: "left", padding: "26px", borderRadius: "22px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)" }}>
-                <h3 style={{ color: "#86efac", fontSize: "34px", margin: 0 }}>{title}</h3>
+                <h3 style={{ color: "#7dd3fc", fontSize: "34px", margin: 0 }}>{title}</h3>
                 <p style={{ color: "#bfdbfe" }}>{text}</p>
               </div>
             ))}
@@ -185,7 +185,7 @@ export default function HomePage() {
         </section>
 
         <section id="pricing" style={{ padding: "90px 0", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-          <div style={{ color: "#22c55e", fontSize: "14px", fontWeight: 900, letterSpacing: "0.14em" }}>
+          <div style={{ color: "#38bdf8", fontSize: "14px", fontWeight: 900, letterSpacing: "0.14em" }}>
             PRICING
           </div>
           <h2 style={{ fontSize: "42px", marginTop: "14px" }}>Choose Your Access</h2>
@@ -199,11 +199,11 @@ export default function HomePage() {
               ["Silver", "$9.99/month", "Unlock daily AI place analysis and confidence ratings."],
               ["Gold", "$19.99/month", "Full access to stronger PlaceDash analysis and priority picks."],
             ].map(([plan, price, desc]) => (
-              <div key={plan} style={{ padding: "28px", borderRadius: "24px", background: plan === "Gold" ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.08)", border: plan === "Gold" ? "1px solid #22c55e" : "1px solid rgba(255,255,255,0.14)" }}>
+              <div key={plan} style={{ padding: "28px", borderRadius: "24px", background: plan === "Gold" ? "rgba(56,189,248,0.12)" : "rgba(255,255,255,0.08)", border: plan === "Gold" ? "1px solid #38bdf8" : "1px solid rgba(255,255,255,0.14)" }}>
                 <h3>{plan}</h3>
                 <p style={{ color: "#dbeafe" }}>{desc}</p>
                 <h2 style={{ fontSize: "34px" }}>{price}</h2>
-                <a href="/dashboard" style={{ display: "block", textAlign: "center", marginTop: "24px", padding: "14px", borderRadius: "14px", background: plan === "Gold" ? "#22c55e" : "transparent", color: plan === "Gold" ? "#07111f" : "#ffffff", border: "1px solid rgba(255,255,255,0.2)", textDecoration: "none", fontWeight: 800 }}>
+                <a href="/dashboard" style={{ display: "block", textAlign: "center", marginTop: "24px", padding: "14px", borderRadius: "14px", background: plan === "Gold" ? "#38bdf8" : "transparent", color: plan === "Gold" ? "#07111f" : "#ffffff", border: "1px solid rgba(255,255,255,0.2)", textDecoration: "none", fontWeight: 800 }}>
                   View Plan
                 </a>
               </div>
@@ -213,7 +213,7 @@ export default function HomePage() {
 
         <section style={{ padding: "80px 0", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
           <div style={{ padding: "36px", borderRadius: "28px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)" }}>
-            <div style={{ color: "#22c55e", fontSize: "14px", fontWeight: 900, letterSpacing: "0.14em" }}>
+            <div style={{ color: "#38bdf8", fontSize: "14px", fontWeight: 900, letterSpacing: "0.14em" }}>
               DASHBOARD PREVIEW
             </div>
             <h2>Built for quick daily decisions</h2>
@@ -221,7 +221,7 @@ export default function HomePage() {
               Users can view filtered races, confidence ratings, full racecard analysis,
               AI reasoning summaries, and locked premium selections in one clean dashboard.
             </p>
-            <a href="/dashboard" style={{ display: "inline-block", marginTop: "18px", background: "#22c55e", color: "#07111f", padding: "14px 24px", borderRadius: "14px", fontWeight: 900, textDecoration: "none" }}>
+            <a href="/dashboard" style={{ display: "inline-block", marginTop: "18px", background: "#38bdf8", color: "#07111f", padding: "14px 24px", borderRadius: "14px", fontWeight: 900, textDecoration: "none" }}>
               View Dashboard
             </a>
           </div>
