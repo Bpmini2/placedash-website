@@ -83,7 +83,14 @@ export default function HomePage() {
               Australian racing only • Place analysis
             </div>
 
-            <h1 style={{ fontSize: "72px", lineHeight: "1.02", margin: 0, fontWeight: 900 }}>
+            <h1
+  style={{
+    fontSize: "clamp(42px, 7vw, 72px)",
+    lineHeight: "1.02",
+    margin: 0,
+    fontWeight: 900,
+  }}
+>
               Daily AI Place Picks for Australian Racing
             </h1>
 
