@@ -34,7 +34,7 @@ export default function HomePage() {
                   width: "70px",
                   height: "70px",
                   borderRadius: "18px",
-                  background: "#22c55e",
+                  background: "#38bdf8",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -79,7 +79,7 @@ export default function HomePage() {
 
         <section style={{ padding: "90px 0 120px" }}>
           <div style={{ maxWidth: "760px" }}>
-            <div style={{ display: "inline-block", padding: "10px 18px", borderRadius: "999px", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.35)", color: "#86efac", fontWeight: 700, marginBottom: "24px" }}>
+            <div style={{ display: "inline-block", padding: "10px 18px", borderRadius: "999px", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.35)", color: "#7dd3fc", fontWeight: 700, marginBottom: "24px" }}>
               Australian racing only • Place analysis
             </div>
 
