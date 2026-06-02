@@ -10,6 +10,7 @@ export default function Dashboard() {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
 const [isAdminPreviewAllowed, setIsAdminPreviewAllowed] = useState(false);
   const [isAdminDashboard, setIsAdminDashboard] = useState(false);
+  const [debugRaces, setDebugRaces] = useState<any[]>([]);
 function canShowTomorrowPreview() {
   const now = new Date();
 
@@ -584,7 +585,7 @@ const res = await fetch(formfavUrl);
           const topPick = getBestRunner(race);
           return topPick?.decision === "BET";
         });
-
+setDebugRaces(racesWithOdds);
         if (usePreview) {
   setRaces(racesWithOdds);
 } else {
@@ -656,7 +657,7 @@ const res = await fetch(formfavUrl);
     const best = getBestRunner(race);
     return best?.decision === "BET";
   });
-const debugSkippedRaces = races.map((race: any) => {
+const debugSkippedRaces = debugRaces.map((race: any) => {
   const best = getBestRunner(race);
   const runnerCount = race.runners?.length || 0;
 
