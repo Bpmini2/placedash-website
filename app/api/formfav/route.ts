@@ -11,7 +11,19 @@ function getMelbourneDate() {
     timeZone: "Australia/Melbourne",
   });
 }
+function getMelbourneTomorrowDate() {
+  const now = new Date();
 
+  const melbourneDate = new Date(
+    now.toLocaleString("en-US", {
+      timeZone: "Australia/Melbourne",
+    })
+  );
+
+  melbourneDate.setDate(melbourneDate.getDate() + 1);
+
+  return melbourneDate.toLocaleDateString("en-CA");
+}
 function formatRaceTime(startTime: string | null, timezone: string | null) {
   if (!startTime) return "TBA";
 
@@ -243,7 +255,7 @@ async function savePickToSupabase(race: any, bestRunner: any, pickDate: string) 
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const apiKey = process.env.FORMFAV_API_KEY;
 
@@ -254,7 +266,9 @@ export async function GET() {
       });
     }
 
-    const today = getMelbourneDate();
+    const url = new URL(request.url);
+const previewMode = url.searchParams.get("preview") === "tomorrow";
+const today = previewMode ? getMelbourneTomorrowDate() : getMelbourneDate();
 
     const meetingsRes = await fetch(
       `https://api.formfav.com/v1/form/meetings?date=${today}`,
@@ -376,30 +390,32 @@ export async function GET() {
       })
       .slice(0, 6);
 
-    await Promise.all(
-      cleanRacecards.map(async (race: any) => {
-        const bestRunner = getBestRunner(race);
+    if (!previewMode) {
+  await Promise.all(
+    cleanRacecards.map(async (race: any) => {
+      const bestRunner = getBestRunner(race);
 
-        if (
-  bestRunner &&
-  (
-    bestRunner.confidence === "HIGH" ||
-    (bestRunner.confidence === "MEDIUM" &&
-      bestRunner.score >= 56)
-  )
-) {
-          await savePickToSupabase(race, bestRunner, today);
-        }
-      })
-    );
-
+      if (
+        bestRunner &&
+        (
+          bestRunner.confidence === "HIGH" ||
+          (bestRunner.confidence === "MEDIUM" &&
+            bestRunner.score >= 56)
+        )
+      ) {
+        await savePickToSupabase(race, bestRunner, today);
+      }
+    })
+  );
+}
     return NextResponse.json({
       ok: true,
       source: "FormFav",
       date: today,
       totalMeetings: meetings.length,
       candidateRaceCount: candidateRaces.length,
-      savedToSupabase: true,
+      previewMode,
+savedToSupabase: !previewMode,
       racecards: cleanRacecards,
       message:
         cleanRacecards.length === 0
