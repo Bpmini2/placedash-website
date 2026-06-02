@@ -7,7 +7,21 @@ export default function Dashboard() {
   const [liveOdds, setLiveOdds] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [selectedRace, setSelectedRace] = useState<any | null>(null);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+const [isAdminPreviewAllowed, setIsAdminPreviewAllowed] = useState(false);
+function canShowTomorrowPreview() {
+  const now = new Date();
 
+  const melbourneTime = new Date(
+    now.toLocaleString("en-US", {
+      timeZone: "Australia/Melbourne",
+    })
+  );
+
+  const hour = melbourneTime.getHours();
+
+  return hour >= 21 && hour < 24;
+}
   function countStarts(runner: any) {
     if (typeof runner.starts === "number") return runner.starts;
     if (!runner.form) return 0;
@@ -459,7 +473,20 @@ export default function Dashboard() {
   useEffect(() => {
     async function loadRaces() {
       try {
-        const res = await fetch("/api/formfav");
+        const previewAllowed = canShowTomorrowPreview();
+setIsAdminPreviewAllowed(previewAllowed);
+
+const usePreview =
+  previewAllowed &&
+  new URLSearchParams(window.location.search).get("admin") === "true";
+
+setIsPreviewMode(usePreview);
+
+const formfavUrl = usePreview
+  ? "/api/formfav?preview=tomorrow"
+  : "/api/formfav";
+
+const res = await fetch(formfavUrl);
         const data = await res.json();
 
         const rawRaces = data.racecards || [];
@@ -555,7 +582,7 @@ export default function Dashboard() {
 
         setRaces(officialBetRaces);
 
-        if (officialBetRaces.length) {
+        if (!usePreview && officialBetRaces.length) {
           for (const race of officialBetRaces) {
             const topPick = getBestRunner(race);
 
@@ -885,7 +912,23 @@ export default function Dashboard() {
               </p>
             </div>
           )}
-
+{isPreviewMode && (
+  <div
+    style={{
+      marginBottom: "18px",
+      padding: "14px 18px",
+      borderRadius: "14px",
+      border: "1px solid rgba(250,204,21,0.45)",
+      background: "rgba(250,204,21,0.12)",
+      color: "#facc15",
+      fontWeight: 900,
+      lineHeight: 1.5,
+    }}
+  >
+    PREVIEW ONLY / ADMIN PREVIEW — Tomorrow&apos;s races are being shown for review only.
+    These picks are not saved to Track Record and do not affect official stats, ROI, profit/loss, or bankroll.
+  </div>
+)}
           {displayRaces.map((race: any, index: number) => {
             const bestRunner = getBestRunner(race);
             const visibleHorse = `${bestRunner?.number ? bestRunner.number + ". " : ""}${
