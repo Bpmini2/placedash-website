@@ -352,10 +352,10 @@ document.body.removeChild(link);
             }}
           >
             {[
-              { label: "Total AI Picks", value: summary.totalPicks, color: "#38bdf8", filter: "all" },
-              { label: "Completed", value: summary.completedPicks, color: "#38bdf8", filter: "completed" },
+              { label: "Total AI Picks", value: summary.totalPicks, color: "#22c55e", filter: "all" },
+              { label: "Completed", value: summary.completedPicks, color: "#22c55e", filter: "completed" },
               { label: "Pending", value: summary.pendingPicks, color: "#facc15", filter: "pending" },
-              { label: "Placed", value: summary.placedPicks, color: "#38bdf8", filter: "placed" },
+              { label: "Placed", value: summary.placedPicks, color: "#22c55e", filter: "placed" },
               { label: "Unplaced", value: summary.unplacedPicks, color: "#ef4444", filter: "unplaced" },
             { label: "Scratched / Abandoned", value: summary.voidPicks || 0, color: "#94a3b8", filter: "scratched" },
               {
@@ -364,16 +364,16 @@ document.body.removeChild(link);
                 color: "#facc15",
                 filter: "placed",
               },
-              { label: "ROI", value: `${summary.roi}%`, color: summary.roi >= 0 ? "#38bdf8" : "#ef4444" },
+              { label: "ROI", value: `${summary.roi}%`, color: summary.roi >= 0 ? "#22c55e" : "#ef4444" },
               {
                 label: "Profit / Loss",
                 value: `$${summary.totalProfitLoss}`,
-                color: summary.totalProfitLoss >= 0 ? "#38bdf8" : "#ef4444",
+                color: summary.totalProfitLoss >= 0 ? "#22c55e" : "#ef4444",
               },
               {
                 label: "Current Bank",
                 value: `$${summary.currentBank || 1000}`,
-                color: "#38bdf8",
+                color: "#22c55e",
               },
             ].map((card, index) => (
               <div
