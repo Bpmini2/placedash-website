@@ -9,6 +9,7 @@ export default function Dashboard() {
   const [selectedRace, setSelectedRace] = useState<any | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
 const [isAdminPreviewAllowed, setIsAdminPreviewAllowed] = useState(false);
+  const [isAdminDashboard, setIsAdminDashboard] = useState(false);
 function canShowTomorrowPreview() {
   const now = new Date();
 
@@ -476,9 +477,13 @@ function canShowTomorrowPreview() {
         const previewAllowed = canShowTomorrowPreview();
 setIsAdminPreviewAllowed(previewAllowed);
 
-const usePreview =
-  previewAllowed &&
+const adminMode =
   new URLSearchParams(window.location.search).get("admin") === "true";
+
+setIsAdminDashboard(adminMode);
+
+const usePreview =
+  previewAllowed && adminMode;
 
 setIsPreviewMode(usePreview);
 
@@ -651,7 +656,36 @@ const res = await fetch(formfavUrl);
     const best = getBestRunner(race);
     return best?.decision === "BET";
   });
+const debugSkippedRaces = races.map((race: any) => {
+  const best = getBestRunner(race);
+  const runnerCount = race.runners?.length || 0;
 
+  let reason = "Unknown reason";
+
+  if (runnerCount < 8 || runnerCount > 11) {
+    reason = `runner count ${runnerCount}`;
+  } else if (!best) {
+    reason = "no suitable runner found";
+  } else if (best.decision === "WATCH") {
+    reason = `best runner WATCH — ${best.reasoning?.[0] || "not strong enough for official bet"}`;
+  } else if (best.decision === "LOW VALUE") {
+    reason = `best runner LOW VALUE — ${best.reasoning?.[0] || "value filter failed"}`;
+  } else if (best.decision === "AVOID") {
+    reason = `best runner AVOID — ${best.reasoning?.[0] || "avoid profile"}`;
+  } else if (best.decision !== "BET") {
+    reason = `best runner ${best.decision || "not BET"}`;
+  } else {
+    reason = "BET-qualified but not displayed";
+  }
+
+  return {
+    course: race.course,
+    race_number: race.race_number || race.raceNumber,
+    state: race.state,
+    bestRunner: best,
+    reason,
+  };
+});
   const selectedBestRunner = selectedRace ? getBestRunner(selectedRace) : null;
   const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
 
@@ -918,6 +952,59 @@ const res = await fetch(formfavUrl);
               </p>
             </div>
           )}
+          {isAdminDashboard && debugSkippedRaces.length > 0 && (
+  <div
+    style={{
+      marginTop: "18px",
+      padding: "18px",
+      borderRadius: "18px",
+      border: "1px solid rgba(56,189,248,0.35)",
+      background: "rgba(56,189,248,0.08)",
+      color: "#cbd5e1",
+    }}
+  >
+    <div
+      style={{
+        color: "#38bdf8",
+        fontWeight: 900,
+        fontSize: "18px",
+        marginBottom: "12px",
+      }}
+    >
+      Admin AI Debug Summary
+    </div>
+
+    <div style={{ color: "#94a3b8", marginBottom: "12px", lineHeight: 1.5 }}>
+      Admin-only view. Shows why races are not becoming official BET selections.
+    </div>
+
+    {debugSkippedRaces.map((item: any, index: number) => (
+      <div
+        key={`${item.course}-${item.race_number}-${index}`}
+        style={{
+          padding: "10px 0",
+          borderTop: index === 0 ? "none" : "1px solid rgba(255,255,255,0.10)",
+          lineHeight: 1.5,
+        }}
+      >
+        <div style={{ fontWeight: 900, color: "#ffffff" }}>
+          {item.course} Race {item.race_number}
+          {item.state ? ` (${item.state})` : ""} — skipped
+        </div>
+
+        <div style={{ color: "#facc15", marginTop: "4px" }}>
+          Reason: {item.reason}
+        </div>
+
+        {item.bestRunner && (
+          <div style={{ color: "#94a3b8", marginTop: "4px" }}>
+            Best runner: {item.bestRunner.number}. {item.bestRunner.horse || item.bestRunner.name || "Unknown"} · {item.bestRunner.decision || "No decision"} · Score {item.bestRunner.valueScore || item.bestRunner.score || "-"}
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+)}
 {isPreviewMode && (
   <div
     style={{
