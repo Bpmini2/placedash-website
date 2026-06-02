@@ -242,7 +242,7 @@ document.body.removeChild(link);
                 width: "70px",
                 height: "70px",
                 borderRadius: "18px",
-                background: "#20c865",
+                background: "#38bdf8",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -272,7 +272,7 @@ document.body.removeChild(link);
           <a
             href="/dashboard"
             style={{
-              background: "#20c865",
+              background: "#38bdf8",
               color: "#07111f",
               padding: "18px 34px",
               borderRadius: "16px",
@@ -293,8 +293,8 @@ document.body.removeChild(link);
               marginBottom: "14px",
               padding: "7px 14px",
               borderRadius: "999px",
-              background: "rgba(34,197,94,0.14)",
-              color: "#22c55e",
+              background: "rgba(56,189,248,0.14)",
+              color: "#38bdf8",
               fontSize: "13px",
               fontWeight: 800,
               letterSpacing: "0.08em",
@@ -326,8 +326,8 @@ document.body.removeChild(link);
               marginBottom: "20px",
               padding: "6px 10px",
               borderRadius: "999px",
-              background: "rgba(34,197,94,0.12)",
-              color: "#22c55e",
+              background: "rgba(56,189,248,0.12)",
+              color: "#38bdf8",
               fontSize: "12px",
               fontWeight: "600",
             }}
@@ -352,10 +352,10 @@ document.body.removeChild(link);
             }}
           >
             {[
-              { label: "Total AI Picks", value: summary.totalPicks, color: "#22c55e", filter: "all" },
+              { label: "Total AI Picks", value: summary.totalPicks, color: "#38bdf8", filter: "all" },
               { label: "Completed", value: summary.completedPicks, color: "#38bdf8", filter: "completed" },
               { label: "Pending", value: summary.pendingPicks, color: "#facc15", filter: "pending" },
-              { label: "Placed", value: summary.placedPicks, color: "#22c55e", filter: "placed" },
+              { label: "Placed", value: summary.placedPicks, color: "#38bdf8", filter: "placed" },
               { label: "Unplaced", value: summary.unplacedPicks, color: "#ef4444", filter: "unplaced" },
             { label: "Scratched / Abandoned", value: summary.voidPicks || 0, color: "#94a3b8", filter: "scratched" },
               {
@@ -364,16 +364,16 @@ document.body.removeChild(link);
                 color: "#facc15",
                 filter: "placed",
               },
-              { label: "ROI", value: `${summary.roi}%`, color: summary.roi >= 0 ? "#22c55e" : "#ef4444" },
+              { label: "ROI", value: `${summary.roi}%`, color: summary.roi >= 0 ? "#38bdf8" : "#ef4444" },
               {
                 label: "Profit / Loss",
                 value: `$${summary.totalProfitLoss}`,
-                color: summary.totalProfitLoss >= 0 ? "#22c55e" : "#ef4444",
+                color: summary.totalProfitLoss >= 0 ? "#38bdf8" : "#ef4444",
               },
               {
                 label: "Current Bank",
                 value: `$${summary.currentBank || 1000}`,
-                color: "#22c55e",
+                color: "#38bdf8",
               },
             ].map((card, index) => (
               <div
@@ -386,12 +386,12 @@ document.body.removeChild(link);
                   background: "rgba(255,255,255,0.05)",
                   border:
                     activeFilter === card.filter
-                      ? "1px solid rgba(34,197,94,0.55)"
+                      ? "1px solid rgba(56,189,248,0.55)"
                       : "1px solid rgba(255,255,255,0.08)",
                   backdropFilter: "blur(12px)",
                   boxShadow:
                     activeFilter === card.filter
-                      ? "0 0 22px rgba(34,197,94,0.22)"
+                      ? "0 0 22px rgba(56,189,248,0.22)"
                       : "none",
                 }}
               >
@@ -437,7 +437,7 @@ document.body.removeChild(link);
             <div style={{ display: "grid", gap: "14px" }}>
               <div
                 style={{
-                  color: "#22c55e",
+                  color: "#38bdf8",
                   fontSize: "18px",
                   fontWeight: 700,
                   marginBottom: "18px",
@@ -473,7 +473,7 @@ document.body.removeChild(link);
                         padding: "8px 14px",
                         borderRadius: "10px",
                         border: "1px solid rgba(255,255,255,0.12)",
-                        background: dateMode === "today" ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.05)",
+                        background: dateMode === "today" ? "rgba(56,189,248,0.18)" : "rgba(255,255,255,0.05)",
                         color: "#fff",
                         cursor: "pointer",
                         fontWeight: 700,
@@ -497,7 +497,7 @@ document.body.removeChild(link);
                         padding: "8px 14px",
                         borderRadius: "10px",
                         border: "1px solid rgba(255,255,255,0.12)",
-                        background: dateMode === "yesterday" ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.05)",
+                        background: dateMode === "yesterday" ? "rgba(56,189,248,0.18)" : "rgba(255,255,255,0.05)",
                         color: "#fff",
                         cursor: "pointer",
                         fontWeight: 700,
@@ -512,7 +512,7 @@ document.body.removeChild(link);
                         padding: "8px 14px",
                         borderRadius: "10px",
                         border: "1px solid rgba(255,255,255,0.12)",
-                        background: dateMode === "last7" ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.05)",
+                        background: dateMode === "last7" ? "rgba(56,189,248,0.18)" : "rgba(255,255,255,0.05)",
                         color: "#fff",
                         cursor: "pointer",
                         fontWeight: 700,
@@ -527,7 +527,7 @@ document.body.removeChild(link);
                         padding: "8px 14px",
                         borderRadius: "10px",
                         border: "1px solid rgba(255,255,255,0.12)",
-                        background: dateMode === "last30" ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.05)",
+                        background: dateMode === "last30" ? "rgba(56,189,248,0.18)" : "rgba(255,255,255,0.05)",
                         color: "#fff",
                         cursor: "pointer",
                         fontWeight: 700,
@@ -578,9 +578,9 @@ document.body.removeChild(link);
                       style={{
                         padding: "8px 14px",
                         borderRadius: "10px",
-                        border: "1px solid rgba(34,197,94,0.35)",
-                        background: "rgba(34,197,94,0.12)",
-                        color: "#22c55e",
+                        border: "1px solid rgba(56,189,248,0.35)",
+                        background: "rgba(56,189,248,0.12)",
+                        color: "#38bdf8",
                         cursor: "pointer",
                         fontWeight: 700,
                       }}
@@ -605,7 +605,7 @@ document.body.removeChild(link);
                         borderRadius: "16px",
                         border:
                           r.placed === true
-                            ? "1px solid rgba(34,197,94,0.35)"
+                            ? "1px solid rgba(56,189,248,0.35)"
                             : r.placed === false
                             ? "1px solid rgba(239,68,68,0.30)"
                             : "1px solid rgba(255,255,255,0.08)",
@@ -631,7 +631,7 @@ document.body.removeChild(link);
                           style={{
                             color:
                               r.confidence === "HIGH"
-                                ? "#22c55e"
+                                ? "#38bdf8"
                                 : r.confidence === "MEDIUM"
                                 ? "#facc15"
                                 : "#ef4444",
@@ -657,7 +657,7 @@ document.body.removeChild(link);
                               r.result === "scratched" || r.settlement_status === "void"
                                 ? "#94a3b8"
                                 : r.placed === true
-                                ? "#22c55e"
+                                ? "#38bdf8"
                                 : r.placed === false
                                 ? "#ef4444"
                                 : "#94a3b8",
@@ -678,7 +678,7 @@ document.body.removeChild(link);
                         </span>
 
                         {r.placed === true && (r.place_dividend || r.dividend) && (
-  <span style={{ marginLeft: "10px", color: "#22c55e", fontWeight: 800 }}>
+  <span style={{ marginLeft: "10px", color: "#38bdf8", fontWeight: 800 }}>
     Paid ${r.place_dividend || r.dividend}
   </span>
 )}
@@ -697,9 +697,9 @@ document.body.removeChild(link);
       marginLeft: "10px",
       padding: "5px 10px",
       borderRadius: "8px",
-      border: "1px solid rgba(34,197,94,0.35)",
-      background: "rgba(34,197,94,0.12)",
-      color: "#22c55e",
+      border: "1px solid rgba(56,189,248,0.35)",
+      background: "rgba(56,189,248,0.12)",
+      color: "#38bdf8",
       fontWeight: 800,
       cursor: "pointer",
     }}
@@ -840,7 +840,7 @@ const placeDividend = dividendInput?.value;
                             padding: "8px 14px",
                             borderRadius: "8px",
                             border: "none",
-                            background: "#22c55e",
+                            background: "#38bdf8",
                             color: "#07111f",
                             fontWeight: 800,
                             cursor: "pointer",
@@ -923,7 +923,7 @@ const placeDividend = dividendInput?.value;
                 key={`${runnerNumber}-${runnerHorse}-${index}`}
                 style={{
                   background: isOfficialPick
-                    ? "rgba(34,197,94,0.16)"
+                    ? "rgba(56,189,248,0.16)"
                     : "transparent",
                   color: isOfficialPick ? "#ffffff" : "#cbd5e1",
                   borderTop: "1px solid rgba(255,255,255,0.08)",
