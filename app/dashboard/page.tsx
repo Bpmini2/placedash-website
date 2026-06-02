@@ -754,14 +754,14 @@ const res = await fetch(formfavUrl);
   Admin Track Record
 </a>
               <a
-                href="/admin-picks"
+                href="/dashboard?admin=true"
                 style={{
                   color: "#07111f",
                   fontWeight: 700,
                   textDecoration: "none",
                 }}
               >
-                Admin
+                Admin Dashboard
               </a>
               <a
                 href="/#pricing"
