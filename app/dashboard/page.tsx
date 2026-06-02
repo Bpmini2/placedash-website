@@ -746,7 +746,7 @@ const res = await fetch(formfavUrl);
               <a
   href="/track-record?admin=true"
   style={{
-    color: "##0284c7",
+    color: "#0284c7",
     fontWeight: 800,
     textDecoration: "none",
   }}
@@ -756,7 +756,7 @@ const res = await fetch(formfavUrl);
               <a
                 href="/dashboard?admin=true"
                 style={{
-                  color: "##0284c7",
+                  color: "#0284c7",
                   fontWeight: 700,
                   textDecoration: "none",
                 }}
