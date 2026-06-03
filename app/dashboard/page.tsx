@@ -800,7 +800,8 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
                   textDecoration: "none",
                 }}
               >
-                Next Day Admin Preview
+                Next Day Dashboard
+                Admin Preview
               </a>
               <a
                 href="/#pricing"
