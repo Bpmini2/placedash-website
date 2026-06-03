@@ -957,60 +957,7 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
               </p>
             </div>
           )}
-          {isAdminDashboard && debugSkippedRaces.length > 0 && (
-  <div
-    style={{
-      gridColumn: "1 / -1",
-      marginTop: "18px",
-      padding: "18px",
-      borderRadius: "18px",
-      border: "1px solid rgba(56,189,248,0.35)",
-      background: "rgba(56,189,248,0.08)",
-      color: "#cbd5e1",
-    }}
-  >
-    <div
-      style={{
-        color: "#38bdf8",
-        fontWeight: 900,
-        fontSize: "18px",
-        marginBottom: "12px",
-      }}
-    >
-      Admin AI Debug Summary
-    </div>
-
-    <div style={{ color: "#94a3b8", marginBottom: "12px", lineHeight: 1.5 }}>
-      Admin-only view. Shows why races are not becoming official BET selections.
-    </div>
-
-    {debugSkippedRaces.map((item: any, index: number) => (
-      <div
-        key={`${item.course}-${item.race_number}-${index}`}
-        style={{
-          padding: "10px 0",
-          borderTop: index === 0 ? "none" : "1px solid rgba(255,255,255,0.10)",
-          lineHeight: 1.5,
-        }}
-      >
-        <div style={{ fontWeight: 900, color: "#ffffff" }}>
-          {item.course} Race {item.race_number}
-          {item.state ? ` (${item.state})` : ""} — skipped
-        </div>
-
-        <div style={{ color: "#facc15", marginTop: "4px" }}>
-          Reason: {item.reason}
-        </div>
-
-        {item.bestRunner && (
-          <div style={{ color: "#94a3b8", marginTop: "4px" }}>
-            Best runner: {item.bestRunner.number}. {item.bestRunner.horse || item.bestRunner.name || "Unknown"} · {item.bestRunner.decision || "No decision"} · Score {item.bestRunner.valueScore || item.bestRunner.score || "-"}
-          </div>
-        )}
-      </div>
-    ))}
-  </div>
-)}
+          
 {isPreviewMode && (
   <div
     style={{
