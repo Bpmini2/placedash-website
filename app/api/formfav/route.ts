@@ -201,7 +201,7 @@ export async function GET(request: Request) {
     );
 
     // Only fetch detailed race cards for possible candidates. This keeps API usage sensible.
-    const candidateRaces = upcomingCandidateRaces.slice(0, 12);
+    const candidateRaces = upcomingCandidateRaces.slice(0, 30);
 
     const racecards = await Promise.all(
       candidateRaces.map(async (race: any) => {
@@ -330,7 +330,7 @@ export async function GET(request: Request) {
           isRaceUpcoming(race.start_time)
         );
       })
-      .slice(0, 6);
+      .slice(0, 20);
 
     const debug = debugMode
       ? {
