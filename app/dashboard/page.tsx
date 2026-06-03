@@ -478,13 +478,15 @@ function canShowTomorrowPreview() {
         const previewAllowed = canShowTomorrowPreview();
 setIsAdminPreviewAllowed(previewAllowed);
 
-const adminMode =
-  new URLSearchParams(window.location.search).get("admin") === "true";
+const searchParams = new URLSearchParams(window.location.search);
+
+const adminMode = searchParams.get("admin") === "true";
+const forcePreview = searchParams.get("forcePreview") === "true";
 
 setIsAdminDashboard(adminMode);
 
 const usePreview =
-  previewAllowed && adminMode;
+  adminMode && (previewAllowed || forcePreview);
 
 setIsPreviewMode(usePreview);
 
@@ -789,14 +791,14 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
   Admin Track Record
 </a>
               <a
-                href="/dashboard?admin=true"
+                href="/dashboard?admin=true&forcePreview=true"
                 style={{
                   color: "#0284c7",
                   fontWeight: 700,
                   textDecoration: "none",
                 }}
               >
-                Admin Dashboard
+                Admin Preview
               </a>
               <a
                 href="/#pricing"
