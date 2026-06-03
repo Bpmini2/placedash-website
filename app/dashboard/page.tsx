@@ -498,7 +498,8 @@ const res = await fetch(formfavUrl);
         const data = await res.json();
 
         const rawRaces = data.racecards || [];
-        let mappedOdds: any = {};
+const apiRaceDate = data.date || "";
+let mappedOdds: any = {};
 
         // Racing API Odds
         try {
@@ -578,9 +579,10 @@ const res = await fetch(formfavUrl);
           });
 
           return {
-            ...race,
-            runners: runnersWithOdds,
-          };
+  ...race,
+  race_date: apiRaceDate,
+  runners: runnersWithOdds,
+};
         });
 
         const officialBetRaces = racesWithOdds.filter((race: any) => {
@@ -1055,9 +1057,9 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
                 </h3>
 
                 <p style={{ color: "#94a3b8" }}>
-                  {race.off_time} {race.timezone_label || ""} •{" "}
-                  {race.runners?.length || 0} runners
-                </p>
+  Date: {race.race_date || "TBA"} • {race.off_time} {race.timezone_label || ""} •{" "}
+  {race.runners?.length || 0} runners
+</p>
 
                 <p style={{ marginTop: "10px" }}>
                   Selection: <strong>{visibleHorse}</strong>
