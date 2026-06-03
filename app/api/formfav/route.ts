@@ -1,16 +1,11 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 function getMelbourneDate() {
   return new Date().toLocaleDateString("en-CA", {
     timeZone: "Australia/Melbourne",
   });
 }
+
 function getMelbourneTomorrowDate() {
   const now = new Date();
 
@@ -24,6 +19,7 @@ function getMelbourneTomorrowDate() {
 
   return melbourneDate.toLocaleDateString("en-CA");
 }
+
 function formatRaceTime(startTime: string | null, timezone: string | null) {
   if (!startTime) return "TBA";
 
@@ -62,197 +58,78 @@ function getTimezoneLabel(timezone: string | null) {
   return "";
 }
 
+function isAustralianMeeting(meeting: any) {
+  const country = String(meeting?.country || "").toLowerCase();
+
+  return country === "au" || country === "aus" || country === "australia";
+}
+
+function getRaceStartMs(startTime: string | null) {
+  if (!startTime) return null;
+
+  const parsed = new Date(startTime).getTime();
+
+  if (Number.isNaN(parsed)) return null;
+
+  return parsed;
+}
+
 function isRaceUpcoming(startTime: string | null) {
-  if (!startTime) return false;
-  const raceStart = new Date(startTime).getTime();
+  const raceStart = getRaceStartMs(startTime);
+
+  if (!raceStart) return false;
+
   const now = Date.now();
   const fiveMinutesAgo = now - 5 * 60 * 1000;
+
   return raceStart > fiveMinutesAgo;
 }
 
-function countStarts(runner: any) {
-  if (typeof runner.starts === "number") return runner.starts;
-  if (!runner.form) return 0;
-  return runner.form.replace(/[^0-9]/g, "").length;
-}
+function getRaceTimeDebug(startTime: string | null) {
+  const raceStart = getRaceStartMs(startTime);
 
-function evaluateRecentForm(form: string, last20Starts?: string) {
-  const formText = last20Starts || form;
-  if (!formText) return 30;
-
-  const results = formText
-    .replace(/[^0-9]/g, "")
-    .split("")
-    .map(Number)
-    .filter((n) => n > 0);
-
-  if (results.length === 0) return 30;
-
-  const recentResults = results.slice(0, 5);
-
-  const score = recentResults.reduce((total, result, index) => {
-    const recencyWeight = index === 0 ? 1.25 : index === 1 ? 1.1 : 1;
-
-    if (result === 1) return total + 90 * recencyWeight;
-    if (result === 2) return total + 75 * recencyWeight;
-    if (result === 3) return total + 60 * recencyWeight;
-    if (result <= 5) return total + 38 * recencyWeight;
-    return total + 15 * recencyWeight;
-  }, 0);
-
-  return Math.round(score / recentResults.length);
-}
-
-function scoreRunner(runner: any) {
-  const starts = countStarts(runner);
-  const wins = Number(runner.wins || 0);
-  const places = Number(runner.places || 0);
-
-  const placePercent =
-    typeof runner.placePercent === "number"
-      ? runner.placePercent * 100
-      : starts > 0
-      ? (places / starts) * 100
-      : 0;
-
-  const winPercent =
-    typeof runner.winPercent === "number"
-      ? runner.winPercent * 100
-      : starts > 0
-      ? (wins / starts) * 100
-      : 0;
-
-  const recentForm = evaluateRecentForm(runner.form, runner.last20Starts);
-
-  let score = 0;
-  score += placePercent * 0.38;
-  score += winPercent * 0.12;
-  score += recentForm * 0.28;
-
-  if (runner.jockey) score += 4;
-  if (runner.trainer) score += 4;
-
-  if (runner.draw) {
-    score += Math.max(0, 10 - parseInt(String(runner.draw))) * 0.45;
+  if (!raceStart) {
+    return {
+      hasStartTime: Boolean(startTime),
+      parseable: false,
+      alreadyStarted: null,
+      minutesUntilStart: null,
+    };
   }
 
-  const weight = Number(runner.lbs || 0);
-  const claim = Number(runner.claim || 0);
-  const adjustedWeight = weight && claim ? weight - claim : weight;
-
-  if (adjustedWeight && adjustedWeight <= 54) score += 4;
-  else if (adjustedWeight && adjustedWeight <= 56) score += 2;
-  else if (adjustedWeight && adjustedWeight >= 60) score -= 3;
-if (adjustedWeight && adjustedWeight <= 54) score += 4;
-else if (adjustedWeight && adjustedWeight <= 56) score += 2;
-else if (adjustedWeight && adjustedWeight >= 60) score -= 3;
-
-// Strong penalties for weak profiles
-if (recentForm < 40) score -= 12;
-
-if (placePercent < 35) score -= 10;
-
-const latestRun =
-  runner.form?.replace(/[^0-9]/g, "").charAt(0) || "";
-
-if (["7", "8", "9"].includes(latestRun)) {
-  score -= 14;
-}
-
-score = Math.min(100, Math.max(0, score));
-  score = Math.min(100, Math.max(0, score));
-
-  let confidence = "LOW";
-
-if (score >= 72) {
-  confidence = "HIGH";
-} else if (score >= 56) {
-  confidence = "MEDIUM";
-}
-
-  const reasoning: string[] = [];
-
-  if (placePercent >= 55) reasoning.push("Strong overall place record");
-  else if (placePercent >= 40) reasoning.push("Solid overall place record");
-
-  if (recentForm >= 65) reasoning.push("Strong recent form");
-  else if (recentForm >= 45) reasoning.push("Recent form support");
-
-  if (starts >= 10) reasoning.push("Experienced runner");
-  else if (starts >= 3) reasoning.push("Meets minimum race experience");
-
-  if (runner.draw && Number(runner.draw) > 0 && Number(runner.draw) <= 6) {
-    reasoning.push("Favourable barrier");
-  }
-
-  if (adjustedWeight && adjustedWeight <= 56) {
-    reasoning.push("Manageable weight");
-  }
-
-  if (reasoning.length === 0) reasoning.push("Limited data available");
+  const now = Date.now();
 
   return {
-    ...runner,
-    score: Math.round(score),
-    confidence,
-    displayPlacePercent: Math.round(placePercent),
-    reasoning: reasoning.slice(0, 5),
+    hasStartTime: true,
+    parseable: true,
+    alreadyStarted: raceStart <= now - 5 * 60 * 1000,
+    minutesUntilStart: Math.round((raceStart - now) / 60000),
   };
 }
 
-function getBestRunner(race: any) {
-  if (!race.runners || race.runners.length === 0) return null;
-
-  return (
-    race.runners
-      .filter((runner: any) => countStarts(runner) >= 3)
-      .filter((runner: any) => !runner.scratched)
-      .map((runner: any) => scoreRunner(runner))
-      .sort((a: any, b: any) => b.score - a.score)[0] || null
-  );
+function mapRaceSummary(meeting: any, race: any) {
+  return {
+    track: meeting.track,
+    slug: meeting.slug,
+    country: meeting.country,
+    raceNumber: race.raceNumber,
+    raceName: race.raceName,
+    startTime: race.startTime,
+    timezone: race.timezone,
+    numberOfRunners: Number(race.numberOfRunners || 0),
+  };
 }
 
-async function savePickToSupabase(race: any, bestRunner: any, pickDate: string) {
-  if (!bestRunner) return;
-
-  const { error } = await supabase.from("saved_picks").upsert(
-    {
-      race_date: pickDate,
-      course: race.course || "",
-      race_number: Number(race.race_number || 0),
-      race_time: race.off_time || "",
-      state: race.state || "",
-
-      horse_number: Number(bestRunner.number || 0),
-      horse_name: bestRunner.horse || "",
-
-      confidence: bestRunner.confidence || "",
-      ai_score: Number(bestRunner.score || 0),
-      reasoning: Array.isArray(bestRunner.reasoning)
-        ? bestRunner.reasoning.join(", ")
-        : String(bestRunner.reasoning || ""),
-
-      distance: race.distance || "",
-      condition: race.condition || "",
-      runner_count: Number(race.runner_count || 0),
-
-      place_odds: null,
-      result: "pending",
-      placed: null,
-      bet_size: null,
-      profit_loss: null,
-      running_bank: null,
-
-      source: "formfav",
-    },
-    {
-      onConflict: "race_date,course,race_number,horse_name",
-    }
-  );
-
-  if (error) {
-    console.error("Supabase saved_picks insert error:", error.message);
-  }
+function buildSkipSample(races: any[], reason: string) {
+  return races.slice(0, 10).map((race: any) => ({
+    reason,
+    track: race.track,
+    raceNumber: race.raceNumber,
+    raceName: race.raceName,
+    startTime: race.startTime,
+    numberOfRunners: race.numberOfRunners,
+    timeDebug: getRaceTimeDebug(race.startTime),
+  }));
 }
 
 export async function GET(request: Request) {
@@ -267,11 +144,14 @@ export async function GET(request: Request) {
     }
 
     const url = new URL(request.url);
-const previewMode = url.searchParams.get("preview") === "tomorrow";
-const today = previewMode ? getMelbourneTomorrowDate() : getMelbourneDate();
+    const previewMode = url.searchParams.get("preview") === "tomorrow";
+    const debugMode = url.searchParams.get("debug") === "1";
+    const targetDate = previewMode
+      ? getMelbourneTomorrowDate()
+      : getMelbourneDate();
 
     const meetingsRes = await fetch(
-      `https://api.formfav.com/v1/form/meetings?date=${today}`,
+      `https://api.formfav.com/v1/form/meetings?date=${targetDate}`,
       {
         headers: {
           "X-API-Key": apiKey,
@@ -281,103 +161,165 @@ const today = previewMode ? getMelbourneTomorrowDate() : getMelbourneDate();
     );
 
     const meetingsData = await meetingsRes.json();
-    const meetings = meetingsData?.meetings || meetingsData?.data?.meetings || [];
 
-    const candidateRaces = meetings
-      .filter((meeting: any) => meeting.country === "au")
-      .flatMap((meeting: any) =>
-        (meeting.races || []).map((race: any) => ({
-          track: meeting.track,
-          slug: meeting.slug,
-          country: meeting.country,
-          raceNumber: race.raceNumber,
-          raceName: race.raceName,
-          startTime: race.startTime,
-          timezone: race.timezone,
-          numberOfRunners: race.numberOfRunners,
-        }))
-      )
-      .filter((race: any) => race.numberOfRunners >= 8 && race.numberOfRunners <= 11)
-      .filter((race: any) => isRaceUpcoming(race.startTime))
-      .slice(0, 8);
+    if (!meetingsRes.ok) {
+      return NextResponse.json({
+        ok: false,
+        source: "FormFav",
+        date: targetDate,
+        error: "Failed to fetch FormFav meetings",
+        status: meetingsRes.status,
+        details: meetingsData,
+      });
+    }
+
+    const meetings =
+      meetingsData?.meetings || meetingsData?.data?.meetings || [];
+
+    const auMeetings = meetings.filter((meeting: any) =>
+      isAustralianMeeting(meeting)
+    );
+
+    const allAuRaces = auMeetings.flatMap((meeting: any) =>
+      (meeting.races || []).map((race: any) => mapRaceSummary(meeting, race))
+    );
+
+    const rejectedByRunnerCount = allAuRaces.filter(
+      (race: any) => race.numberOfRunners < 8 || race.numberOfRunners > 11
+    );
+
+    const runnerCountCandidates = allAuRaces.filter(
+      (race: any) => race.numberOfRunners >= 8 && race.numberOfRunners <= 11
+    );
+
+    const rejectedByStartTime = runnerCountCandidates.filter(
+      (race: any) => !isRaceUpcoming(race.startTime)
+    );
+
+    const upcomingCandidateRaces = runnerCountCandidates.filter((race: any) =>
+      isRaceUpcoming(race.startTime)
+    );
+
+    // Only fetch detailed race cards for possible candidates. This keeps API usage sensible.
+    const candidateRaces = upcomingCandidateRaces.slice(0, 12);
 
     const racecards = await Promise.all(
       candidateRaces.map(async (race: any) => {
-        const raceRes = await fetch(
-          `https://api.formfav.com/v1/form?date=${today}&track=${encodeURIComponent(
-            race.slug
-          )}&race=${race.raceNumber}`,
-          {
-            headers: {
-              "X-API-Key": apiKey,
-            },
-            cache: "no-store",
+        try {
+          const raceRes = await fetch(
+            `https://api.formfav.com/v1/form?date=${targetDate}&track=${encodeURIComponent(
+              race.slug
+            )}&race=${race.raceNumber}`,
+            {
+              headers: {
+                "X-API-Key": apiKey,
+              },
+              cache: "no-store",
+            }
+          );
+
+          const raceData = await raceRes.json();
+
+          if (!raceRes.ok) {
+            return {
+              fetch_error: true,
+              fetch_status: raceRes.status,
+              course: race.track,
+              race_number: race.raceNumber,
+              race_name: race.raceName,
+              start_time: race.startTime,
+              runners: [],
+              runner_count: 0,
+              has_first_starter: false,
+            };
           }
-        );
 
-        const raceData = await raceRes.json();
-        const card = raceData?.data || raceData;
+          const card = raceData?.data || raceData;
 
-        const timezone = card?.timezone || race.timezone || null;
-        const startTime = card?.startTime || race.startTime || null;
+          const timezone = card?.timezone || race.timezone || null;
+          const startTime = card?.startTime || race.startTime || null;
 
-        const runners = (card?.runners || [])
-          .map((runner: any) => ({
-            number: runner.number || "",
-            horse: runner.name || "Unknown",
-            jockey: runner.jockey || "",
-            trainer: runner.trainer || "",
-            draw: runner.barrier || "",
-            lbs: runner.weight || "",
-            claim: runner.claim || "",
-            age: runner.age || "",
-            sex: runner.sex || "",
-            form: runner.form || "",
-            last20Starts: runner.last20Starts || "",
-            careerPrizeMoney: runner.careerPrizeMoney || "",
-            scratched: runner.scratched || false,
+          const runners = (card?.runners || [])
+            .map((runner: any) => ({
+              number: runner.number || "",
+              horse: runner.name || "Unknown",
+              jockey: runner.jockey || "",
+              trainer: runner.trainer || "",
+              draw: runner.barrier || "",
+              lbs: runner.weight || "",
+              claim: runner.claim || "",
+              age: runner.age || "",
+              sex: runner.sex || "",
+              form: runner.form || "",
+              last20Starts: runner.last20Starts || "",
+              careerPrizeMoney: runner.careerPrizeMoney || "",
+              scratched: runner.scratched || false,
 
-            starts: runner?.stats?.overall?.starts || 0,
-            wins: runner?.stats?.overall?.wins || 0,
-            places: runner?.stats?.overall?.places || 0,
-            seconds: runner?.stats?.overall?.seconds || 0,
-            thirds: runner?.stats?.overall?.thirds || 0,
-            placePercent: runner?.stats?.overall?.placePercent || 0,
-            winPercent: runner?.stats?.overall?.winPercent || 0,
+              starts: runner?.stats?.overall?.starts || 0,
+              wins: runner?.stats?.overall?.wins || 0,
+              places: runner?.stats?.overall?.places || 0,
+              seconds: runner?.stats?.overall?.seconds || 0,
+              thirds: runner?.stats?.overall?.thirds || 0,
+              placePercent: runner?.stats?.overall?.placePercent || 0,
+              winPercent: runner?.stats?.overall?.winPercent || 0,
 
-            trackStats: runner?.stats?.track || null,
-            distanceStats: runner?.stats?.distance || null,
-            trackDistanceStats: runner?.stats?.trackDistance || null,
-            conditionStats: runner?.stats?.condition || null,
+              trackStats: runner?.stats?.track || null,
+              distanceStats: runner?.stats?.distance || null,
+              trackDistanceStats: runner?.stats?.trackDistance || null,
+              conditionStats: runner?.stats?.condition || null,
 
-            speedMap: runner.speedMap || null,
-            classProfile: runner.classProfile || null,
-            raceClassFit: runner.raceClassFit || null,
-            gearChange: runner.gearChange || null,
+              speedMap: runner.speedMap || null,
+              classProfile: runner.classProfile || null,
+              raceClassFit: runner.raceClassFit || null,
+              gearChange: runner.gearChange || null,
 
-            firstStarter: (runner?.stats?.overall?.starts || 0) === 0,
-          }))
-          .filter((runner: any) => runner.scratched === false);
+              firstStarter: (runner?.stats?.overall?.starts || 0) === 0,
+            }))
+            .filter((runner: any) => runner.scratched === false);
 
-        const hasFirstStarter = runners.some((runner: any) => runner.firstStarter);
+          const hasFirstStarter = runners.some(
+            (runner: any) => runner.firstStarter
+          );
 
-        return {
-          course: card?.track || race.track,
-          race_number: card?.raceNumber || race.raceNumber,
-          race_name: card?.raceName || race.raceName,
-          off_time: formatRaceTime(startTime, timezone),
-          start_time: startTime,
-          state: getStateFromTimezone(timezone),
-          timezone_label: getTimezoneLabel(timezone),
-          runners,
-          runner_count: runners.length,
-          has_first_starter: hasFirstStarter,
-          condition: card?.condition || "",
-          weather: card?.weather || "",
-          distance: card?.distance || "",
-        };
+          return {
+            course: card?.track || race.track,
+            race_number: card?.raceNumber || race.raceNumber,
+            race_name: card?.raceName || race.raceName,
+            off_time: formatRaceTime(startTime, timezone),
+            start_time: startTime,
+            state: getStateFromTimezone(timezone),
+            timezone_label: getTimezoneLabel(timezone),
+            runners,
+            runner_count: runners.length,
+            has_first_starter: hasFirstStarter,
+            condition: card?.condition || "",
+            weather: card?.weather || "",
+            distance: card?.distance || "",
+          };
+        } catch (error) {
+          return {
+            fetch_error: true,
+            course: race.track,
+            race_number: race.raceNumber,
+            race_name: race.raceName,
+            start_time: race.startTime,
+            runners: [],
+            runner_count: 0,
+            has_first_starter: false,
+            error: String(error),
+          };
+        }
       })
     );
+
+    const rejectedAfterRacecard = racecards.filter((race: any) => {
+      return !(
+        race.runners.length >= 8 &&
+        race.runners.length <= 11 &&
+        race.has_first_starter === false &&
+        isRaceUpcoming(race.start_time)
+      );
+    });
 
     const cleanRacecards = racecards
       .filter((race: any) => {
@@ -390,37 +332,68 @@ const today = previewMode ? getMelbourneTomorrowDate() : getMelbourneDate();
       })
       .slice(0, 6);
 
-    if (!previewMode) {
-  await Promise.all(
-    cleanRacecards.map(async (race: any) => {
-      const bestRunner = getBestRunner(race);
+    const debug = debugMode
+      ? {
+          totalMeetings: meetings.length,
+          australianMeetings: auMeetings.length,
+          totalAustralianRaces: allAuRaces.length,
+          rejectedByRunnerCount: rejectedByRunnerCount.length,
+          runnerCountCandidates: runnerCountCandidates.length,
+          rejectedByStartTime: rejectedByStartTime.length,
+          upcomingCandidateRaces: upcomingCandidateRaces.length,
+          detailedRacecardsFetched: racecards.length,
+          rejectedAfterRacecard: rejectedAfterRacecard.length,
+          finalCleanRacecards: cleanRacecards.length,
+          samples: {
+            rejectedByRunnerCount: buildSkipSample(
+              rejectedByRunnerCount,
+              "Runner count outside 8-11"
+            ),
+            rejectedByStartTime: buildSkipSample(
+              rejectedByStartTime,
+              "Race start time missing, invalid, or already started"
+            ),
+            upcomingCandidates: upcomingCandidateRaces
+              .slice(0, 10)
+              .map((race: any) => ({
+                track: race.track,
+                raceNumber: race.raceNumber,
+                raceName: race.raceName,
+                startTime: race.startTime,
+                numberOfRunners: race.numberOfRunners,
+                timeDebug: getRaceTimeDebug(race.startTime),
+              })),
+            rejectedAfterRacecard: rejectedAfterRacecard
+              .slice(0, 10)
+              .map((race: any) => ({
+                course: race.course,
+                raceNumber: race.race_number,
+                raceName: race.race_name,
+                startTime: race.start_time,
+                runnerCount: race.runners?.length || 0,
+                hasFirstStarter: race.has_first_starter,
+                timeDebug: getRaceTimeDebug(race.start_time),
+                fetchError: race.fetch_error || false,
+              })),
+          },
+        }
+      : undefined;
 
-      if (
-        bestRunner &&
-        (
-          bestRunner.confidence === "HIGH" ||
-          (bestRunner.confidence === "MEDIUM" &&
-            bestRunner.score >= 56)
-        )
-      ) {
-        await savePickToSupabase(race, bestRunner, today);
-      }
-    })
-  );
-}
     return NextResponse.json({
       ok: true,
       source: "FormFav",
-      date: today,
+      date: targetDate,
       totalMeetings: meetings.length,
-      candidateRaceCount: candidateRaces.length,
+      australianMeetings: auMeetings.length,
+      candidateRaceCount: upcomingCandidateRaces.length,
       previewMode,
-savedToSupabase: !previewMode,
+      savedToSupabase: false,
       racecards: cleanRacecards,
       message:
         cleanRacecards.length === 0
-          ? "No qualifying upcoming races found today. PlaceDash only shows Australian races with 8–11 runners, no first starters, and races that have not already started."
+          ? "No qualifying upcoming races found for this date. PlaceDash currently filters Australian races, 8-11 active runners, no first starters, and races not already started."
           : "Upcoming qualifying races loaded successfully.",
+      ...(debugMode ? { debug } : {}),
     });
   } catch (error) {
     return NextResponse.json({
