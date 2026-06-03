@@ -958,6 +958,7 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
           {isAdminDashboard && debugSkippedRaces.length > 0 && (
   <div
     style={{
+      gridColumn: "1 / -1",
       marginTop: "18px",
       padding: "18px",
       borderRadius: "18px",
@@ -1011,6 +1012,7 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
 {isPreviewMode && (
   <div
     style={{
+      gridColumn: "1 / -1",
       marginBottom: "18px",
       padding: "14px 18px",
       borderRadius: "14px",
