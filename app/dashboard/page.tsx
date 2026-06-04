@@ -1150,14 +1150,22 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
 
         {selectedRace && (
           <div
-            style={{
-              marginTop: "40px",
-              padding: "20px",
-              border: "1px solid rgba(255,255,255,0.12)",
-              borderRadius: "16px",
-              background: "rgba(2,8,18,0.72)",
-            }}
-          >
+  style={{
+    position: "fixed",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "min(1100px, 92vw)",
+    maxHeight: "86vh",
+    overflowY: "auto",
+    padding: "24px",
+    border: "1px solid rgba(56,189,248,0.35)",
+    borderRadius: "18px",
+    background: "rgba(2,8,18,0.96)",
+    boxShadow: "0 30px 90px rgba(0,0,0,0.75)",
+    zIndex: 9999,
+  }}
+>
             <h2>
               {selectedRace.course} Race {selectedRace.race_number}
               {selectedRace.state ? ` (${selectedRace.state})` : ""}
