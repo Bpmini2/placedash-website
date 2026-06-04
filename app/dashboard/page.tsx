@@ -509,7 +509,11 @@ function canShowTomorrowPreview() {
 
       setIsPreviewMode(usePreview);
 
-      const res = await fetch("/api/placedash-races/today");
+      const raceApiEndpoint = usePreview
+  ? "/api/placedash-races/preview"
+  : "/api/placedash-races/today";
+
+const res = await fetch(raceApiEndpoint);
       const data = await res.json();
 
       const rawRaces = data.races || [];
