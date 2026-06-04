@@ -40,6 +40,7 @@ export async function GET() {
 
     const auth = Buffer.from(`${username}:${password}`).toString("base64");
     const previewDate = getMelbourneTomorrowDate();
+    console.log("Admin Preview date being requested:", previewDate);
 
     const meetingsRes = await fetch(
       `https://api.theracingapi.com/v1/australia/meets?date=${previewDate}`,
