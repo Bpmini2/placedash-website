@@ -615,43 +615,42 @@ const pendingPicks = Array.from(
 
     for (const pick of pendingPicks || []) {
       try {
-        let resultSource = "Punting Form";
+        let resultSource = "The Racing API";
 
-        let resultData = await fetchPuntingFormRaceResult(
-          pick.race_date,
-          pick.course,
-          Number(pick.race_number)
-        );
+let resultData = await fetchRacingApiRaceResult(
+  pick.race_date,
+  pick.course,
+  Number(pick.race_number)
+);
 
-        let runners = resultData ? getRaceRunners(resultData.raceResult) : [];
+let runners = resultData ? getRaceRunners(resultData.raceResult) : [];
 
-        let matchedRunner = Array.isArray(runners)
-          ? findMatchedRunner(runners, pick)
-          : null;
+let matchedRunner = Array.isArray(runners)
+  ? findMatchedRunner(runners, pick)
+  : null;
 
-        let position = matchedRunner ? getRunnerPosition(matchedRunner) : null;
+let position = matchedRunner ? getRunnerPosition(matchedRunner) : null;
 
-        if (!matchedRunner || !position) {
-          const racingApiResultData = await fetchRacingApiRaceResult(
-            pick.race_date,
-            pick.course,
-            Number(pick.race_number)
-          );
+if (!matchedRunner || !position) {
+  const puntingFormResultData = await fetchPuntingFormRaceResult(
+    pick.race_date,
+    pick.course,
+    Number(pick.race_number)
+  );
 
-          if (racingApiResultData?.raceResult) {
-            resultData = racingApiResultData;
-            resultSource = "The Racing API";
+  if (puntingFormResultData?.raceResult) {
+    resultData = puntingFormResultData;
+    resultSource = "Punting Form";
 
-            runners = getRaceRunners(resultData.raceResult);
+    runners = getRaceRunners(resultData.raceResult);
 
-            matchedRunner = Array.isArray(runners)
-              ? findMatchedRunner(runners, pick)
-              : null;
+    matchedRunner = Array.isArray(runners)
+      ? findMatchedRunner(runners, pick)
+      : null;
 
-            position = matchedRunner ? getRunnerPosition(matchedRunner) : null;
-          }
-        }
-const abandonedRace = resultData?.raceResult
+    position = matchedRunner ? getRunnerPosition(matchedRunner) : null;
+  }
+}
   ? isAbandonedRace(resultData.raceResult)
   : false;
 
