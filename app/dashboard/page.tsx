@@ -954,10 +954,67 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
                   {race.state ? ` (${race.state})` : ""}
                 </h3>
 
-                <p style={{ color: "#94a3b8" }}>
-  Date: {race.race_date || "TBA"} • {race.off_time} {race.timezone_label || ""} •{" "}
-  {race.runners?.length || 0} runners
-</p>
+                {(() => {
+  const raceDateText = race.race_date
+    ? new Date(`${race.race_date}T12:00:00`).toLocaleDateString("en-AU", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : "Not available";
+
+  const melbourneTimeText = race.off_time
+    ? new Date(race.off_time).toLocaleTimeString("en-AU", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: "Australia/Melbourne",
+      })
+    : "Not available";
+
+  const localTrackTimeZone =
+    race.state === "WA"
+      ? "Australia/Perth"
+      : race.state === "SA" || race.state === "NT"
+      ? "Australia/Adelaide"
+      : race.state === "QLD"
+      ? "Australia/Brisbane"
+      : race.state === "TAS"
+      ? "Australia/Hobart"
+      : race.state === "NSW" || race.state === "ACT"
+      ? "Australia/Sydney"
+      : "Australia/Melbourne";
+
+  const localTrackTimeText = race.off_time
+    ? new Date(race.off_time).toLocaleTimeString("en-AU", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: localTrackTimeZone,
+      })
+    : "Not available";
+
+  return (
+    <div
+      style={{
+        color: "#94a3b8",
+        fontSize: "14px",
+        lineHeight: "1.5",
+        marginTop: "12px",
+        marginBottom: "12px",
+      }}
+    >
+      <div>Date: {raceDateText}</div>
+      <div>Melbourne Time: {melbourneTimeText}</div>
+      <div>
+        Local Track Time: {localTrackTimeText}
+        {race.timezone_label ? ` ${race.timezone_label}` : ""}
+      </div>
+      <div>Runners: {race.runners?.length || 0}</div>
+    </div>
+  );
+})()}
 
                 <p style={{ marginTop: "10px" }}>
                   Selection: <strong>{visibleHorse}</strong>
