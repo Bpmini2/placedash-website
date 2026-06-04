@@ -114,14 +114,58 @@ export async function GET() {
   scratched: runner.scratched === true,
   position: runner.position || null,
 
-  starts: Number(runner.stats?.career?.total || 0),
-  wins: Number(runner.stats?.career?.first || 0),
-  seconds: Number(runner.stats?.career?.second || 0),
-  thirds: Number(runner.stats?.career?.third || 0),
-  places:
-    Number(runner.stats?.career?.first || 0) +
-    Number(runner.stats?.career?.second || 0) +
-    Number(runner.stats?.career?.third || 0),
+  starts: Number(
+  runner.stats?.career?.total ||
+    runner.career_stats?.total ||
+    runner.careerStats?.total ||
+    runner.last_ten_races_stats?.total ||
+    runner.lastTenRacesStats?.total ||
+    0
+),
+
+wins: Number(
+  runner.stats?.career?.first ||
+    runner.career_stats?.first ||
+    runner.careerStats?.first ||
+    runner.last_ten_races_stats?.first ||
+    0
+),
+
+seconds: Number(
+  runner.stats?.career?.second ||
+    runner.career_stats?.second ||
+    runner.careerStats?.second ||
+    runner.last_ten_races_stats?.second ||
+    0
+),
+
+thirds: Number(
+  runner.stats?.career?.third ||
+    runner.career_stats?.third ||
+    runner.careerStats?.third ||
+    runner.last_ten_races_stats?.third ||
+    0
+),
+
+places:
+  Number(
+    runner.stats?.career?.first ||
+      runner.career_stats?.first ||
+      runner.last_ten_races_stats?.first ||
+      0
+  ) +
+  Number(
+    runner.stats?.career?.second ||
+      runner.career_stats?.second ||
+      runner.last_ten_races_stats?.second ||
+      0
+  ) +
+  Number(
+    runner.stats?.career?.third ||
+      runner.career_stats?.third ||
+      runner.last_ten_races_stats?.third ||
+      0
+  ),
 
   odds: {
     sportsbetWin: sportsbet?.win_odds || null,
