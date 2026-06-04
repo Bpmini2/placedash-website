@@ -1152,12 +1152,12 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
           <div
   style={{
     position: "fixed",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "min(1100px, 92vw)",
-    maxHeight: "86vh",
-    overflowY: "auto",
+top: "32px",
+left: "50%",
+transform: "translateX(-50%)",
+width: "min(1200px, 94vw)",
+maxHeight: "90vh",
+overflowY: "auto",
     padding: "24px",
     border: "1px solid rgba(56,189,248,0.35)",
     borderRadius: "18px",
@@ -1171,11 +1171,68 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
               {selectedRace.state ? ` (${selectedRace.state})` : ""}
             </h2>
 
-            <p style={{ color: "#94a3b8" }}>
-              {selectedRace.off_time} {selectedRace.timezone_label || ""} ·{" "}
-              {selectedRace.runners?.length || 0} runners ·{" "}
-              {selectedRace.distance || "Distance TBA"}
-            </p>
+            {(() => {
+  const raceDateText = selectedRace.race_date
+    ? new Date(`${selectedRace.race_date}T12:00:00`).toLocaleDateString("en-AU", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : "Not available";
+
+  const melbourneTimeText = selectedRace.off_time
+    ? new Date(selectedRace.off_time).toLocaleTimeString("en-AU", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: "Australia/Melbourne",
+      })
+    : "Not available";
+
+  const localTrackTimeZone =
+    selectedRace.state === "WA"
+      ? "Australia/Perth"
+      : selectedRace.state === "SA" || selectedRace.state === "NT"
+      ? "Australia/Adelaide"
+      : selectedRace.state === "QLD"
+      ? "Australia/Brisbane"
+      : selectedRace.state === "TAS"
+      ? "Australia/Hobart"
+      : selectedRace.state === "NSW" || selectedRace.state === "ACT"
+      ? "Australia/Sydney"
+      : "Australia/Melbourne";
+
+  const localTrackTimeText = selectedRace.off_time
+    ? new Date(selectedRace.off_time).toLocaleTimeString("en-AU", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: localTrackTimeZone,
+      })
+    : "Not available";
+
+  return (
+    <div
+      style={{
+        color: "#94a3b8",
+        fontSize: "15px",
+        lineHeight: "1.6",
+        marginTop: "10px",
+        marginBottom: "16px",
+      }}
+    >
+      <div>Date: {raceDateText}</div>
+      <div>Melbourne Time: {melbourneTimeText}</div>
+      <div>
+        Local Track Time: {localTrackTimeText}
+        {selectedRace.timezone_label ? ` ${selectedRace.timezone_label}` : ""}
+      </div>
+      <div>Runners: {selectedRace.runners?.length || 0}</div>
+      <div>Distance: {selectedRace.distance || "Not available"}</div>
+    </div>
+  );
+})()}
 
             <button
               onClick={() => setSelectedRace(null)}
