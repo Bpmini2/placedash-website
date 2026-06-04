@@ -25,10 +25,30 @@ function canShowTomorrowPreview() {
   return hour >= 21 && hour < 24;
 }
   function countStarts(runner: any) {
-    if (typeof runner.starts === "number") return runner.starts;
-    if (!runner.form) return 0;
+  if (typeof runner.starts === "number") return runner.starts;
+
+  if (runner.stats?.career?.total) {
+    return Number(runner.stats.career.total);
+  }
+
+  if (runner.raw?.stats?.career?.total) {
+    return Number(runner.raw.stats.career.total);
+  }
+
+  if (runner.stats?.career_starts) {
+    return Number(runner.stats.career_starts);
+  }
+
+  if (runner.raw?.stats?.career_starts) {
+    return Number(runner.raw.stats.career_starts);
+  }
+
+  if (runner.form) {
     return runner.form.replace(/[^0-9]/g, "").length;
   }
+
+  return 0;
+}
 
   function evaluateRecentForm(form: string, last20Starts?: string) {
     const formText = last20Starts || form;
