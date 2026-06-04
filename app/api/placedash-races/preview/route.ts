@@ -6,22 +6,31 @@ export const revalidate = 0;
 function getMelbourneTomorrowDate() {
   const now = new Date();
 
-  const melbourneNow = new Date(
-    now.toLocaleString("en-US", {
-      timeZone: "Australia/Melbourne",
-    })
-  );
-
-  melbourneNow.setDate(melbourneNow.getDate() + 1);
-
-  return new Intl.DateTimeFormat("en-CA", {
+  const melbourneParts = new Intl.DateTimeFormat("en-AU", {
     timeZone: "Australia/Melbourne",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).format(melbourneNow);
-}
+  }).formatToParts(now);
 
+  const year = Number(
+    melbourneParts.find((part) => part.type === "year")?.value
+  );
+  const month = Number(
+    melbourneParts.find((part) => part.type === "month")?.value
+  );
+  const day = Number(
+    melbourneParts.find((part) => part.type === "day")?.value
+  );
+
+  const melbourneTomorrow = new Date(Date.UTC(year, month - 1, day + 1));
+
+  const yyyy = melbourneTomorrow.getUTCFullYear();
+  const mm = String(melbourneTomorrow.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(melbourneTomorrow.getUTCDate()).padStart(2, "0");
+
+  return `${yyyy}-${mm}-${dd}`;
+}
 function getOdds(runner: any, bookmaker: string) {
   return runner.odds?.find((o: any) => o.bookmaker === bookmaker) || null;
 }
