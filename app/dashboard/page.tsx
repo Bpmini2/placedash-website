@@ -1171,87 +1171,110 @@ resize: "both",
     zIndex: 9999,
   }}
 >
-            <h2>
-              {selectedRace.course} Race {selectedRace.race_number}
-              {selectedRace.state ? ` (${selectedRace.state})` : ""}
-            </h2>
+            <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "minmax(280px, 1fr) minmax(320px, 500px)",
+    gap: "22px",
+    alignItems: "stretch",
+    marginBottom: "16px",
+  }}
+>
+  <div>
+    <h2 style={{ margin: "0 0 14px 0" }}>
+      {selectedRace.course} Race {selectedRace.race_number}
+      {selectedRace.state ? ` (${selectedRace.state})` : ""}
+    </h2>
 
-            {(() => {
-  const raceDateText = selectedRace.race_date
-    ? new Date(`${selectedRace.race_date}T12:00:00`).toLocaleDateString("en-AU", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })
-    : "Not available";
+    {(() => {
+      const raceDateText = selectedRace.race_date
+        ? new Date(`${selectedRace.race_date}T12:00:00`).toLocaleDateString("en-AU", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })
+        : "Not available";
 
-  const melbourneTimeText = selectedRace.off_time
-    ? new Date(selectedRace.off_time).toLocaleTimeString("en-AU", {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-        timeZone: "Australia/Melbourne",
-      })
-    : "Not available";
+      const melbourneTimeText = selectedRace.off_time
+        ? new Date(selectedRace.off_time).toLocaleTimeString("en-AU", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+            timeZone: "Australia/Melbourne",
+          })
+        : "Not available";
 
-  const localTrackTimeZone =
-    selectedRace.state === "WA"
-      ? "Australia/Perth"
-      : selectedRace.state === "SA" || selectedRace.state === "NT"
-      ? "Australia/Adelaide"
-      : selectedRace.state === "QLD"
-      ? "Australia/Brisbane"
-      : selectedRace.state === "TAS"
-      ? "Australia/Hobart"
-      : selectedRace.state === "NSW" || selectedRace.state === "ACT"
-      ? "Australia/Sydney"
-      : "Australia/Melbourne";
+      const localTrackTimeZone =
+        selectedRace.state === "WA"
+          ? "Australia/Perth"
+          : selectedRace.state === "SA" || selectedRace.state === "NT"
+          ? "Australia/Adelaide"
+          : selectedRace.state === "QLD"
+          ? "Australia/Brisbane"
+          : selectedRace.state === "TAS"
+          ? "Australia/Hobart"
+          : selectedRace.state === "NSW" || selectedRace.state === "ACT"
+          ? "Australia/Sydney"
+          : "Australia/Melbourne";
 
-  const localTrackTimeText = selectedRace.off_time
-    ? new Date(selectedRace.off_time).toLocaleTimeString("en-AU", {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-        timeZone: localTrackTimeZone,
-      })
-    : "Not available";
+      const localTrackTimeText = selectedRace.off_time
+        ? new Date(selectedRace.off_time).toLocaleTimeString("en-AU", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+            timeZone: localTrackTimeZone,
+          })
+        : "Not available";
 
-  return (
-    <div
+      return (
+        <div
+          style={{
+            color: "#cbd5e1",
+            fontSize: "15px",
+            lineHeight: "1.65",
+            marginBottom: "18px",
+          }}
+        >
+          <div>Date: {raceDateText}</div>
+          <div>Melbourne Time: {melbourneTimeText}</div>
+          <div>
+            Local Track Time: {localTrackTimeText}
+            {selectedRace.timezone_label ? ` ${selectedRace.timezone_label}` : ""}
+          </div>
+          <div>Runners: {selectedRace.runners?.length || 0}</div>
+          <div>Distance: {selectedRace.distance || "Not available"}</div>
+        </div>
+      );
+    })()}
+
+    <button
+      onClick={() => setSelectedRace(null)}
       style={{
-        color: "#94a3b8",
-        fontSize: "15px",
-        lineHeight: "1.6",
-        marginTop: "10px",
-        marginBottom: "16px",
+        padding: "8px 14px",
+        borderRadius: "8px",
+        border: "1px solid rgba(255,255,255,0.18)",
+        background: "rgba(255,255,255,0.06)",
+        color: "#ffffff",
+        cursor: "pointer",
       }}
     >
-      <div>Date: {raceDateText}</div>
-      <div>Melbourne Time: {melbourneTimeText}</div>
-      <div>
-        Local Track Time: {localTrackTimeText}
-        {selectedRace.timezone_label ? ` ${selectedRace.timezone_label}` : ""}
-      </div>
-      <div>Runners: {selectedRace.runners?.length || 0}</div>
-      <div>Distance: {selectedRace.distance || "Not available"}</div>
-    </div>
-  );
-})()}
+      Close
+    </button>
+  </div>
 
-            <button
-              onClick={() => setSelectedRace(null)}
-              style={{
-                padding: "8px 12px",
-                borderRadius: "8px",
-                border: "1px solid rgba(255,255,255,0.18)",
-                background: "rgba(255,255,255,0.04)",
-                color: "#ffffff",
-                cursor: "pointer",
-              }}
-            >
-              Close
-            </button>
+  <div
+    style={{
+      minHeight: "190px",
+      borderRadius: "14px",
+      overflow: "hidden",
+      border: "1px solid rgba(255,255,255,0.12)",
+      backgroundImage: "url('/racehorse-bg.png')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }}
+  />
+</div>
 
             <div
               style={{
