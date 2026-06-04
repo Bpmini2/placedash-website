@@ -490,11 +490,46 @@ const usePreview =
 
 setIsPreviewMode(usePreview);
 
-const formfavUrl = usePreview
-  ? "/api/formfav?preview=tomorrow"
-  : "/api/formfav";
+const placedashUrl = usePreview
+  ? "/api/placedash-races/today"
+  : "/api/placedash-races/today";
 
-const res = await fetch(formfavUrl);
+const res = await fetch(placedashUrl);
+const data = await res.json();
+
+const rawRaces = data.races || [];
+const apiRaceDate = data.date || "";
+
+const racesWithOdds = rawRaces.map((race: any) => ({
+  ...race,
+  race_date: apiRaceDate,
+  race_number: race.raceNumber || race.race_number,
+  race_name: race.raceName || race.race_name,
+  race_status: race.raceStatus || race.race_status,
+  off_time: race.startTime || race.off_time,
+  runners: (race.runners || []).map((runner: any) => ({
+    ...runner,
+    runner_number: runner.number || runner.runner_number,
+    horse: runner.horse || runner.name,
+    sportsbet_place: runner.odds?.sportsbetPlace || null,
+    sportsbet_win: runner.odds?.sportsbetWin || null,
+    ladbrokes_place: runner.odds?.ladbrokesPlace || null,
+    ladbrokes_win: runner.odds?.ladbrokesWin || null,
+  })),
+}));
+
+const officialBetRaces = racesWithOdds.filter((race: any) => {
+  const topPick = getBestRunner(race);
+  return topPick?.decision === "BET";
+});
+
+setDebugRaces(racesWithOdds);
+
+if (usePreview) {
+  setRaces(racesWithOdds);
+} else {
+  setRaces(officialBetRaces);
+}
         const data = await res.json();
 
         const rawRaces = data.racecards || [];
