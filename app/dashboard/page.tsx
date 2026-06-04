@@ -473,217 +473,109 @@ function canShowTomorrowPreview() {
   }
 
   useEffect(() => {
-    async function loadRaces() {
-      try {
-        const previewAllowed = canShowTomorrowPreview();
-setIsAdminPreviewAllowed(previewAllowed);
+  async function loadRaces() {
+    try {
+      const previewAllowed = canShowTomorrowPreview();
+      setIsAdminPreviewAllowed(previewAllowed);
 
-const searchParams = new URLSearchParams(window.location.search);
+      const searchParams = new URLSearchParams(window.location.search);
 
-const adminMode = searchParams.get("admin") === "true";
-const forcePreview = searchParams.get("forcePreview") === "true";
+      const adminMode = searchParams.get("admin") === "true";
+      const forcePreview = searchParams.get("forcePreview") === "true";
 
-setIsAdminDashboard(adminMode);
+      setIsAdminDashboard(adminMode);
 
-const usePreview =
-  adminMode && (previewAllowed || forcePreview);
+      const usePreview = adminMode && (previewAllowed || forcePreview);
 
-setIsPreviewMode(usePreview);
+      setIsPreviewMode(usePreview);
 
-const placedashUrl = usePreview
-  ? "/api/placedash-races/today"
-  : "/api/placedash-races/today";
+      const res = await fetch("/api/placedash-races/today");
+      const data = await res.json();
 
-const res = await fetch(placedashUrl);
-const data = await res.json();
+      const rawRaces = data.races || [];
+      const apiRaceDate = data.date || "";
 
-const rawRaces = data.races || [];
-const apiRaceDate = data.date || "";
+      const racesWithOdds = rawRaces.map((race: any) => ({
+        ...race,
+        race_date: apiRaceDate,
+        race_number: race.raceNumber || race.race_number,
+        race_name: race.raceName || race.race_name,
+        race_status: race.raceStatus || race.race_status,
+        off_time: race.startTime || race.off_time,
+        runners: (race.runners || []).map((runner: any) => ({
+          ...runner,
+          runner_number: runner.number || runner.runner_number,
+          horse: runner.horse || runner.name,
+          draw: runner.barrier || runner.draw,
+          sportsbet_place: runner.odds?.sportsbetPlace || null,
+          sportsbet_win: runner.odds?.sportsbetWin || null,
+          ladbrokes_place: runner.odds?.ladbrokesPlace || null,
+          ladbrokes_win: runner.odds?.ladbrokesWin || null,
+        })),
+      }));
 
-const racesWithOdds = rawRaces.map((race: any) => ({
-  ...race,
-  race_date: apiRaceDate,
-  race_number: race.raceNumber || race.race_number,
-  race_name: race.raceName || race.race_name,
-  race_status: race.raceStatus || race.race_status,
-  off_time: race.startTime || race.off_time,
-  runners: (race.runners || []).map((runner: any) => ({
-    ...runner,
-    runner_number: runner.number || runner.runner_number,
-    horse: runner.horse || runner.name,
-    sportsbet_place: runner.odds?.sportsbetPlace || null,
-    sportsbet_win: runner.odds?.sportsbetWin || null,
-    ladbrokes_place: runner.odds?.ladbrokesPlace || null,
-    ladbrokes_win: runner.odds?.ladbrokesWin || null,
-  })),
-}));
+      const officialBetRaces = racesWithOdds.filter((race: any) => {
+        const topPick = getBestRunner(race);
+        return topPick?.decision === "BET";
+      });
 
-const officialBetRaces = racesWithOdds.filter((race: any) => {
-  const topPick = getBestRunner(race);
-  return topPick?.decision === "BET";
-});
+      setDebugRaces(racesWithOdds);
 
-setDebugRaces(racesWithOdds);
-
-if (usePreview) {
-  setRaces(racesWithOdds);
-} else {
-  setRaces(officialBetRaces);
-}
-        const data = await res.json();
-
-        const rawRaces = data.racecards || [];
-const apiRaceDate = data.date || "";
-let mappedOdds: any = {};
-
-        // Racing API Odds
-        try {
-          const oddsRes = await fetch("/api/racing-api-odds");
-          const oddsData = await oddsRes.json();
-
-          if (oddsData?.oddsView) {
-            oddsData.oddsView.forEach((race: any) => {
-              race.runners.forEach((runner: any) => {
-                mappedOdds[
-                  `${race.course}-${race.race_number}-${runner.number}`
-                ] = {
-                  course: race.course,
-                  state: race.state || null,
-                  race_number: race.race_number,
-                  runner_number: runner.number,
-                  sportsbet_place: runner.sportsbet_place,
-                  sportsbet_win: runner.sportsbet_win,
-                  ladbrokes_place: runner.ladbrokes_place,
-                  ladbrokes_win: runner.ladbrokes_win,
-                };
-              });
-            });
-
-            setLiveOdds(mappedOdds);
-          }
-        } catch (err) {
-          console.error("Failed loading Racing API odds", err);
-        }
-
-        const racesWithOdds = rawRaces.map((race: any) => {
-          const raceNumber = race.race_number || race.raceNumber;
-
-          const runnersWithOdds = (race.runners || []).map((runner: any) => {
-            const runnerNumber =
-              runner.number || runner.runner_number || runner.tabNo;
-
-            const directOdds =
-              mappedOdds[`${race.course}-${raceNumber}-${runnerNumber}`];
-
-            const fallbackOdds = Object.entries(mappedOdds).find(
-              ([key, value]: any) => {
-                const lowerKey = key.toLowerCase();
-                const lowerCourse = String(race.course || "").toLowerCase();
-
-                const courseMatch =
-                  lowerKey.includes(lowerCourse) ||
-                  lowerCourse.includes(
-                    String(value?.course || "").toLowerCase()
-                  );
-
-                const stateMatch =
-                  value?.state &&
-                  race.state &&
-                  String(value.state).toLowerCase() ===
-                    String(race.state).toLowerCase();
-
-                const raceMatch =
-                  Number(value?.race_number) === Number(raceNumber);
-
-                const runnerMatch =
-                  Number(value?.runner_number) === Number(runnerNumber);
-
-                return (courseMatch || stateMatch) && raceMatch && runnerMatch;
-              }
-            )?.[1] as any;
-
-            const odds = directOdds || fallbackOdds || {};
-
-            return {
-              ...runner,
-              sportsbet_place: odds.sportsbet_place ?? runner.sportsbet_place,
-              sportsbet_win: odds.sportsbet_win ?? runner.sportsbet_win,
-              ladbrokes_place: odds.ladbrokes_place ?? runner.ladbrokes_place,
-              ladbrokes_win: odds.ladbrokes_win ?? runner.ladbrokes_win,
-            };
-          });
-
-          return {
-  ...race,
-  race_date: apiRaceDate,
-  runners: runnersWithOdds,
-};
-        });
-
-        const officialBetRaces = racesWithOdds.filter((race: any) => {
-          const topPick = getBestRunner(race);
-          return topPick?.decision === "BET";
-        });
-setDebugRaces(racesWithOdds);
-        if (usePreview) {
-  setRaces(racesWithOdds);
-} else {
-  setRaces(officialBetRaces);
-}
-
-        if (!usePreview && officialBetRaces.length) {
-          for (const race of officialBetRaces) {
-            const topPick = getBestRunner(race);
-
-            if (!topPick) continue;
-
-            // AI LOGIC:
-            // Only official BET selections should be saved to Track Record.
-            // WATCH / LOW VALUE / AVOID are shown on the Dashboard, but are not counted as official bets.
-            if (topPick.decision !== "BET") continue;
-
-            try {
-              await fetch("/api/saved-picks", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  race_date: new Date().toLocaleDateString("en-CA", {
-                    timeZone: "Australia/Melbourne",
-                  }),
-                  course: race.course,
-                  race_number: race.race_number || race.raceNumber,
-                  race_time: race.off_time || race.raceTime,
-                  horse_number: topPick.number,
-                  horse_name: topPick.horse || topPick.name,
-                  confidence: topPick.confidence,
-                  ai_score: topPick.score,
-                  reasoning: Array.isArray(topPick.reasoning)
-                    ? topPick.reasoning.join(", ")
-                    : String(topPick.reasoning || ""),
-                  distance: race.distance,
-                  condition: race.condition,
-                  runner_count: race.runners?.length || 0,
-                  state: race.state,
-                  race_card_json: race.runners || [],
-                  logic_version: "v2_value_bet",
-                }),
-              });
-            } catch (err) {
-              console.error("Failed saving pick", err);
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Failed loading races", err);
-      } finally {
-        setLoading(false);
+      if (usePreview) {
+        setRaces(racesWithOdds);
+      } else {
+        setRaces(officialBetRaces);
       }
-    }
 
-    loadRaces();
-  }, []);
+      if (!usePreview && officialBetRaces.length) {
+        for (const race of officialBetRaces) {
+          const topPick = getBestRunner(race);
+
+          if (!topPick) continue;
+          if (topPick.decision !== "BET") continue;
+
+          try {
+            await fetch("/api/saved-picks", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                race_date: new Date().toLocaleDateString("en-CA", {
+                  timeZone: "Australia/Melbourne",
+                }),
+                course: race.course,
+                race_number: race.race_number || race.raceNumber,
+                race_time: race.off_time || race.raceTime,
+                horse_number: topPick.number,
+                horse_name: topPick.horse || topPick.name,
+                confidence: topPick.confidence,
+                ai_score: topPick.score,
+                reasoning: Array.isArray(topPick.reasoning)
+                  ? topPick.reasoning.join(", ")
+                  : String(topPick.reasoning || ""),
+                distance: race.distance,
+                condition: race.condition,
+                runner_count: race.runners?.length || 0,
+                state: race.state,
+                race_card_json: race.runners || [],
+                logic_version: "v2_value_bet",
+              }),
+            });
+          } catch (err) {
+            console.error("Failed saving pick", err);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Failed loading races", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  loadRaces();
+}, []);
 
   const displayRaces = races
   .filter((race: any) => {
