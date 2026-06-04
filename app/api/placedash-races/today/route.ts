@@ -103,24 +103,35 @@ export async function GET() {
             const ladbrokes = getOdds(runner, "Ladbrokes");
 
             return {
-              number: runner.number,
-              horse: runner.horse,
-              jockey: runner.jockey || null,
-              trainer: runner.trainer || null,
-              barrier: runner.draw || runner.barrier || null,
-              weight: runner.weight || null,
-              scratched: runner.scratched === true,
-              position: runner.position || null,
+  number: runner.number,
+  horse: runner.horse,
+  jockey: runner.jockey || null,
+  trainer: runner.trainer || null,
+  barrier: runner.draw || runner.barrier || null,
+  draw: runner.draw || runner.barrier || null,
+  weight: runner.weight || null,
+  form: runner.form || null,
+  scratched: runner.scratched === true,
+  position: runner.position || null,
 
-              odds: {
-                sportsbetWin: sportsbet?.win_odds || null,
-                sportsbetPlace: sportsbet?.place_odds || null,
-                ladbrokesWin: ladbrokes?.win_odds || null,
-                ladbrokesPlace: ladbrokes?.place_odds || null,
-              },
+  starts: Number(runner.stats?.career?.total || 0),
+  wins: Number(runner.stats?.career?.first || 0),
+  seconds: Number(runner.stats?.career?.second || 0),
+  thirds: Number(runner.stats?.career?.third || 0),
+  places:
+    Number(runner.stats?.career?.first || 0) +
+    Number(runner.stats?.career?.second || 0) +
+    Number(runner.stats?.career?.third || 0),
 
-              raw: runner,
-            };
+  odds: {
+    sportsbetWin: sportsbet?.win_odds || null,
+    sportsbetPlace: sportsbet?.place_odds || null,
+    ladbrokesWin: ladbrokes?.win_odds || null,
+    ladbrokesPlace: ladbrokes?.place_odds || null,
+  },
+
+  raw: runner,
+};
           }),
 
           raw: race,
