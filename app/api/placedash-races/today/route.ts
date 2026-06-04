@@ -150,23 +150,37 @@ thirds: Number(
 
 places:
   Number(
+    runner.stats?.career?.places ||
+      runner.career_stats?.places ||
+      runner.career_place_total ||
+      0
+  ) ||
+  Number(
     runner.stats?.career?.first ||
       runner.career_stats?.first ||
       runner.last_ten_races_stats?.first ||
       0
   ) +
-  Number(
-    runner.stats?.career?.second ||
-      runner.career_stats?.second ||
-      runner.last_ten_races_stats?.second ||
-      0
-  ) +
-  Number(
-    runner.stats?.career?.third ||
-      runner.career_stats?.third ||
-      runner.last_ten_races_stats?.third ||
-      0
-  ),
+    Number(
+      runner.stats?.career?.second ||
+        runner.career_stats?.second ||
+        runner.last_ten_races_stats?.second ||
+        0
+    ) +
+    Number(
+      runner.stats?.career?.third ||
+        runner.career_stats?.third ||
+        runner.last_ten_races_stats?.third ||
+        0
+    ),
+
+placePercent: Number(
+  runner.stats?.career?.placePercent ||
+    runner.career_stats?.placePercent ||
+    runner.career_place_percent ||
+    runner.placePercent ||
+    0
+),
 
   odds: {
     sportsbetWin: sportsbet?.win_odds || null,
