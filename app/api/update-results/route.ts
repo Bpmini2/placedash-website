@@ -651,6 +651,7 @@ if (!matchedRunner || !position) {
     position = matchedRunner ? getRunnerPosition(matchedRunner) : null;
   }
 }
+  const abandonedRace = resultData?.raceResult
   ? isAbandonedRace(resultData.raceResult)
   : false;
 
