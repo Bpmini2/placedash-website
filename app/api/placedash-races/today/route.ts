@@ -120,6 +120,7 @@ export async function GET() {
     runner.careerStats?.total ||
     runner.last_ten_races_stats?.total ||
     runner.lastTenRacesStats?.total ||
+    String(runner.form || "").replace(/[^0-9]/g, "").length ||
     0
 ),
 
