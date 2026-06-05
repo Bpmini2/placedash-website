@@ -1309,8 +1309,7 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
                     borderRadius: "8px",
                     fontSize: "12px",
                     fontWeight: "600",
-                    background:
-                      background: getDecisionBackground(bestRunner?.decision || "WATCH"),
+                    background: getDecisionBackground(bestRunner?.decision || "WATCH"),
 color: getDecisionColor(bestRunner?.decision || "WATCH"),
                   }}
                 >
