@@ -762,19 +762,24 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
   </span>
 
   <div
-    className="admin-dropdown"
+  className="admin-dropdown"
+  style={{
+    display: "none",
+    position: "absolute",
+    top: "18px",
+    left: "-12px",
+    minWidth: "240px",
+    paddingTop: "18px",
+    zIndex: 10000,
+  }}
+>
+  <div
     style={{
-      display: "none",
-      position: "absolute",
-      top: "28px",
-      left: 0,
-      minWidth: "220px",
       background: "#ffffff",
       border: "1px solid rgba(2,132,199,0.25)",
       borderRadius: "12px",
       boxShadow: "0 14px 40px rgba(0,0,0,0.18)",
       padding: "10px",
-      zIndex: 10000,
     }}
   >
     <a
