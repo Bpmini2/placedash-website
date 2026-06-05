@@ -1089,6 +1089,7 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
           {isDebugTodayMode && (
   <div
     style={{
+      gridColumn: "1 / -1",
       marginTop: "18px",
       marginBottom: "22px",
       padding: "14px 16px",
