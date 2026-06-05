@@ -1314,9 +1314,8 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
 color: getDecisionColor(bestRunner?.decision || "WATCH"),
                   }}
                 >
-                  {`${bestRunner?.decision || "WATCH"} · ${getDecisionMeaning(
-  bestRunner?.decision || "WATCH"
-)}`}
+                  {bestRunner?.decision || "WATCH"} ·{" "}
+{getDecisionMeaning(bestRunner?.decision || "WATCH")}
                 </div>
               </div>
             );
