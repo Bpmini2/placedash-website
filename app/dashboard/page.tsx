@@ -404,7 +404,29 @@ function canShowTomorrowPreview() {
       reasoning: getRunnerReasoning(scoredRunner),
     };
   }
+function getDecisionColor(decision: string) {
+  if (decision === "BET") return "#22c55e";
+  if (decision === "WATCH") return "#38bdf8";
+  if (decision === "LOW VALUE") return "#facc15";
+  if (decision === "AVOID") return "#ef4444";
+  return "#94a3b8";
+}
 
+function getDecisionBackground(decision: string) {
+  if (decision === "BET") return "rgba(34,197,94,0.15)";
+  if (decision === "WATCH") return "rgba(56,189,248,0.15)";
+  if (decision === "LOW VALUE") return "rgba(250,204,21,0.15)";
+  if (decision === "AVOID") return "rgba(239,68,68,0.15)";
+  return "rgba(148,163,184,0.15)";
+}
+
+function getDecisionMeaning(decision: string) {
+  if (decision === "BET") return "Official PlaceDash selection";
+  if (decision === "WATCH") return "Possible contender — punter decides";
+  if (decision === "LOW VALUE") return "Good profile maybe, but price too short";
+  if (decision === "AVOID") return "AI does not like the profile";
+  return "Review runner";
+}
   function getRunnerBestPlaceOdds(runner: any) {
     const possiblePlaceOdds = [
       runner?.sportsbetPlaceOdds,
@@ -1288,16 +1310,13 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
                     fontSize: "12px",
                     fontWeight: "600",
                     background:
-                      bestRunner?.confidence === "HIGH"
-                        ? "rgba(56,189,248,0.15)"
-                        : "rgba(250,204,21,0.15)",
-                    color:
-                      bestRunner?.confidence === "HIGH" ? "#38bdf8" : "#facc15",
+                      background: getDecisionBackground(bestRunner?.decision || "WATCH"),
+color: getDecisionColor(bestRunner?.decision || "WATCH"),
                   }}
                 >
-                  {`${bestRunner?.decision || "WATCH"} · ${
-                    bestRunner?.confidence || "LOW"
-                  } CONFIDENCE`}
+                  {`${bestRunner?.decision || "WATCH"} · ${getDecisionMeaning(
+  bestRunner?.decision || "WATCH"
+)}`}
                 </div>
               </div>
             );
@@ -1441,12 +1460,14 @@ resize: "both",
                 border: "1px solid rgba(56,189,248,0.18)",
               }}
             >
-              <strong style={{ color: "#38bdf8" }}>Value Selection:</strong>
+              <strong style={{ color: getDecisionColor(selectedBestRunner?.decision || "WATCH") }}>
+  Value Selection:
+</strong>
               {selectedBestRunner?.number ? ` ${selectedBestRunner.number}. ` : ""}
               {selectedBestRunner?.horse || "No selection"} ·{" "}
               {selectedBestRunner?.decision || "WATCH"} ·{" "}
-              {selectedBestRunner?.confidence || "LOW"} confidence · Score{" "}
-              {selectedBestRunner?.score || 0}
+{getDecisionMeaning(selectedBestRunner?.decision || "WATCH")} · Score{" "}
+{selectedBestRunner?.score || 0}
             </div>
 
             <div style={{ overflowX: "auto", marginTop: "18px" }}>
@@ -1513,18 +1534,11 @@ resize: "both",
                       <td
                         style={{
                           padding: "10px",
-                          color:
-                            runner.decision === "BET"
-                              ? "#38bdf8"
-                              : runner.decision === "WATCH"
-                              ? "#facc15"
-                              : runner.decision === "LOW VALUE"
-                              ? "#fb923c"
-                              : "#ef4444",
+                          color: getDecisionColor(runner.decision),
                           fontWeight: 800,
                         }}
                       >
-                        {runner.confidence} · {runner.decision} · {runner.score}
+                        {runner.decision} · {runner.score}
                       </td>
 
                       <td
@@ -1534,8 +1548,8 @@ resize: "both",
                           color: "#94a3b8",
                         }}
                       >
-                        {runner.decision} •{" "}
-                        {runner.reasoning?.slice(0, 2).join(" • ") || "-"}
+                        {getDecisionMeaning(runner.decision)} •{" "}
+{runner.reasoning?.slice(0, 2).join(" • ") || "-"}
                       </td>
                     </tr>
                   ))}
