@@ -11,6 +11,7 @@ export default function Dashboard() {
 const [isAdminPreviewAllowed, setIsAdminPreviewAllowed] = useState(false);
   const [isAdminDashboard, setIsAdminDashboard] = useState(false);
   const [debugRaces, setDebugRaces] = useState<any[]>([]);
+  const [isDebugTodayMode, setIsDebugTodayMode] = useState(false);
 function canShowTomorrowPreview() {
   const now = new Date();
 
@@ -501,9 +502,11 @@ function canShowTomorrowPreview() {
       const searchParams = new URLSearchParams(window.location.search);
 
       const adminMode = searchParams.get("admin") === "true";
-      const forcePreview = searchParams.get("forcePreview") === "true";
+const forcePreview = searchParams.get("forcePreview") === "true";
+const debugToday = searchParams.get("debugToday") === "true";
 
       setIsAdminDashboard(adminMode);
+      setIsDebugTodayMode(adminMode && debugToday);
 
       const usePreview = adminMode && (previewAllowed || forcePreview);
 
@@ -545,13 +548,13 @@ const res = await fetch(raceApiEndpoint);
 
       setDebugRaces(racesWithOdds);
 
-      if (usePreview) {
-        setRaces(racesWithOdds);
-      } else {
-        setRaces(officialBetRaces);
-      }
+      if (usePreview || (adminMode && debugToday)) {
+  setRaces(racesWithOdds);
+} else {
+  setRaces(officialBetRaces);
+}
 
-      if (!usePreview && officialBetRaces.length) {
+      if (!usePreview && !debugToday && officialBetRaces.length) {
         for (const race of officialBetRaces) {
           const topPick = getBestRunner(race);
 
@@ -744,6 +747,16 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
   Admin Track Record
 </a>
               <a
+  href="/dashboard?admin=true&debugToday=true"
+  style={{
+    color: "#0284c7",
+    fontWeight: 700,
+    textDecoration: "none",
+  }}
+>
+  Admin Review Today
+</a>
+              <a
                 href="/dashboard?admin=true&forcePreview=true"
                 style={{
                   color: "#0284c7",
@@ -811,7 +824,11 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
               color: "#ffffff",
             }}
           >
-            Today’s AI Dashboard
+            {isDebugTodayMode
+  ? "Admin Review Today"
+  : isPreviewMode
+  ? "Admin Preview Tomorrow"
+  : "Today’s AI Dashboard"}
           </h1>
         </div>
 
@@ -925,6 +942,25 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
   >
     PREVIEW ONLY / ADMIN PREVIEW — Tomorrow&apos;s races are being shown for review only.
     These picks are not saved to Track Record and do not affect official stats, ROI, profit/loss, or bankroll.
+  </div>
+)}
+          {isDebugTodayMode && (
+  <div
+    style={{
+      marginTop: "18px",
+      marginBottom: "22px",
+      padding: "14px 16px",
+      borderRadius: "12px",
+      border: "1px solid rgba(56,189,248,0.45)",
+      background: "rgba(56,189,248,0.12)",
+      color: "#38bdf8",
+      fontWeight: 900,
+      lineHeight: 1.5,
+    }}
+  >
+    ADMIN REVIEW TODAY — Showing today&apos;s qualifying races before the final
+    BET-only Dashboard filter. These review races are for admin diagnosis only
+    and do not save WATCH, LOW VALUE, or AVOID runners to Track Record.
   </div>
 )}
           {displayRaces.map((race: any, index: number) => {
