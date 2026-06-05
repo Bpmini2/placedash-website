@@ -1339,19 +1339,23 @@ resize: "both",
               >
                 <thead>
                   <tr style={{ color: "#94a3b8", textAlign: "left" }}>
-                    <th style={{ padding: "10px" }}>Rank</th>
-                    <th style={{ padding: "10px" }}>No.</th>
-                    <th style={{ padding: "10px" }}>Horse</th>
-                    <th style={{ padding: "10px" }}>Jockey</th>
-                    <th style={{ padding: "10px" }}>Trainer</th>
-                    <th style={{ padding: "10px" }}>Barrier</th>
-                    <th style={{ padding: "10px" }}>Weight</th>
-                    <th style={{ padding: "10px" }}>Form</th>
-                    <th style={{ padding: "10px" }}>Starts</th>
-                    <th style={{ padding: "10px" }}>Place %</th>
-                    <th style={{ padding: "10px" }}>AI</th>
-                    <th style={{ padding: "10px" }}>Reasoning</th>
-                  </tr>
+  <th style={{ padding: "10px" }}>Rank</th>
+  <th style={{ padding: "10px" }}>No.</th>
+  <th style={{ padding: "10px" }}>Horse</th>
+  <th style={{ padding: "10px" }}>Jockey</th>
+  <th style={{ padding: "10px" }}>Trainer</th>
+  <th style={{ padding: "10px" }}>Barrier</th>
+  <th style={{ padding: "10px" }}>Weight</th>
+  <th style={{ padding: "10px" }}>Form</th>
+  <th style={{ padding: "10px" }}>Starts</th>
+  <th style={{ padding: "10px" }}>Place %</th>
+  <th style={{ padding: "10px" }}>SB Win</th>
+  <th style={{ padding: "10px" }}>SB Place</th>
+  <th style={{ padding: "10px" }}>LB Win</th>
+  <th style={{ padding: "10px" }}>LB Place</th>
+  <th style={{ padding: "10px" }}>AI</th>
+  <th style={{ padding: "10px" }}>Reasoning</th>
+</tr>
                 </thead>
 
                 <tbody>
@@ -1374,7 +1378,18 @@ resize: "both",
                       <td style={{ padding: "10px" }}>
                         {runner.displayPlacePercent || 0}%
                       </td>
-
+<td style={{ padding: "10px" }}>
+  {runner.sportsbet_win ?? "Not available"}
+</td>
+<td style={{ padding: "10px" }}>
+  {runner.sportsbet_place ?? "Not available"}
+</td>
+<td style={{ padding: "10px" }}>
+  {runner.ladbrokes_win ?? "Not available"}
+</td>
+<td style={{ padding: "10px" }}>
+  {runner.ladbrokes_place ?? "Not available"}
+</td>
                       <td
                         style={{
                           padding: "10px",
