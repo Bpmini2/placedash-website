@@ -736,36 +736,90 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
               >
                 Track Record
               </a>
-              <a
-  href="/track-record?admin=true"
+              <div
   style={{
-    color: "#0284c7",
-    fontWeight: 800,
-    textDecoration: "none",
+    position: "relative",
+    display: "inline-block",
+  }}
+  onMouseEnter={(e) => {
+    const menu = e.currentTarget.querySelector(".admin-dropdown") as HTMLElement;
+    if (menu) menu.style.display = "block";
+  }}
+  onMouseLeave={(e) => {
+    const menu = e.currentTarget.querySelector(".admin-dropdown") as HTMLElement;
+    if (menu) menu.style.display = "none";
   }}
 >
-  Admin Track Record
-</a>
-              <a
-  href="/dashboard?admin=true&debugToday=true"
-  style={{
-    color: "#0284c7",
-    fontWeight: 700,
-    textDecoration: "none",
-  }}
->
-  Admin Review Today
-</a>
-              <a
-                href="/dashboard?admin=true&forcePreview=true"
-                style={{
-                  color: "#0284c7",
-                  fontWeight: 700,
-                  textDecoration: "none",
-                }}
-              >
-                Admin Preview Tomorrow
-              </a>
+  <span
+    style={{
+      color: "#0284c7",
+      fontWeight: 800,
+      textDecoration: "none",
+      cursor: "pointer",
+    }}
+  >
+    Admin ▾
+  </span>
+
+  <div
+    className="admin-dropdown"
+    style={{
+      display: "none",
+      position: "absolute",
+      top: "28px",
+      left: 0,
+      minWidth: "220px",
+      background: "#ffffff",
+      border: "1px solid rgba(2,132,199,0.25)",
+      borderRadius: "12px",
+      boxShadow: "0 14px 40px rgba(0,0,0,0.18)",
+      padding: "10px",
+      zIndex: 10000,
+    }}
+  >
+    <a
+      href="/track-record?admin=true"
+      style={{
+        display: "block",
+        padding: "10px 12px",
+        color: "#0284c7",
+        fontWeight: 700,
+        textDecoration: "none",
+        borderRadius: "8px",
+      }}
+    >
+      Admin Track Record
+    </a>
+
+    <a
+      href="/dashboard?admin=true&debugToday=true"
+      style={{
+        display: "block",
+        padding: "10px 12px",
+        color: "#0284c7",
+        fontWeight: 700,
+        textDecoration: "none",
+        borderRadius: "8px",
+      }}
+    >
+      Admin Review Today
+    </a>
+
+    <a
+      href="/dashboard?admin=true&forcePreview=true"
+      style={{
+        display: "block",
+        padding: "10px 12px",
+        color: "#0284c7",
+        fontWeight: 700,
+        textDecoration: "none",
+        borderRadius: "8px",
+      }}
+    >
+      Admin Preview Tomorrow
+    </a>
+  </div>
+</div>
               <a
                 href="/#pricing"
                 style={{
