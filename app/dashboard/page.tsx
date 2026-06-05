@@ -604,13 +604,13 @@ const res = await fetch(raceApiEndpoint);
   loadRaces();
 }, []);
 
-  const displayRaces = races
+ const displayRaces = races
   .filter((race: any) => {
     const runnerCount = race.runners?.length || 0;
     return runnerCount >= 8 && runnerCount <= 11;
   })
   .filter((race: any) => {
-    if (isPreviewMode) return true;
+    if (isPreviewMode || isDebugTodayMode) return true;
 
     const best = getBestRunner(race);
     return best?.decision === "BET";
