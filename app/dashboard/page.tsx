@@ -165,8 +165,17 @@ function canShowTomorrowPreview() {
         .slice(0, 1)
     );
 
+    const recentPlacePercent = Number(
+      runner.recentPlaceStats?.recentPlacePercent || 0
+    );
+
     if (placePercent >= 55) reasons.push("Strong overall place record");
     else if (placePercent >= 40) reasons.push("Solid overall place record");
+    else if (recentPlacePercent >= 80) {
+      reasons.push("Strong recent place support");
+    } else if (recentPlacePercent >= 50) {
+      reasons.push("Recent placing support");
+    }
 
     const hasRecentPlace = String(runner.form || "")
       .replace(/[^0-9]/g, "")
@@ -205,7 +214,7 @@ function canShowTomorrowPreview() {
     if (score >= 70) reasons.push("High PlaceDash score");
     else if (score >= 50) reasons.push("Medium PlaceDash score");
 
-    if (horsePlacePercent > 0 && horsePlacePercent < 40) {
+    if (placePercent > 0 && placePercent < 40) {
       reasons.push("Low overall place strike rate");
     }
 
@@ -228,17 +237,67 @@ function canShowTomorrowPreview() {
     return Array.from(new Set(reasons)).slice(0, 5);
   }
 
+
+  function getRecentFormPlaceStats(runner: any) {
+    const formText = String(
+      runner.form ||
+        runner.last20Starts ||
+        runner.last_20_starts ||
+        ""
+    );
+
+    const results = formText
+      .replace(/[^0-9]/g, "")
+      .split("")
+      .map(Number)
+      .filter((n) => n > 0);
+
+    const recentResults = results.slice(0, 5);
+
+    const recentPlaces = recentResults.filter((n) =>
+      [1, 2, 3].includes(n)
+    ).length;
+
+    const recentPlacePercent =
+      recentResults.length > 0
+        ? (recentPlaces / recentResults.length) * 100
+        : 0;
+
+    return {
+      recentStarts: recentResults.length,
+      recentPlaces,
+      recentPlacePercent,
+      hasRecentPlaceSupport: recentPlaces > 0,
+    };
+  }
+
   function scoreRunner(runner: any) {
     const starts = countStarts(runner);
     const wins = Number(runner.wins || 0);
     const places = Number(runner.places || 0);
 
-    const horsePlacePercent =
+    const recentPlaceStats = getRecentFormPlaceStats(runner);
+
+    const apiPlacePercent =
       typeof runner.placePercent === "number"
         ? runner.placePercent * 100
         : starts > 0
         ? (places / starts) * 100
         : 0;
+
+    const apiPlaceReliable =
+      starts >= 3 &&
+      apiPlacePercent > 0 &&
+      places > 0;
+
+    const formPlaceFallbackPercent =
+      recentPlaceStats.recentStarts > 0
+        ? recentPlaceStats.recentPlacePercent
+        : 0;
+
+    const horsePlacePercent = apiPlaceReliable
+      ? apiPlacePercent
+      : Math.max(apiPlacePercent, formPlaceFallbackPercent);
 
     const horseWinPercent =
       typeof runner.winPercent === "number"
@@ -334,6 +393,7 @@ function canShowTomorrowPreview() {
       betStatus,
       starts,
       recentFormScore: recentForm,
+      recentPlaceStats,
       displayPlacePercent: Math.round(horsePlacePercent),
       specialistNotes: specialist.notes,
       weightNote: weight.note,
