@@ -820,10 +820,11 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
         textDecoration: "none",
         borderRadius: "8px",
       }}
-    >
+       >
       Admin Preview Tomorrow
     </a>
   </div>
+</div>
 </div>
               <a
                 href="/#pricing"
