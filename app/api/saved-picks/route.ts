@@ -53,13 +53,31 @@ const raceNumber = pick.race_number || pick.raceNumber || pick.race?.race_number
   .maybeSingle();
 
     if (existingPick) {
-      return NextResponse.json({
-        ok: true,
-        skipped: true,
-        reason: "Pick already saved",
-        id: existingPick.id,
-      });
-    }
+  const { data: updatedPick, error: updateError } = await supabase
+    .from("saved_picks")
+    .update({
+      logic_version: pick.logic_version || "v2_value_bet",
+      race_card_json: pick.race_card_json || pick.race?.runners || pick.runners || null,
+      source: "dashboard",
+    })
+    .eq("id", existingPick.id)
+    .select()
+    .single();
+
+  if (updateError) {
+    return NextResponse.json({
+      ok: false,
+      error: updateError.message,
+    });
+  }
+
+  return NextResponse.json({
+    ok: true,
+    updated: true,
+    reason: "Existing pick updated with official logic version",
+    pick: updatedPick,
+  });
+}
 
     const { data, error } = await supabase
       .from("saved_picks")
@@ -89,7 +107,8 @@ const raceNumber = pick.race_number || pick.raceNumber || pick.race?.race_number
         bank_start: 1000,
         bet_percentage: 10,
         race_card_json: pick.race_card_json || pick.race?.runners || pick.runners || null,
-        source: "dashboard",
+logic_version: pick.logic_version || "v2_value_bet",
+source: "dashboard",
       })
       .select()
       .single();
