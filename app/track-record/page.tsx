@@ -45,79 +45,9 @@ function getRaceTimes(r: any) {
     };
   }
 
-  const match = String(rawTime).match(/(\d{1,2}):(\d{2})\s*(am|pm)/i);
-
-  if (!match) {
-    return {
-      melbourneTime: rawTime,
-      localTime: rawTime,
-    };
-  }
-
   return {
     melbourneTime: rawTime,
     localTime: rawTime,
-  };
-}
-  const rawTime = r.race_time || r.off_time || r.raceTime || "TBA";
-  const state = r.state || "";
-
-  if (rawTime === "TBA") {
-    return {
-      melbourneTime: "TBA",
-      localTime: "TBA",
-    };
-  }
-
-  const match = String(rawTime).match(/(\d{1,2}):(\d{2})\s*(am|pm)/i);
-
-  if (!match) {
-    return {
-      melbourneTime: rawTime,
-      localTime: rawTime,
-    };
-  }
-
-  let hours = Number(match[1]);
-  const minutes = Number(match[2]);
-  const period = match[3].toLowerCase();
-
-  if (period === "pm" && hours !== 12) hours += 12;
-  if (period === "am" && hours === 12) hours = 0;
-
-  const date = new Date();
-  date.setHours(hours);
-  date.setMinutes(minutes);
-  date.setSeconds(0);
-
-  let offsetMinutes = 0;
-  let localZone = "Local";
-
-  if (state === "WA") {
-    offsetMinutes = 120;
-    localZone = "AWST";
-  } else if (state === "NT") {
-    offsetMinutes = 30;
-    localZone = "ACST";
-  } else if (state === "SA") {
-    offsetMinutes = 30;
-    localZone = "ACST/ACDT";
-  } else {
-    offsetMinutes = 0;
-    localZone = "Local";
-  }
-
-  const melbourneDate = new Date(date.getTime() + offsetMinutes * 60000);
-
-  const melbourneTime = melbourneDate.toLocaleTimeString("en-AU", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-
-  return {
-    melbourneTime,
-    localTime: `${rawTime} ${localZone}`,
   };
 }
 export default function TrackRecordPage() {
