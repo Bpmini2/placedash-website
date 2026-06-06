@@ -13,6 +13,62 @@ function getRaceTimes(r: any) {
     };
   }
 
+  const localTrackTimeZone =
+    state === "WA"
+      ? "Australia/Perth"
+      : state === "SA" || state === "NT"
+      ? "Australia/Adelaide"
+      : state === "QLD"
+      ? "Australia/Brisbane"
+      : state === "TAS"
+      ? "Australia/Hobart"
+      : state === "NSW" || state === "ACT"
+      ? "Australia/Sydney"
+      : "Australia/Melbourne";
+
+  const parsedDate = new Date(rawTime);
+
+  if (!Number.isNaN(parsedDate.getTime())) {
+    return {
+      melbourneTime: parsedDate.toLocaleTimeString("en-AU", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: "Australia/Melbourne",
+      }),
+      localTime: parsedDate.toLocaleTimeString("en-AU", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: localTrackTimeZone,
+      }),
+    };
+  }
+
+  const match = String(rawTime).match(/(\d{1,2}):(\d{2})\s*(am|pm)/i);
+
+  if (!match) {
+    return {
+      melbourneTime: rawTime,
+      localTime: rawTime,
+    };
+  }
+
+  return {
+    melbourneTime: rawTime,
+    localTime: rawTime,
+  };
+}
+  const rawTime = r.race_time || r.off_time || r.raceTime || "TBA";
+  const state = r.state || "";
+
+  if (rawTime === "TBA") {
+    return {
+      melbourneTime: "TBA",
+      localTime: "TBA",
+    };
+  }
+
   const match = String(rawTime).match(/(\d{1,2}):(\d{2})\s*(am|pm)/i);
 
   if (!match) {
