@@ -650,9 +650,11 @@ const res = await fetch(raceApiEndpoint);
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                race_date: new Date().toLocaleDateString("en-CA", {
-                  timeZone: "Australia/Melbourne",
-                }),
+                race_date:
+  race.race_date ||
+  new Date().toLocaleDateString("en-CA", {
+    timeZone: "Australia/Melbourne",
+  }),
                 course: race.course,
                 race_number: race.race_number || race.raceNumber,
                 race_time: race.off_time || race.raceTime,
