@@ -316,7 +316,7 @@ document.body.removeChild(link);
           </h1>
 
           <p style={{ color: "#b7c5d8", fontSize: "17px" }}>
-            Historical PlaceDash AI picks saved before race start.
+            Official v2 Track Record — All Time. Filtered race results are shown below.
           </p>
 
           <div
@@ -341,7 +341,19 @@ document.body.removeChild(link);
         <p style={{ color: "#94a3b8", fontSize: "12px", marginTop: "8px", lineHeight: 1.5 }}>
   Gamble responsibly. PlaceDash provides racing analysis and information only — it is not betting advice and does not guarantee results. If gambling is becoming a problem, contact Gambling Help Online on 1800 858 858 or visit BetStop for self-exclusion support.
 </p>
-
+<div
+  style={{
+    marginTop: "18px",
+    marginBottom: "14px",
+    color: "#38bdf8",
+    fontSize: "14px",
+    fontWeight: 900,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+  }}
+>
+  Official All-Time Stats
+</div>
         {summary && (
           <div
             style={{
@@ -453,7 +465,7 @@ document.body.removeChild(link);
                   }}
                 >
                   <div>
-  Showing: {currentFilterTitle} ({filteredPicks.length})
+  Filtered Results: {currentFilterTitle} ({filteredPicks.length})
 </div>
 
                   <div
