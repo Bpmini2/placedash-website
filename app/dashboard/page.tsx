@@ -820,6 +820,16 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
               >
                 Track Record
               </a>
+              <a
+  href="/bankroll-calculator"
+  style={{
+    color: "#07111f",
+    fontWeight: 700,
+    textDecoration: "none",
+  }}
+>
+  Bankroll Planner
+</a>
               <div
   style={{
     position: "relative",
