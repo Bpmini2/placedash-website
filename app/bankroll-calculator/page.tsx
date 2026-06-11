@@ -13,13 +13,14 @@ type BetRow = {
 
 export default function BankrollCalculatorPage() {
   const [startingBalance, setStartingBalance] = useState("1000");
+
   const [rows, setRows] = useState<BetRow[]>(
     Array.from({ length: 20 }, (_, index) => ({
-  betNumber: index + 1,
-  actualBet: "",
-  dividend: "",
-  result: "Pending",
-}))
+      betNumber: index + 1,
+      actualBet: "",
+      dividend: "",
+      result: "Pending",
+    }))
   );
 
   const calculatedRows = useMemo(() => {
@@ -27,30 +28,33 @@ export default function BankrollCalculatorPage() {
 
     return rows.map((row) => {
       const openingBalance = balance;
-const recommendedBet = openingBalance * 0.1;
-const actualBet = Number(row.actualBet) > 0 ? Number(row.actualBet) : recommendedBet;
-const dividend = Number(row.dividend) || 0;
+      const recommendedBet = openingBalance * 0.1;
+
+      const actualBetAmount =
+        Number(row.actualBet) > 0 ? Number(row.actualBet) : recommendedBet;
+
+      const dividendAmount = Number(row.dividend) || 0;
 
       let returnAmount = 0;
       let profitLoss = 0;
       let closingBalance = openingBalance;
 
-      if (row.result === "Win" && dividend > 0) {
-        returnAmount = actualBet * dividend;
-profitLoss = returnAmount - actualBet;
-closingBalance = openingBalance + profitLoss;
+      if (row.result === "Win" && dividendAmount > 0) {
+        returnAmount = actualBetAmount * dividendAmount;
+        profitLoss = returnAmount - actualBetAmount;
+        closingBalance = openingBalance + profitLoss;
       }
 
       if (row.result === "Loss") {
         returnAmount = 0;
-        profitLoss = -actualBet;
-closingBalance = openingBalance - actualBet;
+        profitLoss = -actualBetAmount;
+        closingBalance = openingBalance - actualBetAmount;
       }
 
       if (row.result === "Void" || row.result === "Race Abandoned") {
-        returnAmount = actualBet;
-profitLoss = 0;
-closingBalance = openingBalance;
+        returnAmount = actualBetAmount;
+        profitLoss = 0;
+        closingBalance = openingBalance;
       }
 
       if (row.result === "Pending") {
@@ -64,15 +68,15 @@ closingBalance = openingBalance;
       }
 
       return {
-  ...row,
-  openingBalance,
-  recommendedBet,
-  actualBet,
-  dividend,
-  returnAmount,
-  profitLoss,
-  closingBalance,
-};
+        ...row,
+        openingBalance,
+        recommendedBet,
+        actualBetAmount,
+        dividendAmount,
+        returnAmount,
+        profitLoss,
+        closingBalance,
+      };
     });
   }, [rows, startingBalance]);
 
@@ -98,11 +102,11 @@ closingBalance = openingBalance;
     setRows((currentRows) => [
       ...currentRows,
       ...Array.from({ length: 10 }, (_, index) => ({
-  betNumber: currentRows.length + index + 1,
-  actualBet: "",
-  dividend: "",
-  result: "Pending" as ResultType,
-})),
+        betNumber: currentRows.length + index + 1,
+        actualBet: "",
+        dividend: "",
+        result: "Pending" as ResultType,
+      })),
     ]);
   }
 
@@ -226,9 +230,9 @@ closingBalance = openingBalance;
               lineHeight: 1.6,
             }}
           >
-            Enter your starting balance, dividend, and result. The calculator
-            updates your running balance and shows the suggested next stake
-            based on 10% of the current balance.
+            Enter your starting balance, actual bet amount, dividend, and result.
+            The calculator updates your running balance and shows the suggested
+            next stake based on 10% of the current balance.
           </p>
 
           <p
@@ -343,16 +347,16 @@ closingBalance = openingBalance;
               width: "100%",
               borderCollapse: "collapse",
               fontSize: "14px",
-              minWidth: "920px",
+              minWidth: "980px",
             }}
           >
             <thead>
               <tr style={{ color: "#94a3b8", textAlign: "left" }}>
                 <th style={{ padding: "12px" }}>Bet #</th>
                 <th style={{ padding: "12px" }}>Opening Balance</th>
-<th style={{ padding: "12px" }}>10% Bet</th>
-<th style={{ padding: "12px" }}>Actual Bet</th>
-<th style={{ padding: "12px" }}>Dividend</th>
+                <th style={{ padding: "12px" }}>10% Bet</th>
+                <th style={{ padding: "12px" }}>Actual Bet</th>
+                <th style={{ padding: "12px" }}>Dividend</th>
                 <th style={{ padding: "12px" }}>Result</th>
                 <th style={{ padding: "12px" }}>Return</th>
                 <th style={{ padding: "12px" }}>Profit / Loss</th>
@@ -372,29 +376,47 @@ closingBalance = openingBalance;
                   <td style={{ padding: "12px", fontWeight: 800 }}>
                     {row.betNumber}
                   </td>
-                  <td style={{ padding: "12px" }}>{money(row.openingBalance)}</td>
-                  <td style={{ padding: "12px", color: "#38bdf8", fontWeight: 800 }}>
+
+                  <td style={{ padding: "12px" }}>
+                    {money(row.openingBalance)}
+                  </td>
+
+                  <td
+                    style={{
+                      padding: "12px",
+                      color: "#38bdf8",
+                      fontWeight: 800,
+                    }}
+                  >
                     {money(row.recommendedBet)}
                   </td>
+
                   <td style={{ padding: "12px" }}>
-  <input
-    type="number"
-    step="0.01"
-    value={row.actualBet}
-    onChange={(e) =>
-      updateRow(index, "actualBet", e.target.value)
-    }
-    placeholder={row.recommendedBet.toFixed(2)}
-    style={{
-      width: "110px",
-      padding: "8px",
-      borderRadius: "8px",
-      border: "1px solid rgba(255,255,255,0.14)",
-      background: "rgba(15,23,42,0.9)",
-      color: "#ffffff",
-    }}
-  />
-</td>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={row.actualBet}
+                      onChange={(e) =>
+                        updateRow(index, "actualBet", e.target.value)
+                      }
+                      onBlur={() => {
+                        const value = Number(row.actualBet);
+                        if (!Number.isNaN(value) && value > 0) {
+                          updateRow(index, "actualBet", value.toFixed(2));
+                        }
+                      }}
+                      placeholder={row.recommendedBet.toFixed(2)}
+                      style={{
+                        width: "110px",
+                        padding: "8px",
+                        borderRadius: "8px",
+                        border: "1px solid rgba(255,255,255,0.14)",
+                        background: "rgba(15,23,42,0.9)",
+                        color: "#ffffff",
+                      }}
+                    />
+                  </td>
+
                   <td style={{ padding: "12px" }}>
                     <input
                       type="number"
@@ -403,6 +425,11 @@ closingBalance = openingBalance;
                       onChange={(e) =>
                         updateRow(index, "dividend", e.target.value)
                       }
+                      onFocus={() => {
+                        if (row.dividend === "0") {
+                          updateRow(index, "dividend", "");
+                        }
+                      }}
                       placeholder="e.g. 1.80"
                       style={{
                         width: "110px",
@@ -414,6 +441,7 @@ closingBalance = openingBalance;
                       }}
                     />
                   </td>
+
                   <td style={{ padding: "12px" }}>
                     <select
                       value={row.result}
@@ -436,7 +464,11 @@ closingBalance = openingBalance;
                       <option>Race Abandoned</option>
                     </select>
                   </td>
-                  <td style={{ padding: "12px" }}>{money(row.returnAmount)}</td>
+
+                  <td style={{ padding: "12px" }}>
+                    {money(row.returnAmount)}
+                  </td>
+
                   <td
                     style={{
                       padding: "12px",
@@ -451,6 +483,7 @@ closingBalance = openingBalance;
                   >
                     {money(row.profitLoss)}
                   </td>
+
                   <td style={{ padding: "12px", fontWeight: 800 }}>
                     {money(row.closingBalance)}
                   </td>
