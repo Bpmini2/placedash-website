@@ -57,6 +57,7 @@ export default function HomePage() {
               <a href="/dashboard" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>Dashboard</a>
               <a href="#method" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>Method</a>
               <a href="#track-record" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>Track Record</a>
+              <a href="/bankroll-calculator" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>Bankroll Planner</a>
               <a href="#pricing" style={{ color: "#07111f", fontWeight: 700, textDecoration: "none" }}>Pricing</a>
             </nav>
 
@@ -183,7 +184,211 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+<section
+  id="bankroll-planner"
+  style={{
+    padding: "90px 0",
+    borderTop: "1px solid rgba(255,255,255,0.08)",
+  }}
+>
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: "34px",
+      alignItems: "center",
+    }}
+  >
+    <div>
+      <div
+        style={{
+          display: "inline-block",
+          marginBottom: "14px",
+          padding: "7px 14px",
+          borderRadius: "999px",
+          background: "rgba(56,189,248,0.14)",
+          color: "#38bdf8",
+          fontSize: "13px",
+          fontWeight: 900,
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
+        }}
+      >
+        Bankroll Planning Tool
+      </div>
 
+      <h2
+        style={{
+          fontSize: "42px",
+          lineHeight: 1.05,
+          margin: "0 0 16px 0",
+          color: "#ffffff",
+        }}
+      >
+        PlaceDash Bankroll Planner
+      </h2>
+
+      <p
+        style={{
+          color: "#b7c5d8",
+          fontSize: "17px",
+          lineHeight: 1.7,
+          marginBottom: "22px",
+        }}
+      >
+        Plan your staking before you bet. Enter your starting balance, actual bet
+        amount, dividend, and result to see your running balance and next
+        suggested stake.
+      </p>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "12px",
+          marginBottom: "26px",
+          color: "#cbd5e1",
+          fontSize: "14px",
+          lineHeight: 1.5,
+        }}
+      >
+        <div>✓ Suggested 10% stake</div>
+        <div>✓ Actual bet override</div>
+        <div>✓ Win / Loss / Void</div>
+        <div>✓ Race Abandoned option</div>
+        <div>✓ Running bank balance</div>
+        <div>✓ Next suggested bet</div>
+      </div>
+
+      <a
+        href="/bankroll-calculator"
+        style={{
+          display: "inline-block",
+          background: "#38bdf8",
+          color: "#07111f",
+          padding: "15px 26px",
+          borderRadius: "14px",
+          fontWeight: 900,
+          textDecoration: "none",
+          boxShadow: "0 14px 30px rgba(56,189,248,0.28)",
+        }}
+      >
+        Open Bankroll Planner
+      </a>
+    </div>
+
+    <div
+      style={{
+        padding: "22px",
+        borderRadius: "26px",
+        background: "rgba(15,23,42,0.72)",
+        border: "1px solid rgba(56,189,248,0.24)",
+        boxShadow: "0 24px 70px rgba(0,0,0,0.34)",
+      }}
+    >
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "14px",
+          marginBottom: "18px",
+        }}
+      >
+        <div
+          style={{
+            padding: "16px",
+            borderRadius: "16px",
+            background: "rgba(2,8,18,0.62)",
+            border: "1px solid rgba(255,255,255,0.1)",
+          }}
+        >
+          <div style={{ color: "#94a3b8", fontSize: "12px", fontWeight: 800 }}>
+            Current Balance
+          </div>
+          <div style={{ color: "#22c55e", fontSize: "28px", fontWeight: 900 }}>
+            $2,324.65
+          </div>
+        </div>
+
+        <div
+          style={{
+            padding: "16px",
+            borderRadius: "16px",
+            background: "rgba(2,8,18,0.62)",
+            border: "1px solid rgba(255,255,255,0.1)",
+          }}
+        >
+          <div style={{ color: "#94a3b8", fontSize: "12px", fontWeight: 800 }}>
+            Next Suggested Bet
+          </div>
+          <div style={{ color: "#38bdf8", fontSize: "28px", fontWeight: 900 }}>
+            $232.47
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          overflow: "hidden",
+          borderRadius: "18px",
+          border: "1px solid rgba(255,255,255,0.1)",
+        }}
+      >
+        {[
+          ["1", "$1,570.00", "$157.00", "$157.00", "1.80", "Win", "+$125.60"],
+          ["2", "$1,695.60", "$169.56", "$500.00", "2.60", "Win", "+$800.00"],
+          ["3", "$2,495.60", "$249.56", "$249.56", "-", "Loss", "-$249.56"],
+          ["4", "$2,246.04", "$224.60", "$224.60", "-", "Void", "$0.00"],
+        ].map((row) => (
+          <div
+            key={row[0]}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "0.4fr 1fr 1fr 1fr 0.8fr 0.8fr 1fr",
+              gap: "8px",
+              padding: "12px",
+              borderBottom: "1px solid rgba(255,255,255,0.08)",
+              color: "#cbd5e1",
+              fontSize: "12px",
+              alignItems: "center",
+            }}
+          >
+            <strong>{row[0]}</strong>
+            <span>{row[1]}</span>
+            <span style={{ color: "#38bdf8", fontWeight: 800 }}>{row[2]}</span>
+            <span>{row[3]}</span>
+            <span>{row[4]}</span>
+            <span>{row[5]}</span>
+            <span
+              style={{
+                color: row[6].startsWith("+")
+                  ? "#22c55e"
+                  : row[6].startsWith("-")
+                  ? "#ef4444"
+                  : "#94a3b8",
+                fontWeight: 900,
+              }}
+            >
+              {row[6]}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <p
+        style={{
+          marginTop: "14px",
+          color: "#94a3b8",
+          fontSize: "12px",
+          lineHeight: 1.5,
+        }}
+      >
+        Example display only. The planner saves your entries in your browser so
+        you can come back later.
+      </p>
+    </div>
+  </div>
+</section>
         <section id="pricing" style={{ padding: "90px 0", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
           <div style={{ color: "#38bdf8", fontSize: "14px", fontWeight: 900, letterSpacing: "0.14em" }}>
             PRICING
