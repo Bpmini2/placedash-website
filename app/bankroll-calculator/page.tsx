@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 type ResultType = "Pending" | "Win" | "Loss" | "Void" | "Race Abandoned";
 
@@ -22,7 +22,44 @@ export default function BankrollCalculatorPage() {
       result: "Pending",
     }))
   );
+const [rows, setRows] = useState<BetRow[]>(
+  Array.from({ length: 20 }, (_, index) => ({
+    betNumber: index + 1,
+    actualBet: "",
+    dividend: "",
+    result: "Pending",
+  }))
+);
 
+useEffect(() => {
+  const savedData = localStorage.getItem("placedash-bankroll-planner");
+
+  if (!savedData) return;
+
+  try {
+    const parsed = JSON.parse(savedData);
+
+    if (parsed.startingBalance) {
+      setStartingBalance(parsed.startingBalance);
+    }
+
+    if (Array.isArray(parsed.rows)) {
+      setRows(parsed.rows);
+    }
+  } catch (error) {
+    console.error("Failed to load saved bankroll planner data", error);
+  }
+}, []);
+
+useEffect(() => {
+  localStorage.setItem(
+    "placedash-bankroll-planner",
+    JSON.stringify({
+      startingBalance,
+      rows,
+    })
+  );
+}, [startingBalance, rows]);
   const calculatedRows = useMemo(() => {
     let balance = Number(startingBalance) || 0;
 
