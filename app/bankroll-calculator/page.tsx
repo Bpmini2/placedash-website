@@ -14,14 +14,7 @@ type BetRow = {
 export default function BankrollCalculatorPage() {
   const [startingBalance, setStartingBalance] = useState("1000");
 
-  const [rows, setRows] = useState<BetRow[]>(
-    Array.from({ length: 20 }, (_, index) => ({
-      betNumber: index + 1,
-      actualBet: "",
-      dividend: "",
-      result: "Pending",
-    }))
-  );
+  
 const [rows, setRows] = useState<BetRow[]>(
   Array.from({ length: 20 }, (_, index) => ({
     betNumber: index + 1,
