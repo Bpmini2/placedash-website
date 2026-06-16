@@ -1501,7 +1501,29 @@ color: getDecisionColor(bestRunner?.decision || "WATCH"),
             );
           })}
         </div>
-
+{isAdminDashboard && (
+  <button
+    type="button"
+    onClick={(event) => {
+      event.stopPropagation();
+      saveFavouriteSplitPick(race);
+    }}
+    style={{
+      display: "block",
+      marginTop: "14px",
+      padding: "10px 14px",
+      borderRadius: "10px",
+      border: "1px solid rgba(56,189,248,0.45)",
+      background: "rgba(56,189,248,0.16)",
+      color: "#38bdf8",
+      fontSize: "13px",
+      fontWeight: 900,
+      cursor: "pointer",
+    }}
+  >
+    Save Favourite Split Test Pick
+  </button>
+)}
         {selectedRace && (
           <div
   style={{
