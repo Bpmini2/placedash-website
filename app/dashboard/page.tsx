@@ -1497,10 +1497,7 @@ color: getDecisionColor(bestRunner?.decision || "WATCH"),
                   {bestRunner?.decision || "WATCH"} ·{" "}
 {getDecisionMeaning(bestRunner?.decision || "WATCH")}
                 </div>
-              </div>
-            );
-          })}
-          {(isAdminDashboard || isDebugTodayMode || isPreviewMode) && (
+                {(isAdminDashboard || isDebugTodayMode || isPreviewMode) && (
   <button
     type="button"
     onClick={(event) => {
@@ -1522,6 +1519,11 @@ color: getDecisionColor(bestRunner?.decision || "WATCH"),
   >
     Save Favourite Split Test Pick
   </button>
+)}
+              </div>
+            );
+          })}
+          
 )}
         </div>
 
