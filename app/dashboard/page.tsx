@@ -1500,7 +1500,7 @@ color: getDecisionColor(bestRunner?.decision || "WATCH"),
                 </div>
               </div>
               {isAdminDashboard && (
-  <button
+                <button
     onClick={(event) => {
       event.stopPropagation();
       saveFavouriteSplitPick(race);
