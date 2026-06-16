@@ -453,34 +453,162 @@ function getDecisionMeaning(decision: string) {
 
     return Math.max(...validOdds);
   }
-{isAdminDashboard && (
-  <button
-    onClick={(event) => {
-      event.stopPropagation();
-      saveFavouriteSplitPick(race);
-    }}
-    style={{
-      display: "block",
-      marginTop: "12px",
-      padding: "10px 12px",
-      borderRadius: "10px",
-      border: "1px solid rgba(56,189,248,0.35)",
-      background: "rgba(56,189,248,0.14)",
-      color: "#38bdf8",
-      fontWeight: 900,
-      cursor: "pointer",
-      width: "100%",
-      textAlign: "left",
-    }}
-  >
-    Save Favourite Split Test Pick
-    {favouriteSplitCandidate
-      ? ` — ${favouriteSplitCandidate.number ? favouriteSplitCandidate.number + ". " : ""}${
-          favouriteSplitCandidate.horse
-        } @ ${favouriteSplitCandidate.winOdds.toFixed(2)} / ${favouriteSplitCandidate.placeOdds.toFixed(2)}`
-      : " — No odds available"}
-  </button>
-)}
+   function getRunnerWinOddsOptions(runner: any) {
+  return [
+    {
+      bookmaker: "Sportsbet",
+      winOdds: Number(
+        runner?.sportsbet_win ||
+          runner?.sportsbetWin ||
+          runner?.sportsbet_win_odds ||
+          runner?.odds?.sportsbetWin ||
+          0
+      ),
+      placeOdds: Number(
+        runner?.sportsbet_place ||
+          runner?.sportsbetPlace ||
+          runner?.sportsbet_place_odds ||
+          runner?.odds?.sportsbetPlace ||
+          0
+      ),
+    },
+    {
+      bookmaker: "Ladbrokes",
+      winOdds: Number(
+        runner?.ladbrokes_win ||
+          runner?.ladbrokesWin ||
+          runner?.ladbrokes_win_odds ||
+          runner?.odds?.ladbrokesWin ||
+          0
+      ),
+      placeOdds: Number(
+        runner?.ladbrokes_place ||
+          runner?.ladbrokesPlace ||
+          runner?.ladbrokes_place_odds ||
+          runner?.odds?.ladbrokesPlace ||
+          0
+      ),
+    },
+  ].filter(
+    (option) =>
+      Number.isFinite(option.winOdds) &&
+      option.winOdds > 1 &&
+      Number.isFinite(option.placeOdds) &&
+      option.placeOdds > 1
+  );
+}
+
+function getFavouriteSplitCandidate(race: any) {
+  const candidates = (race.runners || [])
+    .filter((runner: any) => !runner.scratched)
+    .flatMap((runner: any) =>
+      getRunnerWinOddsOptions(runner).map((oddsOption) => ({
+        runner,
+        bookmaker: oddsOption.bookmaker,
+        winOdds: oddsOption.winOdds,
+        placeOdds: oddsOption.placeOdds,
+      }))
+    )
+    .sort((a: any, b: any) => a.winOdds - b.winOdds);
+
+  if (!candidates.length) return null;
+
+  const favourite = candidates[0];
+
+  return {
+    runner: favourite.runner,
+    bookmaker: favourite.bookmaker,
+    winOdds: favourite.winOdds,
+    placeOdds: favourite.placeOdds,
+    horse:
+      favourite.runner.horse ||
+      favourite.runner.name ||
+      favourite.runner.horse_name ||
+      favourite.runner.horseName,
+    number:
+      favourite.runner.number ||
+      favourite.runner.runner_number ||
+      favourite.runner.runnerNumber ||
+      favourite.runner.saddlecloth ||
+      favourite.runner.cloth_number ||
+      favourite.runner.clothNumber ||
+      "",
+  };
+}
+
+async function saveFavouriteSplitPick(race: any) {
+  const favourite = getFavouriteSplitCandidate(race);
+
+  if (!favourite) {
+    alert("No favourite could be found because win/place odds are missing.");
+    return;
+  }
+
+  try {
+    const summaryRes = await fetch("/api/favourite-split-picks", {
+      cache: "no-store",
+    });
+
+    const summaryData = await summaryRes.json();
+
+    const currentBank =
+      Number(summaryData?.summary?.currentBank) > 0
+        ? Number(summaryData.summary.currentBank)
+        : 1000;
+
+    const totalStake = currentBank * 0.1;
+    const winStake = totalStake * 0.25;
+    const placeStake = totalStake * 0.75;
+
+    const saveRes = await fetch("/api/favourite-split-picks", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        race_date:
+          race.race_date ||
+          new Date().toLocaleDateString("en-CA", {
+            timeZone: "Australia/Melbourne",
+          }),
+        course: race.course,
+        race_number: race.race_number || race.raceNumber,
+        race_time: race.off_time || race.raceTime || race.startTime || null,
+        state: race.state || null,
+
+        favourite_horse: favourite.horse,
+        horse_number: favourite.number,
+
+        win_odds: favourite.winOdds,
+        place_odds: favourite.placeOdds,
+
+        bank_before_bet: currentBank,
+        total_stake: totalStake,
+        win_stake: winStake,
+        place_stake: placeStake,
+
+        status: "pending",
+        race_card_json: race.runners || [],
+      }),
+    });
+
+    const saveData = await saveRes.json();
+
+    if (!saveData.ok) {
+      alert(`Favourite Split save failed: ${saveData.error || "Unknown error"}`);
+      return;
+    }
+
+    alert(
+      `Favourite Split saved: ${
+        favourite.number ? favourite.number + ". " : ""
+      }${favourite.horse} (${favourite.bookmaker})`
+    );
+  } catch (error) {
+    console.error("Favourite Split save failed", error);
+    alert("Favourite Split save failed. Check console/logs.");
+  }
+} 
   function getValueDecision(scoredRunner: any) {
     const placeOdds = getRunnerBestPlaceOdds(scoredRunner);
     const runnerStarts = countStarts(scoredRunner);
