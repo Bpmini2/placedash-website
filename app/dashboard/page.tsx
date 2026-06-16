@@ -453,7 +453,34 @@ function getDecisionMeaning(decision: string) {
 
     return Math.max(...validOdds);
   }
-
+{isAdminDashboard && (
+  <button
+    onClick={(event) => {
+      event.stopPropagation();
+      saveFavouriteSplitPick(race);
+    }}
+    style={{
+      display: "block",
+      marginTop: "12px",
+      padding: "10px 12px",
+      borderRadius: "10px",
+      border: "1px solid rgba(56,189,248,0.35)",
+      background: "rgba(56,189,248,0.14)",
+      color: "#38bdf8",
+      fontWeight: 900,
+      cursor: "pointer",
+      width: "100%",
+      textAlign: "left",
+    }}
+  >
+    Save Favourite Split Test Pick
+    {favouriteSplitCandidate
+      ? ` — ${favouriteSplitCandidate.number ? favouriteSplitCandidate.number + ". " : ""}${
+          favouriteSplitCandidate.horse
+        } @ ${favouriteSplitCandidate.winOdds.toFixed(2)} / ${favouriteSplitCandidate.placeOdds.toFixed(2)}`
+      : " — No odds available"}
+  </button>
+)}
   function getValueDecision(scoredRunner: any) {
     const placeOdds = getRunnerBestPlaceOdds(scoredRunner);
     const runnerStarts = countStarts(scoredRunner);
