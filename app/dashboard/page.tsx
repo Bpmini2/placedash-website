@@ -917,6 +917,19 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
        >
       Admin Preview Tomorrow
     </a>
+    <a
+  href="/track-record-favourite-split?admin=true"
+  style={{
+    display: "block",
+    padding: "10px 12px",
+    color: "#0284c7",
+    fontWeight: 700,
+    textDecoration: "none",
+    borderRadius: "8px",
+  }}
+>
+  Admin Favourite Split
+</a>
   </div>
 </div>
 </div>
