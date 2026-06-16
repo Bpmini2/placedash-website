@@ -1500,8 +1500,7 @@ color: getDecisionColor(bestRunner?.decision || "WATCH"),
               </div>
             );
           })}
-        </div>
-{isAdminDashboard && (
+          {(isAdminDashboard || isDebugTodayMode || isPreviewMode) && (
   <button
     type="button"
     onClick={(event) => {
@@ -1524,6 +1523,8 @@ color: getDecisionColor(bestRunner?.decision || "WATCH"),
     Save Favourite Split Test Pick
   </button>
 )}
+        </div>
+
         {selectedRace && (
           <div
   style={{
