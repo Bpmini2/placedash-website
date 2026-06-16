@@ -1495,42 +1495,56 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
 color: getDecisionColor(bestRunner?.decision || "WATCH"),
                   }}
                 >
+                                  <div
+                  style={{
+                    display: "inline-block",
+                    marginTop: "10px",
+                    padding: "6px 10px",
+                    borderRadius: "8px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    background: getDecisionBackground(bestRunner?.decision || "WATCH"),
+                    color: getDecisionColor(bestRunner?.decision || "WATCH"),
+                  }}
+                >
                   {bestRunner?.decision || "WATCH"} ·{" "}
-{getDecisionMeaning(bestRunner?.decision || "WATCH")}
+                  {getDecisionMeaning(bestRunner?.decision || "WATCH")}
                 </div>
+
+                {isAdminDashboard && (
+                  <button
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      saveFavouriteSplitPick(race);
+                    }}
+                    style={{
+                      display: "block",
+                      marginTop: "12px",
+                      padding: "10px 12px",
+                      borderRadius: "10px",
+                      border: "1px solid rgba(56,189,248,0.35)",
+                      background: "rgba(56,189,248,0.14)",
+                      color: "#38bdf8",
+                      fontWeight: 900,
+                      cursor: "pointer",
+                      width: "100%",
+                      textAlign: "left",
+                    }}
+                  >
+                    Save Favourite Split Test Pick
+                    {favouriteSplitCandidate
+                      ? ` — ${
+                          favouriteSplitCandidate.number
+                            ? favouriteSplitCandidate.number + ". "
+                            : ""
+                        }${favouriteSplitCandidate.horse} @ ${favouriteSplitCandidate.winOdds.toFixed(
+                          2
+                        )} / ${favouriteSplitCandidate.placeOdds.toFixed(2)}`
+                      : " — No odds available"}
+                  </button>
+                )}
               </div>
-              {isAdminDashboard && (
-                <button
-    onClick={(event) => {
-      event.stopPropagation();
-      saveFavouriteSplitPick(race);
-    }}
-    style={{
-      display: "block",
-      marginTop: "12px",
-      padding: "10px 12px",
-      borderRadius: "10px",
-      border: "1px solid rgba(56,189,248,0.35)",
-      background: "rgba(56,189,248,0.14)",
-      color: "#38bdf8",
-      fontWeight: 900,
-      cursor: "pointer",
-      width: "100%",
-      textAlign: "left",
-    }}
-  >
-    Save Favourite Split Test Pick
-    {favouriteSplitCandidate
-      ? ` — ${
-          favouriteSplitCandidate.number
-            ? favouriteSplitCandidate.number + ". "
-            : ""
-        }${favouriteSplitCandidate.horse} @ ${favouriteSplitCandidate.winOdds.toFixed(
-          2
-        )} / ${favouriteSplitCandidate.placeOdds.toFixed(2)}`
-      : " — No odds available"}
-  </button>
-)}
+            );
             );
           })}
         </div>
