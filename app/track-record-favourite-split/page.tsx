@@ -144,6 +144,14 @@ export default function FavouriteSplitTrackRecordPage() {
   const [selectedPick, setSelectedPick] = useState<FavouriteSplitPick | null>(
     null
   );
+  const [editingPickId, setEditingPickId] = useState<string | null>(null);
+const [savingResultId, setSavingResultId] = useState<string | null>(null);
+const [editResult, setEditResult] = useState({
+  status: "pending",
+  finish_position: "",
+  win_odds: "",
+  place_odds: "",
+});
   const [dateMode, setDateMode] = useState("all");
   const [selectedDate, setSelectedDate] = useState("");
   const [trackFilter, setTrackFilter] = useState("all");
@@ -287,6 +295,73 @@ export default function FavouriteSplitTrackRecordPage() {
 
     URL.revokeObjectURL(url);
   }
+  async function refreshFavouriteSplitPicks() {
+  const res = await fetch("/api/favourite-split-picks", {
+    cache: "no-store",
+  });
+
+  const data = await res.json();
+
+  if (data.ok) {
+    setPicks(data.picks || []);
+    setSummary(data.summary || null);
+  }
+}
+
+function startEditingPick(pick: FavouriteSplitPick) {
+  setEditingPickId(pick.id);
+  setEditResult({
+    status: pick.status || "pending",
+    finish_position:
+      pick.finish_position === null || pick.finish_position === undefined
+        ? ""
+        : String(pick.finish_position),
+    win_odds:
+      pick.win_odds === null || pick.win_odds === undefined
+        ? ""
+        : String(pick.win_odds),
+    place_odds:
+      pick.place_odds === null || pick.place_odds === undefined
+        ? ""
+        : String(pick.place_odds),
+  });
+}
+
+async function updateFavouriteSplitResult(pick: FavouriteSplitPick) {
+  try {
+    setSavingResultId(pick.id);
+
+    const res = await fetch("/api/favourite-split-picks", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: pick.id,
+        status: editResult.status,
+        finish_position: editResult.finish_position,
+        win_odds: editResult.win_odds,
+        place_odds: editResult.place_odds,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      alert(`Update failed: ${data.error || "Unknown error"}`);
+      return;
+    }
+
+    await refreshFavouriteSplitPicks();
+    setEditingPickId(null);
+    alert("Favourite Split result updated.");
+  } catch (error) {
+    console.error("Favourite Split update failed", error);
+    alert("Favourite Split update failed. Check console/logs.");
+  } finally {
+    setSavingResultId(null);
+  }
+}
 
   if (!isAdmin) {
     return (
@@ -746,6 +821,7 @@ export default function FavouriteSplitTrackRecordPage() {
                     <th style={thStyle}>Bank After</th>
                     <th style={thStyle}>Status</th>
                     <th style={thStyle}>Race Card</th>
+                    <th style={thStyle}>Admin Edit</th>
                   </tr>
                 </thead>
 
@@ -828,6 +904,124 @@ export default function FavouriteSplitTrackRecordPage() {
                             View
                           </button>
                         </td>
+                        <td style={tdStyle}>
+  {editingPickId === pick.id ? (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "130px 90px 90px 90px",
+        gap: "8px",
+        alignItems: "center",
+        minWidth: "470px",
+      }}
+    >
+      <select
+        value={editResult.status}
+        onChange={(e) =>
+          setEditResult((prev) => ({
+            ...prev,
+            status: e.target.value,
+          }))
+        }
+        style={adminInputStyle}
+      >
+        <option value="pending">Pending</option>
+        <option value="won">Won</option>
+        <option value="placed">Placed</option>
+        <option value="unplaced">Unplaced</option>
+        <option value="scratched">Scratched</option>
+        <option value="abandoned">Abandoned</option>
+      </select>
+
+      <input
+        type="number"
+        placeholder="Finish"
+        value={editResult.finish_position}
+        onChange={(e) =>
+          setEditResult((prev) => ({
+            ...prev,
+            finish_position: e.target.value,
+          }))
+        }
+        style={adminInputStyle}
+      />
+
+      <input
+        type="number"
+        step="0.01"
+        placeholder="Win"
+        value={editResult.win_odds}
+        onChange={(e) =>
+          setEditResult((prev) => ({
+            ...prev,
+            win_odds: e.target.value,
+          }))
+        }
+        style={adminInputStyle}
+      />
+
+      <input
+        type="number"
+        step="0.01"
+        placeholder="Place"
+        value={editResult.place_odds}
+        onChange={(e) =>
+          setEditResult((prev) => ({
+            ...prev,
+            place_odds: e.target.value,
+          }))
+        }
+        style={adminInputStyle}
+      />
+
+      <button
+        onClick={() => updateFavouriteSplitResult(pick)}
+        disabled={savingResultId === pick.id}
+        style={{
+          padding: "8px 12px",
+          borderRadius: "10px",
+          border: "1px solid rgba(34,197,94,0.45)",
+          background: "rgba(34,197,94,0.15)",
+          color: "#22c55e",
+          fontWeight: 900,
+          cursor: "pointer",
+        }}
+      >
+        {savingResultId === pick.id ? "Updating..." : "Update Result"}
+      </button>
+
+      <button
+        onClick={() => setEditingPickId(null)}
+        style={{
+          padding: "8px 12px",
+          borderRadius: "10px",
+          border: "1px solid rgba(255,255,255,0.16)",
+          background: "rgba(255,255,255,0.06)",
+          color: "#ffffff",
+          fontWeight: 800,
+          cursor: "pointer",
+        }}
+      >
+        Cancel
+      </button>
+    </div>
+  ) : (
+    <button
+      onClick={() => startEditingPick(pick)}
+      style={{
+        padding: "8px 12px",
+        borderRadius: "10px",
+        border: "1px solid rgba(56,189,248,0.35)",
+        background: "rgba(56,189,248,0.12)",
+        color: "#38bdf8",
+        fontWeight: 800,
+        cursor: "pointer",
+      }}
+    >
+      Edit
+    </button>
+  )}
+</td>
                       </tr>
                     );
                   })}
@@ -978,4 +1172,13 @@ const tdStyle: React.CSSProperties = {
   padding: "12px",
   verticalAlign: "top",
   whiteSpace: "nowrap",
+};
+const adminInputStyle: React.CSSProperties = {
+  padding: "8px 10px",
+  borderRadius: "10px",
+  border: "1px solid rgba(255,255,255,0.16)",
+  background: "rgba(15,23,42,0.95)",
+  color: "#ffffff",
+  fontWeight: 800,
+  minWidth: "80px",
 };
