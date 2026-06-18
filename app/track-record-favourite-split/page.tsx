@@ -70,6 +70,26 @@ function getStatusColour(status?: string) {
   return "#94a3b8";
 }
 
+function getStatusBackground(status?: string) {
+  if (status === "won") return "rgba(34,197,94,0.15)";
+  if (status === "placed") return "rgba(56,189,248,0.15)";
+  if (status === "unplaced") return "rgba(239,68,68,0.15)";
+  if (status === "scratched") return "rgba(249,115,22,0.15)";
+  if (status === "abandoned") return "rgba(249,115,22,0.15)";
+  if (status === "pending") return "rgba(250,204,21,0.15)";
+  return "rgba(148,163,184,0.15)";
+}
+
+function getStatusBorder(status?: string) {
+  if (status === "won") return "rgba(34,197,94,0.35)";
+  if (status === "placed") return "rgba(56,189,248,0.35)";
+  if (status === "unplaced") return "rgba(239,68,68,0.35)";
+  if (status === "scratched") return "rgba(249,115,22,0.35)";
+  if (status === "abandoned") return "rgba(249,115,22,0.35)";
+  if (status === "pending") return "rgba(250,204,21,0.35)";
+  return "rgba(148,163,184,0.35)";
+}
+
 function getStatusLabel(status?: string) {
   if (status === "won") return "WON";
   if (status === "placed") return "PLACED";
@@ -801,306 +821,311 @@ export default function FavouriteSplitTrackRecordPage() {
           )}
 
           {!loading && filteredPicks.length > 0 && (
-            <div style={{ overflowX: "auto" }}>
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  minWidth: "1100px",
-                  fontSize: "13px",
-                }}
-              >
-                <thead>
-                  <tr style={{ color: "#94a3b8", textAlign: "left" }}>
-                    <th style={thStyle}>Date</th>
-                    <th style={thStyle}>Course</th>
-                    <th style={thStyle}>Race</th>
-                    <th style={thStyle}>Favourite Horse</th>
-                    <th style={thStyle}>Win Odds</th>
-                    <th style={thStyle}>Place Odds</th>
-                    <th style={thStyle}>Total Stake</th>
-                    <th style={thStyle}>Win Stake</th>
-                    <th style={thStyle}>Place Stake</th>
-                    <th style={thStyle}>Finish</th>
-                    <th style={thStyle}>Win Return</th>
-                    <th style={thStyle}>Place Return</th>
-                    <th style={thStyle}>Profit / Loss</th>
-                    <th style={thStyle}>Bank After</th>
-                    <th style={thStyle}>Status</th>
-                  </tr>
-                </thead>
+            <div style={{ display: "grid", gap: "16px" }}>
+              {filteredPicks.map((pick) => {
+                const raceTimes = formatRaceTime(pick.race_time, pick.state);
+                const isEditing = editingPickId === pick.id;
+                const profitLoss = Number(pick.profit_loss || 0);
 
-                <tbody>
-                  {filteredPicks.map((pick) => {
-                    const raceTimes = formatRaceTime(pick.race_time, pick.state);
-                    const isEditing = editingPickId === pick.id;
-
-                    return (
-                      <React.Fragment key={pick.id}>
-                        <tr
+                return (
+                  <div
+                    key={pick.id}
+                    style={{
+                      padding: "20px",
+                      borderRadius: "18px",
+                      background: "rgba(15,23,42,0.72)",
+                      border: `1px solid ${getStatusBorder(pick.status)}`,
+                      boxShadow: "0 18px 45px rgba(0,0,0,0.24)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: "16px",
+                        flexWrap: "wrap",
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <div style={{ minWidth: "280px", flex: "1 1 420px" }}>
+                        <h3
                           style={{
-                            borderTop: "1px solid rgba(255,255,255,0.08)",
-                            color: "#cbd5e1",
+                            margin: "0 0 8px 0",
+                            color: "#ffffff",
+                            fontSize: "21px",
                           }}
                         >
-                          <td style={tdStyle}>{formatDate(pick.race_date)}</td>
+                          {pick.course} Race {pick.race_number}
+                          {pick.state ? ` (${pick.state})` : ""}
+                        </h3>
 
-                          <td style={tdStyle}>
-                            <strong style={{ color: "#ffffff" }}>
-                              {pick.course}
-                            </strong>
-                            <div style={{ color: "#94a3b8", fontSize: "12px" }}>
-                              MEL: {raceTimes.melbourneTime}
-                            </div>
-                            <div style={{ color: "#94a3b8", fontSize: "12px" }}>
-                              Local: {raceTimes.localTime}
-                            </div>
-                          </td>
+                        <div
+                          style={{
+                            color: "#94a3b8",
+                            fontSize: "14px",
+                            lineHeight: 1.55,
+                          }}
+                        >
+                          <div>Date: {formatDate(pick.race_date)}</div>
+                          <div>Melbourne Time: {raceTimes.melbourneTime}</div>
+                          <div>Local Track Time: {raceTimes.localTime}</div>
+                        </div>
 
-                          <td style={tdStyle}>Race {pick.race_number}</td>
+                        <p
+                          style={{
+                            margin: "12px 0 0 0",
+                            color: "#ffffff",
+                            fontSize: "16px",
+                          }}
+                        >
+                          Favourite:{" "}
+                          <strong>
+                            {pick.horse_number ? `${pick.horse_number}. ` : ""}
+                            {pick.favourite_horse}
+                          </strong>
+                        </p>
 
-                          <td style={tdStyle}>
-                            <div style={{ fontWeight: 900, color: "#ffffff" }}>
-                              {pick.horse_number ? `${pick.horse_number}. ` : ""}
-                              {pick.favourite_horse}
-                            </div>
-
-                            <div
-                              style={{
-                                display: "flex",
-                                gap: "8px",
-                                marginTop: "10px",
-                                flexWrap: "wrap",
-                              }}
-                            >
-                              <button
-                                onClick={() => setSelectedPick(pick)}
-                                style={{
-                                  padding: "7px 11px",
-                                  borderRadius: "10px",
-                                  border: "1px solid rgba(56,189,248,0.35)",
-                                  background: "rgba(56,189,248,0.12)",
-                                  color: "#38bdf8",
-                                  fontWeight: 800,
-                                  cursor: "pointer",
-                                }}
-                              >
-                                View
-                              </button>
-
-                              <button
-                                onClick={() => {
-                                  if (isEditing) {
-                                    setEditingPickId(null);
-                                  } else {
-                                    startEditingPick(pick);
-                                  }
-                                }}
-                                style={{
-                                  padding: "7px 11px",
-                                  borderRadius: "10px",
-                                  border: isEditing
-                                    ? "1px solid rgba(250,204,21,0.45)"
-                                    : "1px solid rgba(56,189,248,0.35)",
-                                  background: isEditing
-                                    ? "rgba(250,204,21,0.12)"
-                                    : "rgba(56,189,248,0.12)",
-                                  color: isEditing ? "#facc15" : "#38bdf8",
-                                  fontWeight: 900,
-                                  cursor: "pointer",
-                                }}
-                              >
-                                {isEditing ? "Close Editor" : "Edit"}
-                              </button>
-                            </div>
-                          </td>
-
-                          <td style={tdStyle}>{numberFormat(pick.win_odds || 0)}</td>
-                          <td style={tdStyle}>
-                            {numberFormat(pick.place_odds || 0)}
-                          </td>
-                          <td style={tdStyle}>{money(pick.total_stake)}</td>
-                          <td style={tdStyle}>{money(pick.win_stake)}</td>
-                          <td style={tdStyle}>{money(pick.place_stake)}</td>
-                          <td style={tdStyle}>
-                            {pick.finish_position || "Pending"}
-                          </td>
-                          <td style={tdStyle}>{money(pick.win_return)}</td>
-                          <td style={tdStyle}>{money(pick.place_return)}</td>
-                          <td
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "10px",
+                            flexWrap: "wrap",
+                            marginTop: "14px",
+                          }}
+                        >
+                          <button
+                            onClick={() => {
+                              if (isEditing) {
+                                setEditingPickId(null);
+                              } else {
+                                startEditingPick(pick);
+                              }
+                            }}
                             style={{
-                              ...tdStyle,
-                              color:
-                                Number(pick.profit_loss || 0) >= 0
-                                  ? "#22c55e"
-                                  : "#ef4444",
+                              padding: "9px 14px",
+                              borderRadius: "10px",
+                              border: isEditing
+                                ? "1px solid rgba(250,204,21,0.45)"
+                                : "1px solid rgba(56,189,248,0.35)",
+                              background: isEditing
+                                ? "rgba(250,204,21,0.12)"
+                                : "rgba(56,189,248,0.12)",
+                              color: isEditing ? "#facc15" : "#38bdf8",
                               fontWeight: 900,
+                              cursor: "pointer",
                             }}
                           >
-                            {money(pick.profit_loss)}
-                          </td>
-                          <td style={tdStyle}>{money(pick.bank_after_bet)}</td>
-                          <td
+                            {isEditing ? "Close Editor" : "Edit"}
+                          </button>
+
+                          <button
+                            onClick={() => setSelectedPick(pick)}
                             style={{
-                              ...tdStyle,
-                              color: getStatusColour(pick.status),
+                              padding: "9px 14px",
+                              borderRadius: "10px",
+                              border: "1px solid rgba(56,189,248,0.35)",
+                              background: "rgba(56,189,248,0.12)",
+                              color: "#38bdf8",
                               fontWeight: 900,
+                              cursor: "pointer",
                             }}
                           >
-                            {getStatusLabel(pick.status)}
-                          </td>
-                        </tr>
+                            View Race Card
+                          </button>
+                        </div>
+                      </div>
 
-                        {isEditing && (
-                          <tr>
-                            <td colSpan={15} style={{ padding: "0 12px 16px 12px" }}>
-                              <div
-                                style={{
-                                  marginTop: "8px",
-                                  padding: "18px",
-                                  borderRadius: "16px",
-                                  border: "1px solid rgba(56,189,248,0.28)",
-                                  background: "rgba(15,23,42,0.92)",
-                                  boxShadow: "0 14px 35px rgba(0,0,0,0.28)",
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    marginBottom: "12px",
-                                    color: "#38bdf8",
-                                    fontWeight: 900,
-                                    fontSize: "15px",
-                                  }}
-                                >
-                                  Manual Result Update — {pick.course} Race{" "}
-                                  {pick.race_number}:{" "}
-                                  {pick.horse_number
-                                    ? `${pick.horse_number}. `
-                                    : ""}
-                                  {pick.favourite_horse}
-                                </div>
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns:
+                            "repeat(auto-fit, minmax(120px, 1fr))",
+                          gap: "12px",
+                          flex: "1 1 520px",
+                        }}
+                      >
+                        <MiniStat label="Win Odds" value={numberFormat(pick.win_odds || 0)} />
+                        <MiniStat
+                          label="Place Odds"
+                          value={numberFormat(pick.place_odds || 0)}
+                        />
+                        <MiniStat label="Total Stake" value={money(pick.total_stake)} />
+                        <MiniStat label="Win Stake" value={money(pick.win_stake)} />
+                        <MiniStat label="Place Stake" value={money(pick.place_stake)} />
+                        <MiniStat
+                          label="Finish"
+                          value={pick.finish_position || "Pending"}
+                        />
+                        <MiniStat label="Win Return" value={money(pick.win_return)} />
+                        <MiniStat
+                          label="Place Return"
+                          value={money(pick.place_return)}
+                        />
+                        <MiniStat
+                          label="Profit / Loss"
+                          value={money(pick.profit_loss)}
+                          valueColor={profitLoss >= 0 ? "#22c55e" : "#ef4444"}
+                        />
+                        <MiniStat label="Bank After" value={money(pick.bank_after_bet)} />
+                      </div>
 
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    flexWrap: "wrap",
-                                    gap: "10px",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  <select
-                                    value={editResult.status}
-                                    onChange={(e) =>
-                                      setEditResult((prev) => ({
-                                        ...prev,
-                                        status: e.target.value,
-                                      }))
-                                    }
-                                    style={{
-                                      ...adminInputStyle,
-                                      minWidth: "150px",
-                                    }}
-                                  >
-                                    <option value="pending">Pending</option>
-                                    <option value="won">Won</option>
-                                    <option value="placed">Placed</option>
-                                    <option value="unplaced">Unplaced</option>
-                                    <option value="scratched">Scratched</option>
-                                    <option value="abandoned">Abandoned</option>
-                                  </select>
+                      <div
+                        style={{
+                          padding: "8px 12px",
+                          borderRadius: "999px",
+                          background: getStatusBackground(pick.status),
+                          border: `1px solid ${getStatusBorder(pick.status)}`,
+                          color: getStatusColour(pick.status),
+                          fontWeight: 900,
+                          fontSize: "13px",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {getStatusLabel(pick.status)}
+                      </div>
+                    </div>
 
-                                  <input
-                                    type="number"
-                                    placeholder="Finish"
-                                    value={editResult.finish_position}
-                                    onChange={(e) =>
-                                      setEditResult((prev) => ({
-                                        ...prev,
-                                        finish_position: e.target.value,
-                                      }))
-                                    }
-                                    style={{
-                                      ...adminInputStyle,
-                                      minWidth: "110px",
-                                    }}
-                                  />
+                    {isEditing && (
+                      <div
+                        style={{
+                          marginTop: "18px",
+                          padding: "18px",
+                          borderRadius: "16px",
+                          border: "1px solid rgba(56,189,248,0.28)",
+                          background: "rgba(2,8,18,0.52)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            marginBottom: "12px",
+                            color: "#38bdf8",
+                            fontWeight: 900,
+                            fontSize: "15px",
+                          }}
+                        >
+                          Manual Result Update — {pick.course} Race{" "}
+                          {pick.race_number}:{" "}
+                          {pick.horse_number ? `${pick.horse_number}. ` : ""}
+                          {pick.favourite_horse}
+                        </div>
 
-                                  <input
-                                    type="number"
-                                    step="0.01"
-                                    placeholder="Win Odds"
-                                    value={editResult.win_odds}
-                                    onChange={(e) =>
-                                      setEditResult((prev) => ({
-                                        ...prev,
-                                        win_odds: e.target.value,
-                                      }))
-                                    }
-                                    style={{
-                                      ...adminInputStyle,
-                                      minWidth: "120px",
-                                    }}
-                                  />
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: "10px",
+                            alignItems: "center",
+                          }}
+                        >
+                          <select
+                            value={editResult.status}
+                            onChange={(e) =>
+                              setEditResult((prev) => ({
+                                ...prev,
+                                status: e.target.value,
+                              }))
+                            }
+                            style={{
+                              ...adminInputStyle,
+                              minWidth: "150px",
+                            }}
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="won">Won</option>
+                            <option value="placed">Placed</option>
+                            <option value="unplaced">Unplaced</option>
+                            <option value="scratched">Scratched</option>
+                            <option value="abandoned">Abandoned</option>
+                          </select>
 
-                                  <input
-                                    type="number"
-                                    step="0.01"
-                                    placeholder="Place Odds"
-                                    value={editResult.place_odds}
-                                    onChange={(e) =>
-                                      setEditResult((prev) => ({
-                                        ...prev,
-                                        place_odds: e.target.value,
-                                      }))
-                                    }
-                                    style={{
-                                      ...adminInputStyle,
-                                      minWidth: "130px",
-                                    }}
-                                  />
+                          <input
+                            type="number"
+                            placeholder="Finish"
+                            value={editResult.finish_position}
+                            onChange={(e) =>
+                              setEditResult((prev) => ({
+                                ...prev,
+                                finish_position: e.target.value,
+                              }))
+                            }
+                            style={{
+                              ...adminInputStyle,
+                              minWidth: "110px",
+                            }}
+                          />
 
-                                  <button
-                                    onClick={() => updateFavouriteSplitResult(pick)}
-                                    disabled={savingResultId === pick.id}
-                                    style={{
-                                      padding: "10px 16px",
-                                      borderRadius: "10px",
-                                      border: "1px solid rgba(34,197,94,0.45)",
-                                      background: "rgba(34,197,94,0.15)",
-                                      color: "#22c55e",
-                                      fontWeight: 900,
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    {savingResultId === pick.id
-                                      ? "Updating..."
-                                      : "Update Result"}
-                                  </button>
+                          <input
+                            type="number"
+                            step="0.01"
+                            placeholder="Win Odds"
+                            value={editResult.win_odds}
+                            onChange={(e) =>
+                              setEditResult((prev) => ({
+                                ...prev,
+                                win_odds: e.target.value,
+                              }))
+                            }
+                            style={{
+                              ...adminInputStyle,
+                              minWidth: "120px",
+                            }}
+                          />
 
-                                  <button
-                                    onClick={() => setEditingPickId(null)}
-                                    style={{
-                                      padding: "10px 16px",
-                                      borderRadius: "10px",
-                                      border: "1px solid rgba(255,255,255,0.16)",
-                                      background: "rgba(255,255,255,0.06)",
-                                      color: "#ffffff",
-                                      fontWeight: 800,
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    Cancel
-                                  </button>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          <input
+                            type="number"
+                            step="0.01"
+                            placeholder="Place Odds"
+                            value={editResult.place_odds}
+                            onChange={(e) =>
+                              setEditResult((prev) => ({
+                                ...prev,
+                                place_odds: e.target.value,
+                              }))
+                            }
+                            style={{
+                              ...adminInputStyle,
+                              minWidth: "130px",
+                            }}
+                          />
+
+                          <button
+                            onClick={() => updateFavouriteSplitResult(pick)}
+                            disabled={savingResultId === pick.id}
+                            style={{
+                              padding: "10px 16px",
+                              borderRadius: "10px",
+                              border: "1px solid rgba(34,197,94,0.45)",
+                              background: "rgba(34,197,94,0.15)",
+                              color: "#22c55e",
+                              fontWeight: 900,
+                              cursor: "pointer",
+                            }}
+                          >
+                            {savingResultId === pick.id
+                              ? "Updating..."
+                              : "Update Result"}
+                          </button>
+
+                          <button
+                            onClick={() => setEditingPickId(null)}
+                            style={{
+                              padding: "10px 16px",
+                              borderRadius: "10px",
+                              border: "1px solid rgba(255,255,255,0.16)",
+                              background: "rgba(255,255,255,0.06)",
+                              color: "#ffffff",
+                              fontWeight: 800,
+                              cursor: "pointer",
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </section>
@@ -1109,119 +1134,169 @@ export default function FavouriteSplitTrackRecordPage() {
           <div
             style={{
               position: "fixed",
-              top: "32px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: "min(1100px, 94vw)",
-              maxHeight: "86vh",
+              inset: 0,
+              background: "rgba(0,0,0,0.68)",
+              zIndex: 9998,
+              padding: "32px",
               overflow: "auto",
-              padding: "24px",
-              border: "1px solid rgba(56,189,248,0.35)",
-              borderRadius: "18px",
-              background: "rgba(2,8,18,0.96)",
-              boxShadow: "0 30px 90px rgba(0,0,0,0.75)",
-              zIndex: 9999,
             }}
           >
-            <h2 style={{ marginTop: 0 }}>
-              {selectedPick.course} Race {selectedPick.race_number}
-              {selectedPick.state ? ` (${selectedPick.state})` : ""}
-            </h2>
-
-            <p style={{ color: "#94a3b8" }}>
-              Favourite:{" "}
-              <strong style={{ color: "#ffffff" }}>
-                {selectedPick.horse_number
-                  ? `${selectedPick.horse_number}. `
-                  : ""}
-                {selectedPick.favourite_horse}
-              </strong>
-            </p>
-
-            <p style={{ color: "#94a3b8" }}>
-              Strategy: 10% total stake · 25% win · 75% place
-            </p>
-
-            <button
-              onClick={() => setSelectedPick(null)}
+            <div
               style={{
-                padding: "8px 14px",
-                borderRadius: "8px",
-                border: "1px solid rgba(255,255,255,0.18)",
-                background: "rgba(255,255,255,0.06)",
-                color: "#ffffff",
-                cursor: "pointer",
-                marginBottom: "18px",
+                width: "min(1100px, 94vw)",
+                margin: "0 auto",
+                padding: "24px",
+                border: "1px solid rgba(56,189,248,0.35)",
+                borderRadius: "18px",
+                background: "rgba(2,8,18,0.98)",
+                boxShadow: "0 30px 90px rgba(0,0,0,0.75)",
               }}
             >
-              Close
-            </button>
+              <h2 style={{ marginTop: 0 }}>
+                {selectedPick.course} Race {selectedPick.race_number}
+                {selectedPick.state ? ` (${selectedPick.state})` : ""}
+              </h2>
 
-            {Array.isArray(selectedPick.race_card_json) &&
-            selectedPick.race_card_json.length > 0 ? (
-              <table
+              <p style={{ color: "#94a3b8" }}>
+                Favourite:{" "}
+                <strong style={{ color: "#ffffff" }}>
+                  {selectedPick.horse_number
+                    ? `${selectedPick.horse_number}. `
+                    : ""}
+                  {selectedPick.favourite_horse}
+                </strong>
+              </p>
+
+              <p style={{ color: "#94a3b8" }}>
+                Strategy: 10% total stake · 25% win · 75% place
+              </p>
+
+              <button
+                onClick={() => setSelectedPick(null)}
                 style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  fontSize: "13px",
+                  padding: "8px 14px",
+                  borderRadius: "8px",
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  background: "rgba(255,255,255,0.06)",
+                  color: "#ffffff",
+                  cursor: "pointer",
+                  marginBottom: "18px",
                 }}
               >
-                <thead>
-                  <tr style={{ color: "#94a3b8", textAlign: "left" }}>
-                    <th style={thStyle}>No.</th>
-                    <th style={thStyle}>Horse</th>
-                    <th style={thStyle}>Win Odds</th>
-                    <th style={thStyle}>Place Odds</th>
-                  </tr>
-                </thead>
+                Close
+              </button>
 
-                <tbody>
-                  {selectedPick.race_card_json.map(
-                    (runner: any, index: number) => (
-                      <tr
-                        key={`${runner.number || index}-${
-                          runner.horse || runner.name
-                        }`}
-                        style={{
-                          borderTop: "1px solid rgba(255,255,255,0.08)",
-                          color: "#cbd5e1",
-                        }}
-                      >
-                        <td style={tdStyle}>
-                          {runner.number ||
-                            runner.runner_number ||
-                            runner.runnerNumber ||
-                            "-"}
-                        </td>
-                        <td style={tdStyle}>
-                          {runner.horse || runner.name || "-"}
-                        </td>
-                        <td style={tdStyle}>
-                          {runner.sportsbet_win ||
-                            runner.win_odds ||
-                            runner.odds?.sportsbetWin ||
-                            "-"}
-                        </td>
-                        <td style={tdStyle}>
-                          {runner.sportsbet_place ||
-                            runner.place_odds ||
-                            runner.odds?.sportsbetPlace ||
-                            "-"}
-                        </td>
+              {Array.isArray(selectedPick.race_card_json) &&
+              selectedPick.race_card_json.length > 0 ? (
+                <div style={{ overflowX: "auto" }}>
+                  <table
+                    style={{
+                      width: "100%",
+                      borderCollapse: "collapse",
+                      fontSize: "13px",
+                    }}
+                  >
+                    <thead>
+                      <tr style={{ color: "#94a3b8", textAlign: "left" }}>
+                        <th style={thStyle}>No.</th>
+                        <th style={thStyle}>Horse</th>
+                        <th style={thStyle}>Win Odds</th>
+                        <th style={thStyle}>Place Odds</th>
                       </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
-            ) : (
-              <p style={{ color: "#94a3b8" }}>
-                No race card snapshot saved for this pick yet.
-              </p>
-            )}
+                    </thead>
+
+                    <tbody>
+                      {selectedPick.race_card_json.map(
+                        (runner: any, index: number) => (
+                          <tr
+                            key={`${runner.number || index}-${
+                              runner.horse || runner.name
+                            }`}
+                            style={{
+                              borderTop: "1px solid rgba(255,255,255,0.08)",
+                              color: "#cbd5e1",
+                            }}
+                          >
+                            <td style={tdStyle}>
+                              {runner.number ||
+                                runner.runner_number ||
+                                runner.runnerNumber ||
+                                "-"}
+                            </td>
+                            <td style={tdStyle}>
+                              {runner.horse || runner.name || "-"}
+                            </td>
+                            <td style={tdStyle}>
+                              {runner.sportsbet_win ||
+                                runner.win_odds ||
+                                runner.odds?.sportsbetWin ||
+                                "-"}
+                            </td>
+                            <td style={tdStyle}>
+                              {runner.sportsbet_place ||
+                                runner.place_odds ||
+                                runner.odds?.sportsbetPlace ||
+                                "-"}
+                            </td>
+                          </tr>
+                        )
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p style={{ color: "#94a3b8" }}>
+                  No race card snapshot saved for this pick yet.
+                </p>
+              )}
+            </div>
           </div>
         )}
       </div>
     </main>
+  );
+}
+
+function MiniStat({
+  label,
+  value,
+  valueColor = "#ffffff",
+}: {
+  label: string;
+  value: any;
+  valueColor?: string;
+}) {
+  return (
+    <div
+      style={{
+        padding: "10px",
+        borderRadius: "12px",
+        background: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(255,255,255,0.08)",
+      }}
+    >
+      <div
+        style={{
+          color: "#94a3b8",
+          fontSize: "11px",
+          fontWeight: 900,
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          marginTop: "6px",
+          color: valueColor,
+          fontSize: "14px",
+          fontWeight: 900,
+        }}
+      >
+        {value}
+      </div>
+    </div>
   );
 }
 
