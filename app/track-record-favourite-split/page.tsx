@@ -827,204 +827,263 @@ async function updateFavouriteSplitResult(pick: FavouriteSplitPick) {
 
                 <tbody>
                   {filteredPicks.map((pick) => {
-                    const raceTimes = formatRaceTime(pick.race_time, pick.state);
+  const raceTimes = formatRaceTime(pick.race_time, pick.state);
+  const isEditing = editingPickId === pick.id;
 
-                    return (
-                      <tr
-                        key={pick.id}
-                        style={{
-                          borderTop: "1px solid rgba(255,255,255,0.08)",
-                          color: "#cbd5e1",
-                        }}
-                      >
-                        <td style={tdStyle}>{formatDate(pick.race_date)}</td>
-                        <td style={tdStyle}>
-                          <strong style={{ color: "#ffffff" }}>
-                            {pick.course}
-                          </strong>
-                          <div style={{ color: "#94a3b8", fontSize: "12px" }}>
-                            MEL: {raceTimes.melbourneTime}
-                          </div>
-                          <div style={{ color: "#94a3b8", fontSize: "12px" }}>
-                            Local: {raceTimes.localTime}
-                          </div>
-                        </td>
-                        <td style={tdStyle}>Race {pick.race_number}</td>
-                        <td style={tdStyle}>
-                          {pick.horse_number ? `${pick.horse_number}. ` : ""}
-                          {pick.favourite_horse}
-                        </td>
-                        <td style={tdStyle}>{numberFormat(pick.win_odds || 0)}</td>
-                        <td style={tdStyle}>
-                          {numberFormat(pick.place_odds || 0)}
-                        </td>
-                        <td style={tdStyle}>{money(pick.total_stake)}</td>
-                        <td style={tdStyle}>{money(pick.win_stake)}</td>
-                        <td style={tdStyle}>{money(pick.place_stake)}</td>
-                        <td style={tdStyle}>
-                          {pick.finish_position || "Pending"}
-                        </td>
-                        <td style={tdStyle}>{money(pick.win_return)}</td>
-                        <td style={tdStyle}>{money(pick.place_return)}</td>
-                        <td
-                          style={{
-                            ...tdStyle,
-                            color:
-                              Number(pick.profit_loss || 0) >= 0
-                                ? "#22c55e"
-                                : "#ef4444",
-                            fontWeight: 900,
-                          }}
-                        >
-                          {money(pick.profit_loss)}
-                        </td>
-                        <td style={tdStyle}>{money(pick.bank_after_bet)}</td>
-                        <td
-                          style={{
-                            ...tdStyle,
-                            color: getStatusColour(pick.status),
-                            fontWeight: 900,
-                          }}
-                        >
-                          {getStatusLabel(pick.status)}
-                        </td>
-                        <td style={tdStyle}>
-                          <button
-                            onClick={() => setSelectedPick(pick)}
-                            style={{
-                              padding: "8px 12px",
-                              borderRadius: "10px",
-                              border: "1px solid rgba(56,189,248,0.35)",
-                              background: "rgba(56,189,248,0.12)",
-                              color: "#38bdf8",
-                              fontWeight: 800,
-                              cursor: "pointer",
-                            }}
-                          >
-                            View
-                          </button>
-                        </td>
-                        <td style={tdStyle}>
-  {editingPickId === pick.id ? (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "130px 90px 90px 90px",
-        gap: "8px",
-        alignItems: "center",
-        minWidth: "470px",
-      }}
-    >
-      <select
-        value={editResult.status}
-        onChange={(e) =>
-          setEditResult((prev) => ({
-            ...prev,
-            status: e.target.value,
-          }))
-        }
-        style={adminInputStyle}
-      >
-        <option value="pending">Pending</option>
-        <option value="won">Won</option>
-        <option value="placed">Placed</option>
-        <option value="unplaced">Unplaced</option>
-        <option value="scratched">Scratched</option>
-        <option value="abandoned">Abandoned</option>
-      </select>
-
-      <input
-        type="number"
-        placeholder="Finish"
-        value={editResult.finish_position}
-        onChange={(e) =>
-          setEditResult((prev) => ({
-            ...prev,
-            finish_position: e.target.value,
-          }))
-        }
-        style={adminInputStyle}
-      />
-
-      <input
-        type="number"
-        step="0.01"
-        placeholder="Win"
-        value={editResult.win_odds}
-        onChange={(e) =>
-          setEditResult((prev) => ({
-            ...prev,
-            win_odds: e.target.value,
-          }))
-        }
-        style={adminInputStyle}
-      />
-
-      <input
-        type="number"
-        step="0.01"
-        placeholder="Place"
-        value={editResult.place_odds}
-        onChange={(e) =>
-          setEditResult((prev) => ({
-            ...prev,
-            place_odds: e.target.value,
-          }))
-        }
-        style={adminInputStyle}
-      />
-
-      <button
-        onClick={() => updateFavouriteSplitResult(pick)}
-        disabled={savingResultId === pick.id}
+  return (
+    <React.Fragment key={pick.id}>
+      <tr
         style={{
-          padding: "8px 12px",
-          borderRadius: "10px",
-          border: "1px solid rgba(34,197,94,0.45)",
-          background: "rgba(34,197,94,0.15)",
-          color: "#22c55e",
-          fontWeight: 900,
-          cursor: "pointer",
+          borderTop: "1px solid rgba(255,255,255,0.08)",
+          color: "#cbd5e1",
         }}
       >
-        {savingResultId === pick.id ? "Updating..." : "Update Result"}
-      </button>
+        <td style={tdStyle}>{formatDate(pick.race_date)}</td>
 
-      <button
-        onClick={() => setEditingPickId(null)}
-        style={{
-          padding: "8px 12px",
-          borderRadius: "10px",
-          border: "1px solid rgba(255,255,255,0.16)",
-          background: "rgba(255,255,255,0.06)",
-          color: "#ffffff",
-          fontWeight: 800,
-          cursor: "pointer",
-        }}
-      >
-        Cancel
-      </button>
-    </div>
-  ) : (
-    <button
-      onClick={() => startEditingPick(pick)}
-      style={{
-        padding: "8px 12px",
-        borderRadius: "10px",
-        border: "1px solid rgba(56,189,248,0.35)",
-        background: "rgba(56,189,248,0.12)",
-        color: "#38bdf8",
-        fontWeight: 800,
-        cursor: "pointer",
-      }}
-    >
-      Edit
-    </button>
-  )}
-</td>
-                      </tr>
-                    );
-                  })}
+        <td style={tdStyle}>
+          <strong style={{ color: "#ffffff" }}>{pick.course}</strong>
+          <div style={{ color: "#94a3b8", fontSize: "12px" }}>
+            MEL: {raceTimes.melbourneTime}
+          </div>
+          <div style={{ color: "#94a3b8", fontSize: "12px" }}>
+            Local: {raceTimes.localTime}
+          </div>
+        </td>
+
+        <td style={tdStyle}>Race {pick.race_number}</td>
+
+        <td style={tdStyle}>
+          {pick.horse_number ? `${pick.horse_number}. ` : ""}
+          {pick.favourite_horse}
+        </td>
+
+        <td style={tdStyle}>{numberFormat(pick.win_odds || 0)}</td>
+
+        <td style={tdStyle}>{numberFormat(pick.place_odds || 0)}</td>
+
+        <td style={tdStyle}>{money(pick.total_stake)}</td>
+
+        <td style={tdStyle}>{money(pick.win_stake)}</td>
+
+        <td style={tdStyle}>{money(pick.place_stake)}</td>
+
+        <td style={tdStyle}>{pick.finish_position || "Pending"}</td>
+
+        <td style={tdStyle}>{money(pick.win_return)}</td>
+
+        <td style={tdStyle}>{money(pick.place_return)}</td>
+
+        <td
+          style={{
+            ...tdStyle,
+            color:
+              Number(pick.profit_loss || 0) >= 0 ? "#22c55e" : "#ef4444",
+            fontWeight: 900,
+          }}
+        >
+          {money(pick.profit_loss)}
+        </td>
+
+        <td style={tdStyle}>{money(pick.bank_after_bet)}</td>
+
+        <td
+          style={{
+            ...tdStyle,
+            color: getStatusColour(pick.status),
+            fontWeight: 900,
+          }}
+        >
+          {getStatusLabel(pick.status)}
+        </td>
+
+        <td style={tdStyle}>
+          <button
+            onClick={() => setSelectedPick(pick)}
+            style={{
+              padding: "8px 12px",
+              borderRadius: "10px",
+              border: "1px solid rgba(56,189,248,0.35)",
+              background: "rgba(56,189,248,0.12)",
+              color: "#38bdf8",
+              fontWeight: 800,
+              cursor: "pointer",
+            }}
+          >
+            View
+          </button>
+        </td>
+
+        <td style={tdStyle}>
+          <button
+            onClick={() => {
+              if (isEditing) {
+                setEditingPickId(null);
+              } else {
+                startEditingPick(pick);
+              }
+            }}
+            style={{
+              padding: "8px 12px",
+              borderRadius: "10px",
+              border: isEditing
+                ? "1px solid rgba(250,204,21,0.45)"
+                : "1px solid rgba(56,189,248,0.35)",
+              background: isEditing
+                ? "rgba(250,204,21,0.12)"
+                : "rgba(56,189,248,0.12)",
+              color: isEditing ? "#facc15" : "#38bdf8",
+              fontWeight: 900,
+              cursor: "pointer",
+            }}
+          >
+            {isEditing ? "Close Editor" : "Edit"}
+          </button>
+        </td>
+      </tr>
+
+      {isEditing && (
+        <tr>
+          <td colSpan={17} style={{ padding: "0 12px 16px 12px" }}>
+            <div
+              style={{
+                marginTop: "8px",
+                padding: "18px",
+                borderRadius: "16px",
+                border: "1px solid rgba(56,189,248,0.28)",
+                background: "rgba(15,23,42,0.92)",
+                boxShadow: "0 14px 35px rgba(0,0,0,0.28)",
+              }}
+            >
+              <div
+                style={{
+                  marginBottom: "12px",
+                  color: "#38bdf8",
+                  fontWeight: 900,
+                  fontSize: "15px",
+                }}
+              >
+                Manual Result Update — {pick.course} Race {pick.race_number}:{" "}
+                {pick.horse_number ? `${pick.horse_number}. ` : ""}
+                {pick.favourite_horse}
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "10px",
+                  alignItems: "center",
+                }}
+              >
+                <select
+                  value={editResult.status}
+                  onChange={(e) =>
+                    setEditResult((prev) => ({
+                      ...prev,
+                      status: e.target.value,
+                    }))
+                  }
+                  style={{
+                    ...adminInputStyle,
+                    minWidth: "150px",
+                  }}
+                >
+                  <option value="pending">Pending</option>
+                  <option value="won">Won</option>
+                  <option value="placed">Placed</option>
+                  <option value="unplaced">Unplaced</option>
+                  <option value="scratched">Scratched</option>
+                  <option value="abandoned">Abandoned</option>
+                </select>
+
+                <input
+                  type="number"
+                  placeholder="Finish"
+                  value={editResult.finish_position}
+                  onChange={(e) =>
+                    setEditResult((prev) => ({
+                      ...prev,
+                      finish_position: e.target.value,
+                    }))
+                  }
+                  style={{
+                    ...adminInputStyle,
+                    minWidth: "110px",
+                  }}
+                />
+
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="Win Odds"
+                  value={editResult.win_odds}
+                  onChange={(e) =>
+                    setEditResult((prev) => ({
+                      ...prev,
+                      win_odds: e.target.value,
+                    }))
+                  }
+                  style={{
+                    ...adminInputStyle,
+                    minWidth: "120px",
+                  }}
+                />
+
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="Place Odds"
+                  value={editResult.place_odds}
+                  onChange={(e) =>
+                    setEditResult((prev) => ({
+                      ...prev,
+                      place_odds: e.target.value,
+                    }))
+                  }
+                  style={{
+                    ...adminInputStyle,
+                    minWidth: "130px",
+                  }}
+                />
+
+                <button
+                  onClick={() => updateFavouriteSplitResult(pick)}
+                  disabled={savingResultId === pick.id}
+                  style={{
+                    padding: "10px 16px",
+                    borderRadius: "10px",
+                    border: "1px solid rgba(34,197,94,0.45)",
+                    background: "rgba(34,197,94,0.15)",
+                    color: "#22c55e",
+                    fontWeight: 900,
+                    cursor: "pointer",
+                  }}
+                >
+                  {savingResultId === pick.id ? "Updating..." : "Update Result"}
+                </button>
+
+                <button
+                  onClick={() => setEditingPickId(null)}
+                  style={{
+                    padding: "10px 16px",
+                    borderRadius: "10px",
+                    border: "1px solid rgba(255,255,255,0.16)",
+                    background: "rgba(255,255,255,0.06)",
+                    color: "#ffffff",
+                    fontWeight: 800,
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      )}
+    </React.Fragment>
+  );
+})}
                 </tbody>
               </table>
             </div>
