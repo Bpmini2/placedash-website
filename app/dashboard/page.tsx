@@ -1524,7 +1524,6 @@ color: getDecisionColor(bestRunner?.decision || "WATCH"),
             );
           })}
           
-)}
         </div>
 
         {selectedRace && (
