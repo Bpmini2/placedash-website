@@ -8,48 +8,50 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedRace, setSelectedRace] = useState<any | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-const [isAdminPreviewAllowed, setIsAdminPreviewAllowed] = useState(false);
+  const [isAdminPreviewAllowed, setIsAdminPreviewAllowed] = useState(false);
   const [isAdminDashboard, setIsAdminDashboard] = useState(false);
   const [debugRaces, setDebugRaces] = useState<any[]>([]);
   const [isDebugTodayMode, setIsDebugTodayMode] = useState(false);
-function canShowTomorrowPreview() {
-  const now = new Date();
 
-  const melbourneTime = new Date(
-    now.toLocaleString("en-US", {
-      timeZone: "Australia/Melbourne",
-    })
-  );
+  function canShowTomorrowPreview() {
+    const now = new Date();
 
-  const hour = melbourneTime.getHours();
+    const melbourneTime = new Date(
+      now.toLocaleString("en-US", {
+        timeZone: "Australia/Melbourne",
+      })
+    );
 
-  return hour >= 21 && hour < 24;
-}
+    const hour = melbourneTime.getHours();
+
+    return hour >= 21 && hour < 24;
+  }
+
   function countStarts(runner: any) {
-  if (typeof runner.starts === "number") return runner.starts;
+    if (typeof runner.starts === "number") return runner.starts;
 
-  if (runner.stats?.career?.total) {
-    return Number(runner.stats.career.total);
+    if (runner.stats?.career?.total) {
+      return Number(runner.stats.career.total);
+    }
+
+    if (runner.raw?.stats?.career?.total) {
+      return Number(runner.raw.stats.career.total);
+    }
+
+    if (runner.stats?.career_starts) {
+      return Number(runner.stats.career_starts);
+    }
+
+    if (runner.raw?.stats?.career_starts) {
+      return Number(runner.raw.stats.career_starts);
+    }
+
+    if (runner.form) {
+      return runner.form.replace(/[^0-9]/g, "").length;
+    }
+
+    return 0;
   }
-
-  if (runner.raw?.stats?.career?.total) {
-    return Number(runner.raw.stats.career.total);
-  }
-
-  if (runner.stats?.career_starts) {
-    return Number(runner.stats.career_starts);
-  }
-
-  if (runner.raw?.stats?.career_starts) {
-    return Number(runner.raw.stats.career_starts);
-  }
-
-  if (runner.form) {
-    return runner.form.replace(/[^0-9]/g, "").length;
-  }
-
-  return 0;
-}
 
   function evaluateRecentForm(form: string, last20Starts?: string) {
     const formText = last20Starts || form;
@@ -237,13 +239,9 @@ function canShowTomorrowPreview() {
     return Array.from(new Set(reasons)).slice(0, 5);
   }
 
-
   function getRecentFormPlaceStats(runner: any) {
     const formText = String(
-      runner.form ||
-        runner.last20Starts ||
-        runner.last_20_starts ||
-        ""
+      runner.form || runner.last20Starts || runner.last_20_starts || ""
     );
 
     const results = formText
@@ -285,10 +283,7 @@ function canShowTomorrowPreview() {
         ? (places / starts) * 100
         : 0;
 
-    const apiPlaceReliable =
-      starts >= 3 &&
-      apiPlacePercent > 0 &&
-      places > 0;
+    const apiPlaceReliable = starts >= 3 && apiPlacePercent > 0 && places > 0;
 
     const formPlaceFallbackPercent =
       recentPlaceStats.recentStarts > 0
@@ -370,10 +365,6 @@ function canShowTomorrowPreview() {
       betStatus = "WATCH";
     }
 
-    // AI LOGIC:
-    // Horses with fewer than 3 starts can still appear in the full race table,
-    // but they must never be HIGH confidence or official BET selections.
-    // Best possible label for under-3-start runners is MEDIUM · WATCH.
     if (starts < 3) {
       score = Math.min(score, 69);
 
@@ -404,29 +395,31 @@ function canShowTomorrowPreview() {
       reasoning: getRunnerReasoning(scoredRunner),
     };
   }
-function getDecisionColor(decision: string) {
-  if (decision === "BET") return "#22c55e";
-  if (decision === "WATCH") return "#38bdf8";
-  if (decision === "LOW VALUE") return "#facc15";
-  if (decision === "AVOID") return "#ef4444";
-  return "#94a3b8";
-}
 
-function getDecisionBackground(decision: string) {
-  if (decision === "BET") return "rgba(34,197,94,0.15)";
-  if (decision === "WATCH") return "rgba(56,189,248,0.15)";
-  if (decision === "LOW VALUE") return "rgba(250,204,21,0.15)";
-  if (decision === "AVOID") return "rgba(239,68,68,0.15)";
-  return "rgba(148,163,184,0.15)";
-}
+  function getDecisionColor(decision: string) {
+    if (decision === "BET") return "#22c55e";
+    if (decision === "WATCH") return "#38bdf8";
+    if (decision === "LOW VALUE") return "#facc15";
+    if (decision === "AVOID") return "#ef4444";
+    return "#94a3b8";
+  }
 
-function getDecisionMeaning(decision: string) {
-  if (decision === "BET") return "Official PlaceDash selection";
-  if (decision === "WATCH") return "Possible contender — punter decides";
-  if (decision === "LOW VALUE") return "Good profile maybe, but price too short";
-  if (decision === "AVOID") return "AI does not like the profile";
-  return "Review runner";
-}
+  function getDecisionBackground(decision: string) {
+    if (decision === "BET") return "rgba(34,197,94,0.15)";
+    if (decision === "WATCH") return "rgba(56,189,248,0.15)";
+    if (decision === "LOW VALUE") return "rgba(250,204,21,0.15)";
+    if (decision === "AVOID") return "rgba(239,68,68,0.15)";
+    return "rgba(148,163,184,0.15)";
+  }
+
+  function getDecisionMeaning(decision: string) {
+    if (decision === "BET") return "Official PlaceDash selection";
+    if (decision === "WATCH") return "Possible contender — punter decides";
+    if (decision === "LOW VALUE") return "Good profile maybe, but price too short";
+    if (decision === "AVOID") return "AI does not like the profile";
+    return "Review runner";
+  }
+
   function getRunnerBestPlaceOdds(runner: any) {
     const possiblePlaceOdds = [
       runner?.sportsbetPlaceOdds,
@@ -453,168 +446,213 @@ function getDecisionMeaning(decision: string) {
 
     return Math.max(...validOdds);
   }
-   function getRunnerWinOddsOptions(runner: any) {
-  return [
-    {
-      bookmaker: "Sportsbet",
-      winOdds: Number(
-        runner?.sportsbet_win ||
-          runner?.sportsbetWin ||
-          runner?.sportsbet_win_odds ||
-          runner?.odds?.sportsbetWin ||
-          0
-      ),
-      placeOdds: Number(
-        runner?.sportsbet_place ||
-          runner?.sportsbetPlace ||
-          runner?.sportsbet_place_odds ||
-          runner?.odds?.sportsbetPlace ||
-          0
-      ),
-    },
-    {
-      bookmaker: "Ladbrokes",
-      winOdds: Number(
-        runner?.ladbrokes_win ||
-          runner?.ladbrokesWin ||
-          runner?.ladbrokes_win_odds ||
-          runner?.odds?.ladbrokesWin ||
-          0
-      ),
-      placeOdds: Number(
-        runner?.ladbrokes_place ||
-          runner?.ladbrokesPlace ||
-          runner?.ladbrokes_place_odds ||
-          runner?.odds?.ladbrokesPlace ||
-          0
-      ),
-    },
-  ].filter(
-    (option) =>
-      Number.isFinite(option.winOdds) &&
-      option.winOdds > 1 &&
-      Number.isFinite(option.placeOdds) &&
-      option.placeOdds > 1
-  );
-}
 
-function getFavouriteSplitCandidate(race: any) {
-  const candidates = (race.runners || [])
-    .filter((runner: any) => !runner.scratched)
-    .flatMap((runner: any) =>
-      getRunnerWinOddsOptions(runner).map((oddsOption) => ({
-        runner,
-        bookmaker: oddsOption.bookmaker,
-        winOdds: oddsOption.winOdds,
-        placeOdds: oddsOption.placeOdds,
-      }))
-    )
-    .sort((a: any, b: any) => a.winOdds - b.winOdds);
+  function getRunnerWinOddsOptions(runner: any) {
+    return [
+      {
+        bookmaker: "Sportsbet",
+        winOdds: Number(
+          runner?.sportsbet_win ||
+            runner?.sportsbetWin ||
+            runner?.sportsbet_win_odds ||
+            runner?.odds?.sportsbetWin ||
+            0
+        ),
+        placeOdds: Number(
+          runner?.sportsbet_place ||
+            runner?.sportsbetPlace ||
+            runner?.sportsbet_place_odds ||
+            runner?.odds?.sportsbetPlace ||
+            0
+        ),
+      },
+      {
+        bookmaker: "Ladbrokes",
+        winOdds: Number(
+          runner?.ladbrokes_win ||
+            runner?.ladbrokesWin ||
+            runner?.ladbrokes_win_odds ||
+            runner?.odds?.ladbrokesWin ||
+            0
+        ),
+        placeOdds: Number(
+          runner?.ladbrokes_place ||
+            runner?.ladbrokesPlace ||
+            runner?.ladbrokes_place_odds ||
+            runner?.odds?.ladbrokesPlace ||
+            0
+        ),
+      },
+    ].filter(
+      (option) =>
+        Number.isFinite(option.winOdds) &&
+        option.winOdds > 1 &&
+        Number.isFinite(option.placeOdds) &&
+        option.placeOdds > 1
+    );
+  }
 
-  if (!candidates.length) return null;
+  function getFavouriteSplitCandidate(race: any) {
+    const candidates = (race.runners || [])
+      .filter((runner: any) => !runner.scratched)
+      .flatMap((runner: any) =>
+        getRunnerWinOddsOptions(runner).map((oddsOption) => ({
+          runner,
+          bookmaker: oddsOption.bookmaker,
+          winOdds: oddsOption.winOdds,
+          placeOdds: oddsOption.placeOdds,
+        }))
+      )
+      .sort((a: any, b: any) => a.winOdds - b.winOdds);
 
-  const favourite = candidates[0];
+    if (!candidates.length) {
+      return {
+        canSave: false,
+        reason:
+          "Favourite Split skipped — no favourite could be found because win/place odds are missing.",
+      };
+    }
 
-  return {
-    runner: favourite.runner,
-    bookmaker: favourite.bookmaker,
-    winOdds: favourite.winOdds,
-    placeOdds: favourite.placeOdds,
-    horse:
+    const favourite = candidates[0];
+
+    const horse =
       favourite.runner.horse ||
       favourite.runner.name ||
       favourite.runner.horse_name ||
-      favourite.runner.horseName,
-    number:
+      favourite.runner.horseName;
+
+    const number =
       favourite.runner.number ||
       favourite.runner.runner_number ||
       favourite.runner.runnerNumber ||
       favourite.runner.saddlecloth ||
       favourite.runner.cloth_number ||
       favourite.runner.clothNumber ||
-      "",
-  };
-}
+      "";
 
-async function saveFavouriteSplitPick(race: any) {
-  const favourite = getFavouriteSplitCandidate(race);
+    if (!favourite.winOdds || !favourite.placeOdds) {
+      return {
+        canSave: false,
+        reason:
+          "Favourite Split skipped — no favourite could be found because win/place odds are missing.",
+      };
+    }
 
-  if (!favourite) {
-    alert("No favourite could be found because win/place odds are missing.");
-    return;
+    if (favourite.placeOdds < 1.35) {
+      return {
+        canSave: false,
+        reason: "Favourite Split skipped — odds too short / not enough value.",
+        runner: favourite.runner,
+        bookmaker: favourite.bookmaker,
+        winOdds: favourite.winOdds,
+        placeOdds: favourite.placeOdds,
+        horse,
+        number,
+      };
+    }
+
+    if (favourite.winOdds < 2.2 || favourite.winOdds > 4.5) {
+      return {
+        canSave: false,
+        reason: "Favourite Split skipped — odds too short / not enough value.",
+        runner: favourite.runner,
+        bookmaker: favourite.bookmaker,
+        winOdds: favourite.winOdds,
+        placeOdds: favourite.placeOdds,
+        horse,
+        number,
+      };
+    }
+
+    return {
+      canSave: true,
+      runner: favourite.runner,
+      bookmaker: favourite.bookmaker,
+      winOdds: favourite.winOdds,
+      placeOdds: favourite.placeOdds,
+      horse,
+      number,
+    };
   }
 
-  try {
-    const summaryRes = await fetch("/api/favourite-split-picks", {
-      cache: "no-store",
-    });
+  async function saveFavouriteSplitPick(race: any) {
+    const favourite = getFavouriteSplitCandidate(race);
 
-    const summaryData = await summaryRes.json();
-
-    const currentBank =
-      Number(summaryData?.summary?.currentBank) > 0
-        ? Number(summaryData.summary.currentBank)
-        : 1000;
-
-    const totalStake = currentBank * 0.1;
-    const winStake = totalStake * 0.25;
-    const placeStake = totalStake * 0.75;
-
-    const saveRes = await fetch("/api/favourite-split-picks", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        race_date:
-          race.race_date ||
-          new Date().toLocaleDateString("en-CA", {
-            timeZone: "Australia/Melbourne",
-          }),
-        course: race.course,
-        race_number: race.race_number || race.raceNumber,
-        race_time: race.off_time || race.raceTime || race.startTime || null,
-        state: race.state || null,
-
-        favourite_horse: favourite.horse,
-        horse_number: favourite.number,
-
-        win_odds: favourite.winOdds,
-        place_odds: favourite.placeOdds,
-
-        bank_before_bet: currentBank,
-        total_stake: totalStake,
-        win_stake: winStake,
-        place_stake: placeStake,
-
-        status: "pending",
-        race_card_json: race.runners || [],
-      }),
-    });
-
-    const saveData = await saveRes.json();
-
-    if (!saveData.ok) {
-      alert(`Favourite Split save failed: ${saveData.error || "Unknown error"}`);
+    if (!favourite.canSave) {
+      alert(favourite.reason || "Favourite Split skipped.");
       return;
     }
 
-    alert(
-      `Favourite Split saved: ${
-        favourite.number ? favourite.number + ". " : ""
-      }${favourite.horse} (${favourite.bookmaker})`
-    );
-  } catch (error) {
-    console.error("Favourite Split save failed", error);
-    alert("Favourite Split save failed. Check console/logs.");
+    try {
+      const summaryRes = await fetch("/api/favourite-split-picks", {
+        cache: "no-store",
+      });
+
+      const summaryData = await summaryRes.json();
+
+      const currentBank =
+        Number(summaryData?.summary?.currentBank) > 0
+          ? Number(summaryData.summary.currentBank)
+          : 1000;
+
+      const totalStake = currentBank * 0.1;
+      const winStake = totalStake * 0.25;
+      const placeStake = totalStake * 0.75;
+
+      const saveRes = await fetch("/api/favourite-split-picks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          race_date:
+            race.race_date ||
+            new Date().toLocaleDateString("en-CA", {
+              timeZone: "Australia/Melbourne",
+            }),
+          course: race.course,
+          race_number: race.race_number || race.raceNumber,
+          race_time: race.off_time || race.raceTime || race.startTime || null,
+          state: race.state || null,
+
+          favourite_horse: favourite.horse,
+          horse_number: favourite.number,
+
+          win_odds: favourite.winOdds,
+          place_odds: favourite.placeOdds,
+
+          bank_before_bet: currentBank,
+          total_stake: totalStake,
+          win_stake: winStake,
+          place_stake: placeStake,
+
+          status: "pending",
+          race_card_json: race.runners || [],
+        }),
+      });
+
+      const saveData = await saveRes.json();
+
+      if (!saveData.ok) {
+        alert(saveData.error || "Favourite Split save failed.");
+        return;
+      }
+
+      alert(
+        `Favourite Split saved: ${
+          favourite.number ? favourite.number + ". " : ""
+        }${favourite.horse} (${favourite.bookmaker})`
+      );
+    } catch (error) {
+      console.error("Favourite Split save failed", error);
+      alert("Favourite Split save failed. Check console/logs.");
+    }
   }
-} 
+
   function getValueDecision(scoredRunner: any) {
     const placeOdds = getRunnerBestPlaceOdds(scoredRunner);
     const runnerStarts = countStarts(scoredRunner);
 
-    // AI LOGIC SAFETY RULE:
-    // Under-3-start runners can be displayed, but cannot become official BET selections.
     if (runnerStarts < 3) {
       return {
         decision: "WATCH",
@@ -671,7 +709,6 @@ async function saveFavouriteSplitPick(race: any) {
   function applyValueDecision(runner: any) {
     const scoredRunner = scoreRunner(runner);
 
-    // Keep original runner odds attached so value logic can see live SB/LB place prices.
     const runnerWithOdds = {
       ...runner,
       ...scoredRunner,
@@ -723,167 +760,171 @@ async function saveFavouriteSplitPick(race: any) {
   function getScoredRunners(race: any) {
     if (!race?.runners || race.runners.length === 0) return [];
 
-    // Full race table must show every runner.
-    // AI Logic still prevents under-3-start runners from becoming official BET selections.
     return race.runners
       .map((runner: any) => applyValueDecision(runner))
       .sort((a: any, b: any) => b.valueScore - a.valueScore);
   }
 
   useEffect(() => {
-  async function loadRaces() {
-    try {
-      const previewAllowed = canShowTomorrowPreview();
-      setIsAdminPreviewAllowed(previewAllowed);
+    async function loadRaces() {
+      try {
+        const previewAllowed = canShowTomorrowPreview();
+        setIsAdminPreviewAllowed(previewAllowed);
 
-      const searchParams = new URLSearchParams(window.location.search);
+        const searchParams = new URLSearchParams(window.location.search);
 
-      const adminMode = searchParams.get("admin") === "true";
-const forcePreview = searchParams.get("forcePreview") === "true";
-const debugToday = searchParams.get("debugToday") === "true";
+        const adminMode = searchParams.get("admin") === "true";
+        const forcePreview = searchParams.get("forcePreview") === "true";
+        const debugToday = searchParams.get("debugToday") === "true";
 
-      setIsAdminDashboard(adminMode);
-      setIsDebugTodayMode(adminMode && debugToday);
+        setIsAdminDashboard(adminMode);
+        setIsDebugTodayMode(adminMode && debugToday);
 
-      const usePreview = adminMode && (previewAllowed || forcePreview);
+        const usePreview = adminMode && (previewAllowed || forcePreview);
 
-      setIsPreviewMode(usePreview);
+        setIsPreviewMode(usePreview);
 
-      const raceApiEndpoint = usePreview
-  ? "/api/placedash-races/preview"
-  : "/api/placedash-races/today";
+        const raceApiEndpoint = usePreview
+          ? "/api/placedash-races/preview"
+          : "/api/placedash-races/today";
 
-const res = await fetch(raceApiEndpoint);
-      const data = await res.json();
+        const res = await fetch(raceApiEndpoint);
+        const data = await res.json();
 
-      const rawRaces = data.races || [];
-      const apiRaceDate = data.date || "";
+        const rawRaces = data.races || [];
+        const apiRaceDate = data.date || "";
 
-      const racesWithOdds = rawRaces.map((race: any) => ({
-        ...race,
-        race_date: apiRaceDate,
-        race_number: race.raceNumber || race.race_number,
-        race_name: race.raceName || race.race_name,
-        race_status: race.raceStatus || race.race_status,
-        off_time: race.startTime || race.off_time,
-        runners: (race.runners || []).map((runner: any) => ({
-          ...runner,
-          runner_number: runner.number || runner.runner_number,
-          horse: runner.horse || runner.name,
-          draw: runner.barrier || runner.draw,
-          sportsbet_place: runner.odds?.sportsbetPlace || null,
-          sportsbet_win: runner.odds?.sportsbetWin || null,
-          ladbrokes_place: runner.odds?.ladbrokesPlace || null,
-          ladbrokes_win: runner.odds?.ladbrokesWin || null,
-        })),
-      }));
+        const racesWithOdds = rawRaces.map((race: any) => ({
+          ...race,
+          race_date: apiRaceDate,
+          race_number: race.raceNumber || race.race_number,
+          race_name: race.raceName || race.race_name,
+          race_status: race.raceStatus || race.race_status,
+          off_time: race.startTime || race.off_time,
+          runners: (race.runners || []).map((runner: any) => ({
+            ...runner,
+            runner_number: runner.number || runner.runner_number,
+            horse: runner.horse || runner.name,
+            draw: runner.barrier || runner.draw,
+            sportsbet_place: runner.odds?.sportsbetPlace || null,
+            sportsbet_win: runner.odds?.sportsbetWin || null,
+            ladbrokes_place: runner.odds?.ladbrokesPlace || null,
+            ladbrokes_win: runner.odds?.ladbrokesWin || null,
+          })),
+        }));
 
-      const officialBetRaces = racesWithOdds.filter((race: any) => {
-        const topPick = getBestRunner(race);
-        return topPick?.decision === "BET";
-      });
-
-      setDebugRaces(racesWithOdds);
-
-      if (usePreview || (adminMode && debugToday)) {
-  setRaces(racesWithOdds);
-} else {
-  setRaces(officialBetRaces);
-}
-
-      if (!usePreview && !debugToday && officialBetRaces.length) {
-        for (const race of officialBetRaces) {
+        const officialBetRaces = racesWithOdds.filter((race: any) => {
           const topPick = getBestRunner(race);
+          return topPick?.decision === "BET";
+        });
 
-          if (!topPick) continue;
-          if (topPick.decision !== "BET") continue;
+        setDebugRaces(racesWithOdds);
 
-          try {
-            await fetch("/api/saved-picks", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                race_date:
-  race.race_date ||
-  new Date().toLocaleDateString("en-CA", {
-    timeZone: "Australia/Melbourne",
-  }),
-                course: race.course,
-                race_number: race.race_number || race.raceNumber,
-                race_time: race.off_time || race.raceTime,
-                horse_number: topPick.number,
-                horse_name: topPick.horse || topPick.name,
-                confidence: topPick.confidence,
-                ai_score: topPick.score,
-                reasoning: Array.isArray(topPick.reasoning)
-                  ? topPick.reasoning.join(", ")
-                  : String(topPick.reasoning || ""),
-                distance: race.distance,
-                condition: race.condition,
-                runner_count: race.runners?.length || 0,
-                state: race.state,
-                race_card_json: race.runners || [],
-                logic_version: "v2_value_bet",
-              }),
-            });
-          } catch (err) {
-            console.error("Failed saving pick", err);
+        if (usePreview || (adminMode && debugToday)) {
+          setRaces(racesWithOdds);
+        } else {
+          setRaces(officialBetRaces);
+        }
+
+        if (!usePreview && !debugToday && officialBetRaces.length) {
+          for (const race of officialBetRaces) {
+            const topPick = getBestRunner(race);
+
+            if (!topPick) continue;
+            if (topPick.decision !== "BET") continue;
+
+            try {
+              await fetch("/api/saved-picks", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  race_date:
+                    race.race_date ||
+                    new Date().toLocaleDateString("en-CA", {
+                      timeZone: "Australia/Melbourne",
+                    }),
+                  course: race.course,
+                  race_number: race.race_number || race.raceNumber,
+                  race_time: race.off_time || race.raceTime,
+                  horse_number: topPick.number,
+                  horse_name: topPick.horse || topPick.name,
+                  confidence: topPick.confidence,
+                  ai_score: topPick.score,
+                  reasoning: Array.isArray(topPick.reasoning)
+                    ? topPick.reasoning.join(", ")
+                    : String(topPick.reasoning || ""),
+                  distance: race.distance,
+                  condition: race.condition,
+                  runner_count: race.runners?.length || 0,
+                  state: race.state,
+                  race_card_json: race.runners || [],
+                  logic_version: "v2_value_bet",
+                }),
+              });
+            } catch (err) {
+              console.error("Failed saving pick", err);
+            }
           }
         }
+      } catch (err) {
+        console.error("Failed loading races", err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Failed loading races", err);
-    } finally {
-      setLoading(false);
     }
-  }
 
-  loadRaces();
-}, []);
+    loadRaces();
+  }, []);
 
- const displayRaces = races
-  .filter((race: any) => {
-    const runnerCount = race.runners?.length || 0;
-    return runnerCount >= 8 && runnerCount <= 11;
-  })
-  .filter((race: any) => {
-    if (isPreviewMode || isDebugTodayMode) return true;
+  const displayRaces = races
+    .filter((race: any) => {
+      const runnerCount = race.runners?.length || 0;
+      return runnerCount >= 8 && runnerCount <= 11;
+    })
+    .filter((race: any) => {
+      if (isPreviewMode || isDebugTodayMode) return true;
 
+      const best = getBestRunner(race);
+      return best?.decision === "BET";
+    });
+
+  const debugSkippedRaces = debugRaces.map((race: any) => {
     const best = getBestRunner(race);
-    return best?.decision === "BET";
+    const runnerCount = race.runners?.length || 0;
+
+    let reason = "Unknown reason";
+
+    if (runnerCount < 8 || runnerCount > 11) {
+      reason = `runner count ${runnerCount}`;
+    } else if (!best) {
+      reason = "no suitable runner found";
+    } else if (best.decision === "WATCH") {
+      reason = `best runner WATCH — ${
+        best.reasoning?.[0] || "not strong enough for official bet"
+      }`;
+    } else if (best.decision === "LOW VALUE") {
+      reason = `best runner LOW VALUE — ${
+        best.reasoning?.[0] || "value filter failed"
+      }`;
+    } else if (best.decision === "AVOID") {
+      reason = `best runner AVOID — ${best.reasoning?.[0] || "avoid profile"}`;
+    } else if (best.decision !== "BET") {
+      reason = `best runner ${best.decision || "not BET"}`;
+    } else {
+      reason = "BET-qualified but not displayed";
+    }
+
+    return {
+      course: race.course,
+      race_number: race.race_number || race.raceNumber,
+      state: race.state,
+      bestRunner: best,
+      reason,
+    };
   });
-const debugSkippedRaces = debugRaces.map((race: any) => {
-  const best = getBestRunner(race);
-  const runnerCount = race.runners?.length || 0;
 
-  let reason = "Unknown reason";
-
-  if (runnerCount < 8 || runnerCount > 11) {
-    reason = `runner count ${runnerCount}`;
-  } else if (!best) {
-    reason = "no suitable runner found";
-  } else if (best.decision === "WATCH") {
-    reason = `best runner WATCH — ${best.reasoning?.[0] || "not strong enough for official bet"}`;
-  } else if (best.decision === "LOW VALUE") {
-    reason = `best runner LOW VALUE — ${best.reasoning?.[0] || "value filter failed"}`;
-  } else if (best.decision === "AVOID") {
-    reason = `best runner AVOID — ${best.reasoning?.[0] || "avoid profile"}`;
-  } else if (best.decision !== "BET") {
-    reason = `best runner ${best.decision || "not BET"}`;
-  } else {
-    reason = "BET-qualified but not displayed";
-  }
-
-  return {
-    course: race.course,
-    race_number: race.race_number || race.raceNumber,
-    state: race.state,
-    bestRunner: best,
-    reason,
-  };
-});
   const selectedBestRunner = selectedRace ? getBestRunner(selectedRace) : null;
   const scoredRunners = selectedRace ? getScoredRunners(selectedRace) : [];
 
@@ -976,118 +1017,122 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
                 Track Record
               </a>
               <a
-  href="/bankroll-calculator"
-  style={{
-    color: "#07111f",
-    fontWeight: 700,
-    textDecoration: "none",
-  }}
->
-  Bankroll Planner
-</a>
+                href="/bankroll-calculator"
+                style={{
+                  color: "#07111f",
+                  fontWeight: 700,
+                  textDecoration: "none",
+                }}
+              >
+                Bankroll Planner
+              </a>
               <div
-  style={{
-    position: "relative",
-    display: "inline-block",
-  }}
-  onMouseEnter={(e) => {
-    const menu = e.currentTarget.querySelector(".admin-dropdown") as HTMLElement;
-    if (menu) menu.style.display = "block";
-  }}
-  onMouseLeave={(e) => {
-    const menu = e.currentTarget.querySelector(".admin-dropdown") as HTMLElement;
-    if (menu) menu.style.display = "none";
-  }}
->
-  <span
-    style={{
-      color: "#0284c7",
-      fontWeight: 800,
-      textDecoration: "none",
-      cursor: "pointer",
-    }}
-  >
-    Admin ▾
-  </span>
+                style={{
+                  position: "relative",
+                  display: "inline-block",
+                }}
+                onMouseEnter={(e) => {
+                  const menu = e.currentTarget.querySelector(
+                    ".admin-dropdown"
+                  ) as HTMLElement;
+                  if (menu) menu.style.display = "block";
+                }}
+                onMouseLeave={(e) => {
+                  const menu = e.currentTarget.querySelector(
+                    ".admin-dropdown"
+                  ) as HTMLElement;
+                  if (menu) menu.style.display = "none";
+                }}
+              >
+                <span
+                  style={{
+                    color: "#0284c7",
+                    fontWeight: 800,
+                    textDecoration: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Admin ▾
+                </span>
 
-  <div
-  className="admin-dropdown"
-  style={{
-    display: "none",
-    position: "absolute",
-    top: "18px",
-    left: "-12px",
-    minWidth: "240px",
-    paddingTop: "18px",
-    zIndex: 10000,
-  }}
->
-  <div
-    style={{
-      background: "#ffffff",
-      border: "1px solid rgba(2,132,199,0.25)",
-      borderRadius: "12px",
-      boxShadow: "0 14px 40px rgba(0,0,0,0.18)",
-      padding: "10px",
-    }}
-  >
-    <a
-      href="/track-record?admin=true"
-      style={{
-        display: "block",
-        padding: "10px 12px",
-        color: "#0284c7",
-        fontWeight: 700,
-        textDecoration: "none",
-        borderRadius: "8px",
-      }}
-    >
-      Admin Track Record
-    </a>
+                <div
+                  className="admin-dropdown"
+                  style={{
+                    display: "none",
+                    position: "absolute",
+                    top: "18px",
+                    left: "-12px",
+                    minWidth: "240px",
+                    paddingTop: "18px",
+                    zIndex: 10000,
+                  }}
+                >
+                  <div
+                    style={{
+                      background: "#ffffff",
+                      border: "1px solid rgba(2,132,199,0.25)",
+                      borderRadius: "12px",
+                      boxShadow: "0 14px 40px rgba(0,0,0,0.18)",
+                      padding: "10px",
+                    }}
+                  >
+                    <a
+                      href="/track-record?admin=true"
+                      style={{
+                        display: "block",
+                        padding: "10px 12px",
+                        color: "#0284c7",
+                        fontWeight: 700,
+                        textDecoration: "none",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      Admin Track Record
+                    </a>
 
-    <a
-      href="/dashboard?admin=true&debugToday=true"
-      style={{
-        display: "block",
-        padding: "10px 12px",
-        color: "#0284c7",
-        fontWeight: 700,
-        textDecoration: "none",
-        borderRadius: "8px",
-      }}
-    >
-      Admin Review Today
-    </a>
+                    <a
+                      href="/dashboard?admin=true&debugToday=true"
+                      style={{
+                        display: "block",
+                        padding: "10px 12px",
+                        color: "#0284c7",
+                        fontWeight: 700,
+                        textDecoration: "none",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      Admin Review Today
+                    </a>
 
-    <a
-      href="/dashboard?admin=true&forcePreview=true"
-      style={{
-        display: "block",
-        padding: "10px 12px",
-        color: "#0284c7",
-        fontWeight: 700,
-        textDecoration: "none",
-        borderRadius: "8px",
-      }}
-       >
-      Admin Preview Tomorrow
-    </a>
-    <a
-  href="/track-record-favourite-split?admin=true"
-  style={{
-    display: "block",
-    padding: "10px 12px",
-    color: "#0284c7",
-    fontWeight: 700,
-    textDecoration: "none",
-    borderRadius: "8px",
-  }}
->
-  Admin Favourite Split
-</a>
-  </div>
-</div>
-</div>
+                    <a
+                      href="/dashboard?admin=true&forcePreview=true"
+                      style={{
+                        display: "block",
+                        padding: "10px 12px",
+                        color: "#0284c7",
+                        fontWeight: 700,
+                        textDecoration: "none",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      Admin Preview Tomorrow
+                    </a>
+                    <a
+                      href="/track-record-favourite-split?admin=true"
+                      style={{
+                        display: "block",
+                        padding: "10px 12px",
+                        color: "#0284c7",
+                        fontWeight: 700,
+                        textDecoration: "none",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      Admin Favourite Split
+                    </a>
+                  </div>
+                </div>
+              </div>
               <a
                 href="/#pricing"
                 style={{
@@ -1147,10 +1192,10 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
             }}
           >
             {isDebugTodayMode
-  ? "Admin Review Today"
-  : isPreviewMode
-  ? "Admin Preview Tomorrow"
-  : "Today’s AI Dashboard"}
+              ? "Admin Review Today"
+              : isPreviewMode
+              ? "Admin Preview Tomorrow"
+              : "Today’s AI Dashboard"}
           </h1>
         </div>
 
@@ -1241,51 +1286,55 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
                 PlaceDash is currently only showing races with a value-qualified
                 BET selection.
               </p>
-              <p style={{ marginTop: "10px", color: "#94a3b8", lineHeight: 1.6 }}>
+              <p
+                style={{ marginTop: "10px", color: "#94a3b8", lineHeight: 1.6 }}
+              >
                 WATCH, LOW VALUE, and AVOID races are not saved as official
                 Track Record selections.
               </p>
             </div>
           )}
-          
-{isPreviewMode && (
-  <div
-    style={{
-      gridColumn: "1 / -1",
-      marginBottom: "18px",
-      padding: "14px 18px",
-      borderRadius: "14px",
-      border: "1px solid rgba(250,204,21,0.45)",
-      background: "rgba(250,204,21,0.12)",
-      color: "#facc15",
-      fontWeight: 900,
-      lineHeight: 1.5,
-    }}
-  >
-    PREVIEW ONLY / ADMIN PREVIEW — Tomorrow&apos;s races are being shown for review only.
-    These picks are not saved to Track Record and do not affect official stats, ROI, profit/loss, or bankroll.
-  </div>
-)}
+
+          {isPreviewMode && (
+            <div
+              style={{
+                gridColumn: "1 / -1",
+                marginBottom: "18px",
+                padding: "14px 18px",
+                borderRadius: "14px",
+                border: "1px solid rgba(250,204,21,0.45)",
+                background: "rgba(250,204,21,0.12)",
+                color: "#facc15",
+                fontWeight: 900,
+                lineHeight: 1.5,
+              }}
+            >
+              PREVIEW ONLY / ADMIN PREVIEW — Tomorrow&apos;s races are being shown
+              for review only. These picks are not saved to Track Record and do
+              not affect official stats, ROI, profit/loss, or bankroll.
+            </div>
+          )}
           {isDebugTodayMode && (
-  <div
-    style={{
-      gridColumn: "1 / -1",
-      marginTop: "18px",
-      marginBottom: "22px",
-      padding: "14px 16px",
-      borderRadius: "12px",
-      border: "1px solid rgba(56,189,248,0.45)",
-      background: "rgba(56,189,248,0.12)",
-      color: "#38bdf8",
-      fontWeight: 900,
-      lineHeight: 1.5,
-    }}
-  >
-    ADMIN REVIEW TODAY — Showing today&apos;s qualifying races before the final
-    BET-only Dashboard filter. These review races are for admin diagnosis only
-    and do not save WATCH, LOW VALUE, or AVOID runners to Track Record.
-  </div>
-)}
+            <div
+              style={{
+                gridColumn: "1 / -1",
+                marginTop: "18px",
+                marginBottom: "22px",
+                padding: "14px 16px",
+                borderRadius: "12px",
+                border: "1px solid rgba(56,189,248,0.45)",
+                background: "rgba(56,189,248,0.12)",
+                color: "#38bdf8",
+                fontWeight: 900,
+                lineHeight: 1.5,
+              }}
+            >
+              ADMIN REVIEW TODAY — Showing today&apos;s qualifying races before
+              the final BET-only Dashboard filter. These review races are for
+              admin diagnosis only and do not save WATCH, LOW VALUE, or AVOID
+              runners to Track Record.
+            </div>
+          )}
           {displayRaces.map((race: any, index: number) => {
             const bestRunner = getBestRunner(race);
             const visibleHorse = `${bestRunner?.number ? bestRunner.number + ". " : ""}${
@@ -1314,137 +1363,145 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
                 </h3>
 
                 {(() => {
-  const raceDateText = race.race_date
-    ? new Date(`${race.race_date}T12:00:00`).toLocaleDateString("en-AU", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })
-    : "Not available";
+                  const raceDateText = race.race_date
+                    ? new Date(`${race.race_date}T12:00:00`).toLocaleDateString(
+                        "en-AU",
+                        {
+                          weekday: "long",
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        }
+                      )
+                    : "Not available";
 
-  const melbourneTimeText = race.off_time
-    ? new Date(race.off_time).toLocaleTimeString("en-AU", {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-        timeZone: "Australia/Melbourne",
-      })
-    : "Not available";
+                  const melbourneTimeText = race.off_time
+                    ? new Date(race.off_time).toLocaleTimeString("en-AU", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
+                        timeZone: "Australia/Melbourne",
+                      })
+                    : "Not available";
 
-  const localTrackTimeZone =
-    race.state === "WA"
-      ? "Australia/Perth"
-      : race.state === "SA" || race.state === "NT"
-      ? "Australia/Adelaide"
-      : race.state === "QLD"
-      ? "Australia/Brisbane"
-      : race.state === "TAS"
-      ? "Australia/Hobart"
-      : race.state === "NSW" || race.state === "ACT"
-      ? "Australia/Sydney"
-      : "Australia/Melbourne";
+                  const localTrackTimeZone =
+                    race.state === "WA"
+                      ? "Australia/Perth"
+                      : race.state === "SA" || race.state === "NT"
+                      ? "Australia/Adelaide"
+                      : race.state === "QLD"
+                      ? "Australia/Brisbane"
+                      : race.state === "TAS"
+                      ? "Australia/Hobart"
+                      : race.state === "NSW" || race.state === "ACT"
+                      ? "Australia/Sydney"
+                      : "Australia/Melbourne";
 
-  const localTrackTimeText = race.off_time
-    ? new Date(race.off_time).toLocaleTimeString("en-AU", {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-        timeZone: localTrackTimeZone,
-      })
-    : "Not available";
+                  const localTrackTimeText = race.off_time
+                    ? new Date(race.off_time).toLocaleTimeString("en-AU", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
+                        timeZone: localTrackTimeZone,
+                      })
+                    : "Not available";
 
-  return (
-    <div
-      style={{
-        color: "#94a3b8",
-        fontSize: "14px",
-        lineHeight: "1.5",
-        marginTop: "12px",
-        marginBottom: "12px",
-      }}
-    >
-      <div>Date: {raceDateText}</div>
-      <div>Melbourne Time: {melbourneTimeText}</div>
-      <div>
-        Local Track Time: {localTrackTimeText}
-        {race.timezone_label ? ` ${race.timezone_label}` : ""}
-      </div>
-      <div>Runners: {race.runners?.length || 0}</div>
-    </div>
-  );
-})()}
+                  return (
+                    <div
+                      style={{
+                        color: "#94a3b8",
+                        fontSize: "14px",
+                        lineHeight: "1.5",
+                        marginTop: "12px",
+                        marginBottom: "12px",
+                      }}
+                    >
+                      <div>Date: {raceDateText}</div>
+                      <div>Melbourne Time: {melbourneTimeText}</div>
+                      <div>
+                        Local Track Time: {localTrackTimeText}
+                        {race.timezone_label ? ` ${race.timezone_label}` : ""}
+                      </div>
+                      <div>Runners: {race.runners?.length || 0}</div>
+                    </div>
+                  );
+                })()}
 
                 <p style={{ marginTop: "10px" }}>
                   Selection: <strong>{visibleHorse}</strong>
                 </p>
 
-                {bestRunner && (() => {
-                  const raceNumber = race.race_number || race.raceNumber;
-                  const runnerNumber = bestRunner.number;
+                {bestRunner &&
+                  (() => {
+                    const raceNumber = race.race_number || race.raceNumber;
+                    const runnerNumber = bestRunner.number;
 
-                  const directOdds =
-                    liveOdds[`${race.course}-${raceNumber}-${runnerNumber}`];
+                    const directOdds =
+                      liveOdds[`${race.course}-${raceNumber}-${runnerNumber}`];
 
-                  const fallbackOdds = Object.entries(liveOdds).find(
-                    ([key, value]: any) => {
-                      const lowerKey = key.toLowerCase();
-                      const lowerCourse = String(race.course || "").toLowerCase();
+                    const fallbackOdds = Object.entries(liveOdds).find(
+                      ([key, value]: any) => {
+                        const lowerKey = key.toLowerCase();
+                        const lowerCourse = String(
+                          race.course || ""
+                        ).toLowerCase();
 
-                      const courseMatch =
-                        lowerKey.includes(lowerCourse) ||
-                        lowerCourse.includes(
-                          String(value?.course || "").toLowerCase()
+                        const courseMatch =
+                          lowerKey.includes(lowerCourse) ||
+                          lowerCourse.includes(
+                            String(value?.course || "").toLowerCase()
+                          );
+
+                        const stateMatch =
+                          value?.state &&
+                          race.state &&
+                          String(value.state).toLowerCase() ===
+                            String(race.state).toLowerCase();
+
+                        const raceMatch =
+                          Number(value?.race_number) === Number(raceNumber);
+                        const runnerMatch =
+                          Number(value?.runner_number) === Number(runnerNumber);
+
+                        return (
+                          (courseMatch || stateMatch) && raceMatch && runnerMatch
                         );
+                      }
+                    )?.[1] as any;
 
-                      const stateMatch =
-                        value?.state &&
-                        race.state &&
-                        String(value.state).toLowerCase() ===
-                          String(race.state).toLowerCase();
+                    const odds = directOdds || fallbackOdds;
 
-                      const raceMatch =
-                        Number(value?.race_number) === Number(raceNumber);
-                      const runnerMatch =
-                        Number(value?.runner_number) === Number(runnerNumber);
+                    if (!odds) return null;
 
-                      return (courseMatch || stateMatch) && raceMatch && runnerMatch;
-                    }
-                  )?.[1] as any;
-
-                  const odds = directOdds || fallbackOdds;
-
-                  if (!odds) return null;
-
-                  return (
-                    <div
-                      style={{
-                        marginTop: "10px",
-                        padding: "10px",
-                        borderRadius: "10px",
-                        background: "rgba(56,189,248,0.08)",
-                        border: "1px solid rgba(56,189,248,0.2)",
-                        fontSize: "13px",
-                      }}
-                    >
-                      <div style={{ color: "#38bdf8", fontWeight: 800 }}>
-                        SB Place: ${odds.sportsbet_place || "-"} · LB Place: $
-                        {odds.ladbrokes_place || "-"}
-                      </div>
-
+                    return (
                       <div
                         style={{
-                          marginTop: "4px",
-                          color: "#94a3b8",
-                          fontSize: "12px",
+                          marginTop: "10px",
+                          padding: "10px",
+                          borderRadius: "10px",
+                          background: "rgba(56,189,248,0.08)",
+                          border: "1px solid rgba(56,189,248,0.2)",
+                          fontSize: "13px",
                         }}
                       >
-                        SB Win: ${odds.sportsbet_win || "-"} · LB Win: $
-                        {odds.ladbrokes_win || "-"}
+                        <div style={{ color: "#38bdf8", fontWeight: 800 }}>
+                          SB Place: ${odds.sportsbet_place || "-"} · LB Place: $
+                          {odds.ladbrokes_place || "-"}
+                        </div>
+
+                        <div
+                          style={{
+                            marginTop: "4px",
+                            color: "#94a3b8",
+                            fontSize: "12px",
+                          }}
+                        >
+                          SB Win: ${odds.sportsbet_win || "-"} · LB Win: $
+                          {odds.ladbrokes_win || "-"}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })()}
+                    );
+                  })()}
 
                 <div
                   style={{
@@ -1490,169 +1547,182 @@ const debugSkippedRaces = debugRaces.map((race: any) => {
                     borderRadius: "8px",
                     fontSize: "12px",
                     fontWeight: "600",
-                    background: getDecisionBackground(bestRunner?.decision || "WATCH"),
-color: getDecisionColor(bestRunner?.decision || "WATCH"),
+                    background: getDecisionBackground(
+                      bestRunner?.decision || "WATCH"
+                    ),
+                    color: getDecisionColor(bestRunner?.decision || "WATCH"),
                   }}
                 >
                   {bestRunner?.decision || "WATCH"} ·{" "}
-{getDecisionMeaning(bestRunner?.decision || "WATCH")}
+                  {getDecisionMeaning(bestRunner?.decision || "WATCH")}
                 </div>
                 {(isAdminDashboard || isDebugTodayMode || isPreviewMode) && (
-  <button
-    type="button"
-    onClick={(event) => {
-      event.stopPropagation();
-      saveFavouriteSplitPick(race);
-    }}
-    style={{
-      display: "block",
-      marginTop: "14px",
-      padding: "10px 14px",
-      borderRadius: "10px",
-      border: "1px solid rgba(56,189,248,0.45)",
-      background: "rgba(56,189,248,0.16)",
-      color: "#38bdf8",
-      fontSize: "13px",
-      fontWeight: 900,
-      cursor: "pointer",
-    }}
-  >
-    Save Favourite Split Test Pick
-  </button>
-)}
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      saveFavouriteSplitPick(race);
+                    }}
+                    style={{
+                      display: "block",
+                      marginTop: "14px",
+                      padding: "10px 14px",
+                      borderRadius: "10px",
+                      border: "1px solid rgba(56,189,248,0.45)",
+                      background: "rgba(56,189,248,0.16)",
+                      color: "#38bdf8",
+                      fontSize: "13px",
+                      fontWeight: 900,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Save Favourite Split Test Pick
+                  </button>
+                )}
               </div>
             );
           })}
-          
         </div>
 
         {selectedRace && (
           <div
-  style={{
-    position: "fixed",
-top: "32px",
-left: "50%",
-transform: "translateX(-50%)",
-width: "min(1200px, 94vw)",
-height: "80vh",
-minWidth: "620px",
-minHeight: "420px",
-maxWidth: "96vw",
-maxHeight: "92vh",
-overflow: "auto",
-resize: "both",
-    padding: "24px",
-    border: "1px solid rgba(56,189,248,0.35)",
-    borderRadius: "18px",
-    background: "rgba(2,8,18,0.96)",
-    boxShadow: "0 30px 90px rgba(0,0,0,0.75)",
-    zIndex: 9999,
-  }}
->
+            style={{
+              position: "fixed",
+              top: "32px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: "min(1200px, 94vw)",
+              height: "80vh",
+              minWidth: "620px",
+              minHeight: "420px",
+              maxWidth: "96vw",
+              maxHeight: "92vh",
+              overflow: "auto",
+              resize: "both",
+              padding: "24px",
+              border: "1px solid rgba(56,189,248,0.35)",
+              borderRadius: "18px",
+              background: "rgba(2,8,18,0.96)",
+              boxShadow: "0 30px 90px rgba(0,0,0,0.75)",
+              zIndex: 9999,
+            }}
+          >
             <div
-  style={{
-    display: "grid",
-    gridTemplateColumns: "minmax(280px, 1fr) minmax(320px, 500px)",
-    gap: "22px",
-    alignItems: "stretch",
-    marginBottom: "16px",
-  }}
->
-  <div>
-    <h2 style={{ margin: "0 0 14px 0" }}>
-      {selectedRace.course} Race {selectedRace.race_number}
-      {selectedRace.state ? ` (${selectedRace.state})` : ""}
-    </h2>
+              style={{
+                display: "grid",
+                gridTemplateColumns: "minmax(280px, 1fr) minmax(320px, 500px)",
+                gap: "22px",
+                alignItems: "stretch",
+                marginBottom: "16px",
+              }}
+            >
+              <div>
+                <h2 style={{ margin: "0 0 14px 0" }}>
+                  {selectedRace.course} Race {selectedRace.race_number}
+                  {selectedRace.state ? ` (${selectedRace.state})` : ""}
+                </h2>
 
-    {(() => {
-      const raceDateText = selectedRace.race_date
-        ? new Date(`${selectedRace.race_date}T12:00:00`).toLocaleDateString("en-AU", {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          })
-        : "Not available";
+                {(() => {
+                  const raceDateText = selectedRace.race_date
+                    ? new Date(
+                        `${selectedRace.race_date}T12:00:00`
+                      ).toLocaleDateString("en-AU", {
+                        weekday: "long",
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })
+                    : "Not available";
 
-      const melbourneTimeText = selectedRace.off_time
-        ? new Date(selectedRace.off_time).toLocaleTimeString("en-AU", {
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: true,
-            timeZone: "Australia/Melbourne",
-          })
-        : "Not available";
+                  const melbourneTimeText = selectedRace.off_time
+                    ? new Date(selectedRace.off_time).toLocaleTimeString(
+                        "en-AU",
+                        {
+                          hour: "numeric",
+                          minute: "2-digit",
+                          hour12: true,
+                          timeZone: "Australia/Melbourne",
+                        }
+                      )
+                    : "Not available";
 
-      const localTrackTimeZone =
-        selectedRace.state === "WA"
-          ? "Australia/Perth"
-          : selectedRace.state === "SA" || selectedRace.state === "NT"
-          ? "Australia/Adelaide"
-          : selectedRace.state === "QLD"
-          ? "Australia/Brisbane"
-          : selectedRace.state === "TAS"
-          ? "Australia/Hobart"
-          : selectedRace.state === "NSW" || selectedRace.state === "ACT"
-          ? "Australia/Sydney"
-          : "Australia/Melbourne";
+                  const localTrackTimeZone =
+                    selectedRace.state === "WA"
+                      ? "Australia/Perth"
+                      : selectedRace.state === "SA" ||
+                        selectedRace.state === "NT"
+                      ? "Australia/Adelaide"
+                      : selectedRace.state === "QLD"
+                      ? "Australia/Brisbane"
+                      : selectedRace.state === "TAS"
+                      ? "Australia/Hobart"
+                      : selectedRace.state === "NSW" ||
+                        selectedRace.state === "ACT"
+                      ? "Australia/Sydney"
+                      : "Australia/Melbourne";
 
-      const localTrackTimeText = selectedRace.off_time
-        ? new Date(selectedRace.off_time).toLocaleTimeString("en-AU", {
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: true,
-            timeZone: localTrackTimeZone,
-          })
-        : "Not available";
+                  const localTrackTimeText = selectedRace.off_time
+                    ? new Date(selectedRace.off_time).toLocaleTimeString(
+                        "en-AU",
+                        {
+                          hour: "numeric",
+                          minute: "2-digit",
+                          hour12: true,
+                          timeZone: localTrackTimeZone,
+                        }
+                      )
+                    : "Not available";
 
-      return (
-        <div
-          style={{
-            color: "#cbd5e1",
-            fontSize: "15px",
-            lineHeight: "1.65",
-            marginBottom: "18px",
-          }}
-        >
-          <div>Date: {raceDateText}</div>
-          <div>Melbourne Time: {melbourneTimeText}</div>
-          <div>
-            Local Track Time: {localTrackTimeText}
-            {selectedRace.timezone_label ? ` ${selectedRace.timezone_label}` : ""}
-          </div>
-          <div>Runners: {selectedRace.runners?.length || 0}</div>
-          <div>Distance: {selectedRace.distance || "Not available"}</div>
-        </div>
-      );
-    })()}
+                  return (
+                    <div
+                      style={{
+                        color: "#cbd5e1",
+                        fontSize: "15px",
+                        lineHeight: "1.65",
+                        marginBottom: "18px",
+                      }}
+                    >
+                      <div>Date: {raceDateText}</div>
+                      <div>Melbourne Time: {melbourneTimeText}</div>
+                      <div>
+                        Local Track Time: {localTrackTimeText}
+                        {selectedRace.timezone_label
+                          ? ` ${selectedRace.timezone_label}`
+                          : ""}
+                      </div>
+                      <div>Runners: {selectedRace.runners?.length || 0}</div>
+                      <div>Distance: {selectedRace.distance || "Not available"}</div>
+                    </div>
+                  );
+                })()}
 
-    <button
-      onClick={() => setSelectedRace(null)}
-      style={{
-        padding: "8px 14px",
-        borderRadius: "8px",
-        border: "1px solid rgba(255,255,255,0.18)",
-        background: "rgba(255,255,255,0.06)",
-        color: "#ffffff",
-        cursor: "pointer",
-      }}
-    >
-      Close
-    </button>
-  </div>
+                <button
+                  onClick={() => setSelectedRace(null)}
+                  style={{
+                    padding: "8px 14px",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(255,255,255,0.18)",
+                    background: "rgba(255,255,255,0.06)",
+                    color: "#ffffff",
+                    cursor: "pointer",
+                  }}
+                >
+                  Close
+                </button>
+              </div>
 
-  <div
-    style={{
-      minHeight: "190px",
-      borderRadius: "14px",
-      overflow: "hidden",
-      border: "1px solid rgba(255,255,255,0.12)",
-      backgroundImage: "url('/racehorse-bg.png')",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-    }}
-  />
-</div>
+              <div
+                style={{
+                  minHeight: "190px",
+                  borderRadius: "14px",
+                  overflow: "hidden",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  backgroundImage: "url('/racehorse-bg.png')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              />
+            </div>
 
             <div
               style={{
@@ -1663,14 +1733,20 @@ resize: "both",
                 border: "1px solid rgba(56,189,248,0.18)",
               }}
             >
-              <strong style={{ color: getDecisionColor(selectedBestRunner?.decision || "WATCH") }}>
-  Value Selection:
-</strong>
-              {selectedBestRunner?.number ? ` ${selectedBestRunner.number}. ` : ""}
+              <strong
+                style={{
+                  color: getDecisionColor(selectedBestRunner?.decision || "WATCH"),
+                }}
+              >
+                Value Selection:
+              </strong>
+              {selectedBestRunner?.number
+                ? ` ${selectedBestRunner.number}. `
+                : ""}
               {selectedBestRunner?.horse || "No selection"} ·{" "}
               {selectedBestRunner?.decision || "WATCH"} ·{" "}
-{getDecisionMeaning(selectedBestRunner?.decision || "WATCH")} · Score{" "}
-{selectedBestRunner?.score || 0}
+              {getDecisionMeaning(selectedBestRunner?.decision || "WATCH")} ·
+              Score {selectedBestRunner?.score || 0}
             </div>
 
             <div style={{ overflowX: "auto", marginTop: "18px" }}>
@@ -1683,23 +1759,23 @@ resize: "both",
               >
                 <thead>
                   <tr style={{ color: "#94a3b8", textAlign: "left" }}>
-  <th style={{ padding: "10px" }}>Rank</th>
-  <th style={{ padding: "10px" }}>No.</th>
-  <th style={{ padding: "10px" }}>Horse</th>
-  <th style={{ padding: "10px" }}>Jockey</th>
-  <th style={{ padding: "10px" }}>Trainer</th>
-  <th style={{ padding: "10px" }}>Barrier</th>
-  <th style={{ padding: "10px" }}>Weight</th>
-  <th style={{ padding: "10px" }}>Form</th>
-  <th style={{ padding: "10px" }}>Starts</th>
-  <th style={{ padding: "10px" }}>Place %</th>
-  <th style={{ padding: "10px" }}>SB Win</th>
-  <th style={{ padding: "10px" }}>SB Place</th>
-  <th style={{ padding: "10px" }}>LB Win</th>
-  <th style={{ padding: "10px" }}>LB Place</th>
-  <th style={{ padding: "10px" }}>AI</th>
-  <th style={{ padding: "10px" }}>Reasoning</th>
-</tr>
+                    <th style={{ padding: "10px" }}>Rank</th>
+                    <th style={{ padding: "10px" }}>No.</th>
+                    <th style={{ padding: "10px" }}>Horse</th>
+                    <th style={{ padding: "10px" }}>Jockey</th>
+                    <th style={{ padding: "10px" }}>Trainer</th>
+                    <th style={{ padding: "10px" }}>Barrier</th>
+                    <th style={{ padding: "10px" }}>Weight</th>
+                    <th style={{ padding: "10px" }}>Form</th>
+                    <th style={{ padding: "10px" }}>Starts</th>
+                    <th style={{ padding: "10px" }}>Place %</th>
+                    <th style={{ padding: "10px" }}>SB Win</th>
+                    <th style={{ padding: "10px" }}>SB Place</th>
+                    <th style={{ padding: "10px" }}>LB Win</th>
+                    <th style={{ padding: "10px" }}>LB Place</th>
+                    <th style={{ padding: "10px" }}>AI</th>
+                    <th style={{ padding: "10px" }}>Reasoning</th>
+                  </tr>
                 </thead>
 
                 <tbody>
@@ -1722,18 +1798,18 @@ resize: "both",
                       <td style={{ padding: "10px" }}>
                         {runner.displayPlacePercent || 0}%
                       </td>
-<td style={{ padding: "10px" }}>
-  {runner.sportsbet_win ?? "Not available"}
-</td>
-<td style={{ padding: "10px" }}>
-  {runner.sportsbet_place ?? "Not available"}
-</td>
-<td style={{ padding: "10px" }}>
-  {runner.ladbrokes_win ?? "Not available"}
-</td>
-<td style={{ padding: "10px" }}>
-  {runner.ladbrokes_place ?? "Not available"}
-</td>
+                      <td style={{ padding: "10px" }}>
+                        {runner.sportsbet_win ?? "Not available"}
+                      </td>
+                      <td style={{ padding: "10px" }}>
+                        {runner.sportsbet_place ?? "Not available"}
+                      </td>
+                      <td style={{ padding: "10px" }}>
+                        {runner.ladbrokes_win ?? "Not available"}
+                      </td>
+                      <td style={{ padding: "10px" }}>
+                        {runner.ladbrokes_place ?? "Not available"}
+                      </td>
                       <td
                         style={{
                           padding: "10px",
@@ -1752,7 +1828,7 @@ resize: "both",
                         }}
                       >
                         {getDecisionMeaning(runner.decision)} •{" "}
-{runner.reasoning?.slice(0, 2).join(" • ") || "-"}
+                        {runner.reasoning?.slice(0, 2).join(" • ") || "-"}
                       </td>
                     </tr>
                   ))}
