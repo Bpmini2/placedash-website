@@ -11,6 +11,10 @@ function toNumber(value: any, fallback = 0) {
   return Number.isFinite(numberValue) ? numberValue : fallback;
 }
 
+function roundMoney(value: number) {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
 function normaliseStatus(value: any) {
   const status = String(value || "pending").toLowerCase();
 
@@ -50,15 +54,15 @@ function calculateSettlement(pick: any) {
 
   if (status === "pending") {
     return {
-      bank_before_bet: bankBeforeBet,
-      total_stake: totalStake,
-      win_stake: winStake,
-      place_stake: placeStake,
+      bank_before_bet: roundMoney(bankBeforeBet),
+      total_stake: roundMoney(totalStake),
+      win_stake: roundMoney(winStake),
+      place_stake: roundMoney(placeStake),
       win_return: 0,
       place_return: 0,
       total_return: 0,
       profit_loss: 0,
-      bank_after_bet: bankBeforeBet,
+      bank_after_bet: roundMoney(bankBeforeBet),
       status: "pending",
       settlement_status: "pending",
       finish_position: finishPosition,
@@ -72,15 +76,15 @@ function calculateSettlement(pick: any) {
     settlementStatus = "void";
 
     return {
-      bank_before_bet: bankBeforeBet,
-      total_stake: totalStake,
-      win_stake: winStake,
-      place_stake: placeStake,
+      bank_before_bet: roundMoney(bankBeforeBet),
+      total_stake: roundMoney(totalStake),
+      win_stake: roundMoney(winStake),
+      place_stake: roundMoney(placeStake),
       win_return: 0,
       place_return: 0,
-      total_return: totalReturn,
-      profit_loss: profitLoss,
-      bank_after_bet: bankAfterBet,
+      total_return: roundMoney(totalReturn),
+      profit_loss: roundMoney(profitLoss),
+      bank_after_bet: roundMoney(bankAfterBet),
       status,
       settlement_status: settlementStatus,
       finish_position: finishPosition,
@@ -114,15 +118,15 @@ function calculateSettlement(pick: any) {
   }
 
   return {
-    bank_before_bet: bankBeforeBet,
-    total_stake: totalStake,
-    win_stake: winStake,
-    place_stake: placeStake,
-    win_return: winReturn,
-    place_return: placeReturn,
-    total_return: totalReturn,
-    profit_loss: profitLoss,
-    bank_after_bet: bankAfterBet,
+    bank_before_bet: roundMoney(bankBeforeBet),
+    total_stake: roundMoney(totalStake),
+    win_stake: roundMoney(winStake),
+    place_stake: roundMoney(placeStake),
+    win_return: roundMoney(winReturn),
+    place_return: roundMoney(placeReturn),
+    total_return: roundMoney(totalReturn),
+    profit_loss: roundMoney(profitLoss),
+    bank_after_bet: roundMoney(bankAfterBet),
     status,
     settlement_status: settlementStatus,
     finish_position: finishPosition,
@@ -144,18 +148,25 @@ async function getFavouriteSplitData() {
   const picks = data || [];
 
   const completed = picks.filter((pick) =>
-    ["won", "placed", "unplaced"].includes(pick.status)
+    ["won", "placed", "unplaced"].includes(normaliseStatus(pick.status))
   );
 
-  const wins = picks.filter((pick) => pick.status === "won");
-
-  const places = picks.filter(
-    (pick) => pick.status === "won" || pick.status === "placed"
+  const voided = picks.filter((pick) =>
+    ["scratched", "abandoned"].includes(normaliseStatus(pick.status))
   );
 
-  const pending = picks.filter((pick) => pick.status === "pending");
+  const wins = picks.filter((pick) => normaliseStatus(pick.status) === "won");
 
-  const totalStake = completed.reduce(
+  const places = picks.filter((pick) => {
+    const status = normaliseStatus(pick.status);
+    return status === "won" || status === "placed";
+  });
+
+  const pending = picks.filter(
+    (pick) => normaliseStatus(pick.status) === "pending"
+  );
+
+  const settledStake = completed.reduce(
     (sum, pick) => sum + toNumber(pick.total_stake),
     0
   );
@@ -169,28 +180,34 @@ async function getFavouriteSplitData() {
     ? toNumber(picks[picks.length - 1].bank_before_bet, 1000)
     : 1000;
 
-  const currentBank = picks.length
-    ? toNumber(picks[0].bank_after_bet, startingBank)
-    : startingBank;
+  // IMPORTANT:
+  // This fixes the broken summary card.
+  // Do not use latest row bank_after_bet because rows can be edited,
+  // pending, void, duplicated from earlier testing, or saved out of order.
+  const currentBank = startingBank + totalProfitLoss;
+
+  const winOddsRows = picks.filter((pick) => toNumber(pick.win_odds) > 0);
+  const placeOddsRows = picks.filter((pick) => toNumber(pick.place_odds) > 0);
 
   const avgWinOdds =
-    picks.length > 0
-      ? picks.reduce((sum, pick) => sum + toNumber(pick.win_odds), 0) /
-        picks.length
+    winOddsRows.length > 0
+      ? winOddsRows.reduce((sum, pick) => sum + toNumber(pick.win_odds), 0) /
+        winOddsRows.length
       : 0;
 
   const avgPlaceOdds =
-    picks.length > 0
-      ? picks.reduce((sum, pick) => sum + toNumber(pick.place_odds), 0) /
-        picks.length
+    placeOddsRows.length > 0
+      ? placeOddsRows.reduce((sum, pick) => sum + toNumber(pick.place_odds), 0) /
+        placeOddsRows.length
       : 0;
 
   const summary = {
-    startingBank,
-    currentBank,
+    startingBank: roundMoney(startingBank),
+    currentBank: roundMoney(currentBank),
     totalBets: picks.length,
     completedBets: completed.length,
     pendingBets: pending.length,
+    voidBets: voided.length,
     wins: wins.length,
     places: places.length,
     winStrikeRate:
@@ -201,8 +218,11 @@ async function getFavouriteSplitData() {
       completed.length > 0
         ? Math.round((places.length / completed.length) * 100)
         : 0,
-    totalProfitLoss,
-    roi: totalStake > 0 ? Math.round((totalProfitLoss / totalStake) * 100) : 0,
+    totalProfitLoss: roundMoney(totalProfitLoss),
+    roi:
+      settledStake > 0
+        ? Math.round((totalProfitLoss / settledStake) * 100)
+        : 0,
     averageWinOdds: Number(avgWinOdds.toFixed(2)),
     averagePlaceOdds: Number(avgPlaceOdds.toFixed(2)),
   };
@@ -244,6 +264,37 @@ export async function POST(request: Request) {
     const course = pick.course;
     const raceNumber = pick.race_number || pick.raceNumber;
 
+    if (!course || !raceNumber) {
+      return NextResponse.json({
+        ok: false,
+        error: "Missing course or race number.",
+      });
+    }
+
+    const { data: existingPick, error: existingError } = await supabase
+      .from("favourite_split_picks")
+      .select("id")
+      .eq("race_date", raceDate)
+      .eq("course", course)
+      .eq("race_number", raceNumber)
+      .eq("strategy_version", "v3_favourite_split")
+      .maybeSingle();
+
+    if (existingError) {
+      return NextResponse.json({
+        ok: false,
+        error: existingError.message,
+      });
+    }
+
+    if (existingPick) {
+      return NextResponse.json({
+        ok: false,
+        skipped: true,
+        error: "Favourite Split already saved for this race.",
+      });
+    }
+
     const bankBeforeBet = toNumber(pick.bank_before_bet, 1000);
     const totalStake = toNumber(pick.total_stake, bankBeforeBet * 0.1);
     const winStake = toNumber(pick.win_stake, totalStake * 0.25);
@@ -271,10 +322,10 @@ export async function POST(request: Request) {
       win_odds: pick.win_odds || null,
       place_odds: pick.place_odds || null,
 
-      bank_before_bet: bankBeforeBet,
-      total_stake: totalStake,
-      win_stake: winStake,
-      place_stake: placeStake,
+      bank_before_bet: settlement.bank_before_bet,
+      total_stake: settlement.total_stake,
+      win_stake: settlement.win_stake,
+      place_stake: settlement.place_stake,
 
       finish_position: settlement.finish_position,
       status: settlement.status,
@@ -290,39 +341,6 @@ export async function POST(request: Request) {
 
       race_card_json: pick.race_card_json || pick.race?.runners || null,
     };
-
-    const { data: existingPick } = await supabase
-      .from("favourite_split_picks")
-      .select("id")
-      .eq("race_date", raceDate)
-      .eq("course", course)
-      .eq("race_number", raceNumber)
-      .maybeSingle();
-
-    if (existingPick) {
-      const { data, error } = await supabase
-        .from("favourite_split_picks")
-        .update({
-          ...insertPayload,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", existingPick.id)
-        .select()
-        .single();
-
-      if (error) {
-        return NextResponse.json({
-          ok: false,
-          error: error.message,
-        });
-      }
-
-      return NextResponse.json({
-        ok: true,
-        updated: true,
-        pick: data,
-      });
-    }
 
     const { data, error } = await supabase
       .from("favourite_split_picks")
