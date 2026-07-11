@@ -245,6 +245,7 @@ export default function FavouriteSplitTrackRecordPage() {
   );
   const [editingPickId, setEditingPickId] = useState<string | null>(null);
   const [savingResultId, setSavingResultId] = useState<string | null>(null);
+  const [deletingPickId, setDeletingPickId] = useState<string | null>(null);
   const [editResult, setEditResult] = useState({
     status: "pending",
     finish_position: "",
@@ -462,6 +463,54 @@ export default function FavouriteSplitTrackRecordPage() {
       alert("Favourite Split update failed. Check console/logs.");
     } finally {
       setSavingResultId(null);
+    }
+  }
+
+
+  async function deleteFavouriteSplitPick(pick: FavouriteSplitPick) {
+    const confirmed = window.confirm(
+      `Delete ${pick.course} Race ${pick.race_number} — ${
+        pick.horse_number ? pick.horse_number + ". " : ""
+      }${pick.favourite_horse}? This cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setDeletingPickId(pick.id);
+
+      const res = await fetch("/api/favourite-split-picks", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: pick.id,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!data.ok) {
+        alert(`Delete failed: ${data.error || "Unknown error"}`);
+        return;
+      }
+
+      if (selectedPick?.id === pick.id) {
+        setSelectedPick(null);
+      }
+
+      if (editingPickId === pick.id) {
+        setEditingPickId(null);
+      }
+
+      await refreshFavouriteSplitPicks();
+      alert("Favourite Split pick deleted.");
+    } catch (error) {
+      console.error("Favourite Split delete failed", error);
+      alert("Favourite Split delete failed. Check console/logs.");
+    } finally {
+      setDeletingPickId(null);
     }
   }
 
@@ -1108,6 +1157,28 @@ export default function FavouriteSplitTrackRecordPage() {
                             }}
                           >
                             View Race Card
+                          </button>
+
+                          <button
+                            onClick={() => deleteFavouriteSplitPick(pick)}
+                            disabled={deletingPickId === pick.id}
+                            style={{
+                              padding: "9px 14px",
+                              borderRadius: "10px",
+                              border: "1px solid rgba(239,68,68,0.45)",
+                              background: "rgba(239,68,68,0.14)",
+                              color: "#ef4444",
+                              fontWeight: 900,
+                              cursor:
+                                deletingPickId === pick.id
+                                  ? "not-allowed"
+                                  : "pointer",
+                              opacity: deletingPickId === pick.id ? 0.65 : 1,
+                            }}
+                          >
+                            {deletingPickId === pick.id
+                              ? "Deleting..."
+                              : "Delete"}
                           </button>
                         </div>
                       </div>
