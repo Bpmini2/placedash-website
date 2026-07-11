@@ -161,6 +161,73 @@ function formatRaceTime(rawTime?: string, state?: string) {
   };
 }
 
+
+function normaliseRunnerText(value: any) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+function getSavedFavouriteRunner(pick: FavouriteSplitPick) {
+  if (!Array.isArray(pick.race_card_json)) return null;
+
+  const targetNumber = normaliseRunnerText(pick.horse_number);
+  const targetHorse = normaliseRunnerText(pick.favourite_horse);
+
+  return (
+    pick.race_card_json.find((runner: any) => {
+      const runnerNumber = normaliseRunnerText(
+        runner.number ||
+          runner.runner_number ||
+          runner.runnerNumber ||
+          runner.saddlecloth ||
+          runner.cloth_number ||
+          runner.clothNumber
+      );
+
+      const runnerHorse = normaliseRunnerText(
+        runner.horse ||
+          runner.name ||
+          runner.horse_name ||
+          runner.horseName
+      );
+
+      const numberMatches =
+        targetNumber && runnerNumber && targetNumber === runnerNumber;
+      const horseMatches =
+        targetHorse && runnerHorse && targetHorse === runnerHorse;
+
+      return numberMatches || horseMatches;
+    }) || null
+  );
+}
+
+function getDecisionColour(decision?: string) {
+  if (decision === "BET") return "#22c55e";
+  if (decision === "WATCH") return "#38bdf8";
+  if (decision === "LOW VALUE") return "#facc15";
+  if (decision === "AVOID") return "#ef4444";
+  return "#94a3b8";
+}
+
+function getSavedReasoning(runner: any) {
+  if (!runner) return [];
+
+  if (Array.isArray(runner.reasoning)) {
+    return runner.reasoning.filter(Boolean);
+  }
+
+  if (typeof runner.reasoning === "string" && runner.reasoning.trim()) {
+    return runner.reasoning
+      .split(/[,•|]/)
+      .map((reason: string) => reason.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
 export default function FavouriteSplitTrackRecordPage() {
   const [picks, setPicks] = useState<FavouriteSplitPick[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
@@ -826,6 +893,18 @@ export default function FavouriteSplitTrackRecordPage() {
                 const raceTimes = formatRaceTime(pick.race_time, pick.state);
                 const isEditing = editingPickId === pick.id;
                 const profitLoss = Number(pick.profit_loss || 0);
+                const savedFavouriteRunner = getSavedFavouriteRunner(pick);
+                const savedReasoning = getSavedReasoning(savedFavouriteRunner);
+                const savedDecision =
+                  savedFavouriteRunner?.decision ||
+                  savedFavouriteRunner?.betStatus ||
+                  "";
+                const savedScore =
+                  savedFavouriteRunner?.score ??
+                  savedFavouriteRunner?.valueScore ??
+                  null;
+                const savedConfidence =
+                  savedFavouriteRunner?.confidence || "";
 
                 return (
                   <div
@@ -884,6 +963,96 @@ export default function FavouriteSplitTrackRecordPage() {
                             {pick.favourite_horse}
                           </strong>
                         </p>
+
+                        {(savedDecision ||
+                          savedScore !== null ||
+                          savedConfidence ||
+                          savedReasoning.length > 0) && (
+                          <div
+                            style={{
+                              marginTop: "14px",
+                              padding: "14px",
+                              borderRadius: "14px",
+                              background: "rgba(255,255,255,0.045)",
+                              border: "1px solid rgba(255,255,255,0.09)",
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "10px",
+                                flexWrap: "wrap",
+                                alignItems: "center",
+                                marginBottom:
+                                  savedReasoning.length > 0 ? "8px" : 0,
+                              }}
+                            >
+                              <strong style={{ color: "#ffffff" }}>
+                                Saved AI Notes
+                              </strong>
+
+                              {savedDecision && (
+                                <span
+                                  style={{
+                                    padding: "4px 8px",
+                                    borderRadius: "999px",
+                                    background: "rgba(255,255,255,0.06)",
+                                    border: `1px solid ${getDecisionColour(
+                                      savedDecision
+                                    )}`,
+                                    color: getDecisionColour(savedDecision),
+                                    fontSize: "12px",
+                                    fontWeight: 900,
+                                  }}
+                                >
+                                  {savedDecision}
+                                </span>
+                              )}
+
+                              {savedScore !== null && (
+                                <span
+                                  style={{
+                                    color: "#cbd5e1",
+                                    fontSize: "12px",
+                                    fontWeight: 800,
+                                  }}
+                                >
+                                  Score {savedScore}
+                                </span>
+                              )}
+
+                              {savedConfidence && (
+                                <span
+                                  style={{
+                                    color: "#cbd5e1",
+                                    fontSize: "12px",
+                                    fontWeight: 800,
+                                  }}
+                                >
+                                  {savedConfidence} confidence
+                                </span>
+                              )}
+                            </div>
+
+                            {savedReasoning.length > 0 && (
+                              <ul
+                                style={{
+                                  margin: "0 0 0 18px",
+                                  padding: 0,
+                                  color: "#cbd5e1",
+                                  fontSize: "13px",
+                                  lineHeight: 1.55,
+                                }}
+                              >
+                                {savedReasoning.map(
+                                  (reason: string, reasonIndex: number) => (
+                                    <li key={reasonIndex}>{reason}</li>
+                                  )
+                                )}
+                              </ul>
+                            )}
+                          </div>
+                        )}
 
                         <div
                           style={{
@@ -1171,6 +1340,95 @@ export default function FavouriteSplitTrackRecordPage() {
                 Strategy: 10% total stake · 25% win · 75% place
               </p>
 
+              {(() => {
+                const savedRunner = getSavedFavouriteRunner(selectedPick);
+                const reasoning = getSavedReasoning(savedRunner);
+                const decision =
+                  savedRunner?.decision || savedRunner?.betStatus || "";
+                const score =
+                  savedRunner?.score ?? savedRunner?.valueScore ?? null;
+                const confidence = savedRunner?.confidence || "";
+
+                if (
+                  !decision &&
+                  score === null &&
+                  !confidence &&
+                  reasoning.length === 0
+                ) {
+                  return null;
+                }
+
+                return (
+                  <div
+                    style={{
+                      marginBottom: "18px",
+                      padding: "16px",
+                      borderRadius: "14px",
+                      background: "rgba(255,255,255,0.045)",
+                      border: "1px solid rgba(255,255,255,0.09)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        marginBottom: reasoning.length > 0 ? "9px" : 0,
+                      }}
+                    >
+                      <strong style={{ color: "#ffffff" }}>
+                        Saved AI Notes
+                      </strong>
+
+                      {decision && (
+                        <span
+                          style={{
+                            padding: "4px 8px",
+                            borderRadius: "999px",
+                            border: `1px solid ${getDecisionColour(decision)}`,
+                            color: getDecisionColour(decision),
+                            fontSize: "12px",
+                            fontWeight: 900,
+                          }}
+                        >
+                          {decision}
+                        </span>
+                      )}
+
+                      {score !== null && (
+                        <span style={{ color: "#cbd5e1", fontWeight: 800 }}>
+                          Score {score}
+                        </span>
+                      )}
+
+                      {confidence && (
+                        <span style={{ color: "#cbd5e1", fontWeight: 800 }}>
+                          {confidence} confidence
+                        </span>
+                      )}
+                    </div>
+
+                    {reasoning.length > 0 && (
+                      <ul
+                        style={{
+                          margin: "0 0 0 18px",
+                          padding: 0,
+                          color: "#cbd5e1",
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {reasoning.map(
+                          (reason: string, reasonIndex: number) => (
+                            <li key={reasonIndex}>{reason}</li>
+                          )
+                        )}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })()}
+
               <button
                 onClick={() => setSelectedPick(null)}
                 style={{
@@ -1202,6 +1460,8 @@ export default function FavouriteSplitTrackRecordPage() {
                         <th style={thStyle}>Horse</th>
                         <th style={thStyle}>Win Odds</th>
                         <th style={thStyle}>Place Odds</th>
+                        <th style={thStyle}>AI</th>
+                        <th style={thStyle}>Reasoning</th>
                       </tr>
                     </thead>
 
@@ -1237,6 +1497,32 @@ export default function FavouriteSplitTrackRecordPage() {
                                 runner.place_odds ||
                                 runner.odds?.sportsbetPlace ||
                                 "-"}
+                            </td>
+                            <td
+                              style={{
+                                ...tdStyle,
+                                color: getDecisionColour(
+                                  runner.decision || runner.betStatus
+                                ),
+                                fontWeight: 900,
+                              }}
+                            >
+                              {runner.decision || runner.betStatus || "-"}
+                              {(runner.score ?? runner.valueScore) !== undefined
+                                ? ` · ${runner.score ?? runner.valueScore}`
+                                : ""}
+                            </td>
+                            <td
+                              style={{
+                                ...tdStyle,
+                                whiteSpace: "normal",
+                                minWidth: "260px",
+                                color: "#94a3b8",
+                              }}
+                            >
+                              {getSavedReasoning(runner).length > 0
+                                ? getSavedReasoning(runner).join(" • ")
+                                : "-"}
                             </td>
                           </tr>
                         )
