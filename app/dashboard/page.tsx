@@ -627,7 +627,7 @@ export default function Dashboard() {
           place_stake: placeStake,
 
           status: "pending",
-          race_card_json: race.runners || [],
+          race_card_json: getScoredRunners(race),
         }),
       });
 
