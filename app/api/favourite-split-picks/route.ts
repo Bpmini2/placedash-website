@@ -462,3 +462,61 @@ export async function PATCH(request: Request) {
     });
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const body = await request.json();
+    const id = body.id;
+
+    if (!id) {
+      return NextResponse.json({
+        ok: false,
+        error: "Missing favourite split pick id.",
+      });
+    }
+
+    const { data: existingPick, error: existingError } = await supabase
+      .from("favourite_split_picks")
+      .select("id, strategy_version")
+      .eq("id", id)
+      .single();
+
+    if (existingError || !existingPick) {
+      return NextResponse.json({
+        ok: false,
+        error: existingError?.message || "Favourite split pick not found.",
+      });
+    }
+
+    if (existingPick.strategy_version !== "v3_favourite_split") {
+      return NextResponse.json({
+        ok: false,
+        error: "This pick is not a Favourite Split v3 record.",
+      });
+    }
+
+    const { error } = await supabase
+      .from("favourite_split_picks")
+      .delete()
+      .eq("id", id)
+      .eq("strategy_version", "v3_favourite_split");
+
+    if (error) {
+      return NextResponse.json({
+        ok: false,
+        error: error.message,
+      });
+    }
+
+    return NextResponse.json({
+      ok: true,
+      deleted: true,
+      id,
+    });
+  } catch (err: any) {
+    return NextResponse.json({
+      ok: false,
+      error: err.message || "Unknown error",
+    });
+  }
+}
