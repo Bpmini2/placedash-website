@@ -205,10 +205,18 @@ function getSavedFavouriteRunner(pick: FavouriteSplitPick) {
 
 function getDecisionColour(decision?: string) {
   if (decision === "BET") return "#22c55e";
-  if (decision === "WATCH") return "#38bdf8";
+  if (decision === "WATCH") return "#f97316";
   if (decision === "LOW VALUE") return "#facc15";
   if (decision === "AVOID") return "#ef4444";
   return "#94a3b8";
+}
+
+function getDecisionLabel(decision?: string) {
+  if (decision === "BET") return "BET · Official PlaceDash selection";
+  if (decision === "WATCH") return "WATCH · Possible contender — punter decides";
+  if (decision === "LOW VALUE") return "LOW VALUE · Good profile, price too short";
+  if (decision === "AVOID") return "AVOID · AI does not like the profile";
+  return decision || "UNKNOWN";
 }
 
 function getSavedReasoning(runner: any) {
@@ -1005,7 +1013,7 @@ export default function FavouriteSplitTrackRecordPage() {
                                     fontWeight: 900,
                                   }}
                                 >
-                                  {savedDecision}
+                                  {getDecisionLabel(savedDecision)}
                                 </span>
                               )}
 
@@ -1392,7 +1400,7 @@ export default function FavouriteSplitTrackRecordPage() {
                             fontWeight: 900,
                           }}
                         >
-                          {decision}
+                          {getDecisionLabel(decision)}
                         </span>
                       )}
 
@@ -1507,7 +1515,9 @@ export default function FavouriteSplitTrackRecordPage() {
                                 fontWeight: 900,
                               }}
                             >
-                              {runner.decision || runner.betStatus || "-"}
+                              {getDecisionLabel(
+                                runner.decision || runner.betStatus
+                              )}
                               {(runner.score ?? runner.valueScore) !== undefined
                                 ? ` · ${runner.score ?? runner.valueScore}`
                                 : ""}
