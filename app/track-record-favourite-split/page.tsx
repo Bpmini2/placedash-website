@@ -44,6 +44,11 @@ type Summary = {
   averagePlaceOdds: number;
 };
 
+type FilteredSummary = Summary & {
+  voidBets: number;
+  settledStake: number;
+};
+
 function money(value: any) {
   const numberValue = Number(value) || 0;
 
@@ -58,6 +63,108 @@ function money(value: any) {
 function numberFormat(value: any, decimals = 2) {
   const numberValue = Number(value) || 0;
   return numberValue.toFixed(decimals);
+}
+
+function safeNumber(value: any, fallback = 0) {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : fallback;
+}
+
+function normalisePickStatus(value: any) {
+  const status = String(value || "pending").toLowerCase();
+
+  if (status === "won") return "won";
+  if (status === "placed") return "placed";
+  if (status === "unplaced") return "unplaced";
+  if (status === "scratched") return "scratched";
+  if (status === "abandoned") return "abandoned";
+  if (status === "void") return "scratched";
+
+  return "pending";
+}
+
+function buildFilteredSummary(rows: FavouriteSplitPick[]): FilteredSummary {
+  const completed = rows.filter((pick) =>
+    ["won", "placed", "unplaced"].includes(normalisePickStatus(pick.status))
+  );
+
+  const voided = rows.filter((pick) =>
+    ["scratched", "abandoned"].includes(normalisePickStatus(pick.status))
+  );
+
+  const wins = rows.filter((pick) => normalisePickStatus(pick.status) === "won");
+
+  const places = rows.filter((pick) => {
+    const status = normalisePickStatus(pick.status);
+    return status === "won" || status === "placed";
+  });
+
+  const pending = rows.filter(
+    (pick) => normalisePickStatus(pick.status) === "pending"
+  );
+
+  const settledStake = completed.reduce(
+    (sum, pick) => sum + safeNumber(pick.total_stake),
+    0
+  );
+
+  const totalProfitLoss = rows.reduce(
+    (sum, pick) => sum + safeNumber(pick.profit_loss),
+    0
+  );
+
+  const winOddsRows = rows.filter((pick) => safeNumber(pick.win_odds) > 0);
+  const placeOddsRows = rows.filter((pick) => safeNumber(pick.place_odds) > 0);
+
+  const averageWinOdds =
+    winOddsRows.length > 0
+      ? winOddsRows.reduce((sum, pick) => sum + safeNumber(pick.win_odds), 0) /
+        winOddsRows.length
+      : 0;
+
+  const averagePlaceOdds =
+    placeOddsRows.length > 0
+      ? placeOddsRows.reduce(
+          (sum, pick) => sum + safeNumber(pick.place_odds),
+          0
+        ) / placeOddsRows.length
+      : 0;
+
+  return {
+    startingBank: 1000,
+    currentBank: 1000 + totalProfitLoss,
+    totalBets: rows.length,
+    completedBets: completed.length,
+    pendingBets: pending.length,
+    voidBets: voided.length,
+    wins: wins.length,
+    places: places.length,
+    winStrikeRate:
+      completed.length > 0
+        ? Math.round((wins.length / completed.length) * 100)
+        : 0,
+    placeStrikeRate:
+      completed.length > 0
+        ? Math.round((places.length / completed.length) * 100)
+        : 0,
+    totalProfitLoss,
+    roi:
+      settledStake > 0
+        ? Math.round((totalProfitLoss / settledStake) * 100)
+        : 0,
+    averageWinOdds: Number(averageWinOdds.toFixed(2)),
+    averagePlaceOdds: Number(averagePlaceOdds.toFixed(2)),
+    settledStake,
+  };
+}
+
+function csvNumber(value: any) {
+  if (value === null || value === undefined || value === "") return "";
+
+  const numberValue = Number(value);
+  if (!Number.isFinite(numberValue)) return String(value);
+
+  return numberValue.toFixed(2);
 }
 
 function getStatusColour(status?: string) {
@@ -340,7 +447,11 @@ export default function FavouriteSplitTrackRecordPage() {
       ? selectedDate || "Custom Date"
       : "All Favourite Split Picks";
 
-  function downloadCsv() {
+  const filteredSummary = useMemo(() => {
+    return buildFilteredSummary(filteredPicks);
+  }, [filteredPicks]);
+
+  function downloadCsv(csvPicks: FavouriteSplitPick[], scopeLabel: string) {
     const headers = [
       "Date",
       "Course",
@@ -361,23 +472,23 @@ export default function FavouriteSplitTrackRecordPage() {
       "Status",
     ];
 
-    const rows = filteredPicks.map((pick) => [
+    const rows = csvPicks.map((pick) => [
       pick.race_date,
       pick.course,
       pick.race_number,
       pick.favourite_horse,
       pick.horse_number || "",
-      pick.win_odds || "",
-      pick.place_odds || "",
-      pick.total_stake || "",
-      pick.win_stake || "",
-      pick.place_stake || "",
+      csvNumber(pick.win_odds),
+      csvNumber(pick.place_odds),
+      csvNumber(pick.total_stake),
+      csvNumber(pick.win_stake),
+      csvNumber(pick.place_stake),
       pick.finish_position || "",
-      pick.win_return || "",
-      pick.place_return || "",
-      pick.total_return || "",
-      pick.profit_loss || "",
-      pick.bank_after_bet || "",
+      csvNumber(pick.win_return),
+      csvNumber(pick.place_return),
+      csvNumber(pick.total_return),
+      csvNumber(pick.profit_loss),
+      csvNumber(pick.bank_after_bet),
       pick.status || "",
     ]);
 
@@ -391,8 +502,13 @@ export default function FavouriteSplitTrackRecordPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
+    const safeScope = scopeLabel
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+
     link.href = url;
-    link.download = "placedash-favourite-split-track-record.csv";
+    link.download = `placedash-favourite-split-${safeScope || "export"}.csv`;
     link.click();
 
     URL.revokeObjectURL(url);
@@ -714,6 +830,16 @@ export default function FavouriteSplitTrackRecordPage() {
           </p>
         </section>
 
+        <h2
+          style={{
+            margin: "18px 0 14px 0",
+            color: "#38bdf8",
+            fontSize: "22px",
+          }}
+        >
+          All-Time Summary
+        </h2>
+
         <div
           style={{
             display: "grid",
@@ -916,7 +1042,7 @@ export default function FavouriteSplitTrackRecordPage() {
               </select>
 
               <button
-                onClick={downloadCsv}
+                onClick={() => downloadCsv(filteredPicks, currentFilterTitle)}
                 style={{
                   padding: "10px 16px",
                   borderRadius: "10px",
@@ -927,8 +1053,90 @@ export default function FavouriteSplitTrackRecordPage() {
                   cursor: "pointer",
                 }}
               >
-                Download CSV
+                Download Filtered CSV
               </button>
+
+              <button
+                onClick={() => downloadCsv(picks, "All-Time")}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: "10px",
+                  border: "1px solid rgba(34,197,94,0.45)",
+                  background: "rgba(34,197,94,0.12)",
+                  color: "#22c55e",
+                  fontWeight: 900,
+                  cursor: "pointer",
+                }}
+              >
+                Download All-Time CSV
+              </button>
+            </div>
+          </div>
+
+          <div
+            style={{
+              marginBottom: "22px",
+              padding: "18px",
+              borderRadius: "18px",
+              background: "rgba(15,23,42,0.66)",
+              border: "1px solid rgba(56,189,248,0.22)",
+            }}
+          >
+            <h3
+              style={{
+                margin: "0 0 14px 0",
+                color: "#38bdf8",
+                fontSize: "18px",
+              }}
+            >
+              Filtered Summary: {currentFilterTitle}
+            </h3>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+                gap: "12px",
+              }}
+            >
+              <MiniStat label="Rows" value={filteredSummary.totalBets} />
+              <MiniStat label="Completed" value={filteredSummary.completedBets} />
+              <MiniStat label="Pending" value={filteredSummary.pendingBets} />
+              <MiniStat label="Voids" value={filteredSummary.voidBets} />
+              <MiniStat label="Wins" value={filteredSummary.wins} />
+              <MiniStat label="Places" value={filteredSummary.places} />
+              <MiniStat
+                label="Win Strike"
+                value={`${filteredSummary.winStrikeRate}%`}
+                valueColor="#facc15"
+              />
+              <MiniStat
+                label="Place Strike"
+                value={`${filteredSummary.placeStrikeRate}%`}
+                valueColor="#facc15"
+              />
+              <MiniStat
+                label="Profit / Loss"
+                value={money(filteredSummary.totalProfitLoss)}
+                valueColor={
+                  filteredSummary.totalProfitLoss >= 0 ? "#22c55e" : "#ef4444"
+                }
+              />
+              <MiniStat
+                label="ROI"
+                value={`${filteredSummary.roi}%`}
+                valueColor={filteredSummary.roi >= 0 ? "#22c55e" : "#ef4444"}
+              />
+              <MiniStat
+                label="Avg Win Odds"
+                value={numberFormat(filteredSummary.averageWinOdds)}
+                valueColor="#38bdf8"
+              />
+              <MiniStat
+                label="Avg Place Odds"
+                value={numberFormat(filteredSummary.averagePlaceOdds)}
+                valueColor="#38bdf8"
+              />
             </div>
           </div>
 
