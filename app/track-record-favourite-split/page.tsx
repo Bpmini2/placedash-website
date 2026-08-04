@@ -362,6 +362,11 @@ export default function FavouriteSplitTrackRecordPage() {
   const [dateMode, setDateMode] = useState("all");
   const [selectedDate, setSelectedDate] = useState("");
   const [trackFilter, setTrackFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [autoSaveLoading, setAutoSaveLoading] = useState<
+    "today" | "preview" | null
+  >(null);
+  const [autoSaveResult, setAutoSaveResult] = useState<any | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -430,11 +435,29 @@ export default function FavouriteSplitTrackRecordPage() {
 
       if (trackFilter !== "all" && pick.course !== trackFilter) return false;
 
+      const normalisedStatus = normalisePickStatus(pick.status);
+
+      if (statusFilter === "voids") {
+        return ["scratched", "abandoned"].includes(normalisedStatus);
+      }
+
+      if (statusFilter !== "all" && normalisedStatus !== statusFilter) {
+        return false;
+      }
+
       return true;
     });
-  }, [picks, dateMode, selectedDate, trackFilter, today, yesterday]);
+  }, [
+    picks,
+    dateMode,
+    selectedDate,
+    trackFilter,
+    statusFilter,
+    today,
+    yesterday,
+  ]);
 
-  const currentFilterTitle =
+  const currentDateFilterTitle =
     dateMode === "today"
       ? "Today"
       : dateMode === "yesterday"
@@ -446,6 +469,19 @@ export default function FavouriteSplitTrackRecordPage() {
       : dateMode === "custom"
       ? selectedDate || "Custom Date"
       : "All Favourite Split Picks";
+
+  const currentStatusFilterTitle =
+    statusFilter === "all"
+      ? "All Results"
+      : statusFilter === "voids"
+      ? "Voids"
+      : getStatusLabel(statusFilter).charAt(0) +
+        getStatusLabel(statusFilter).slice(1).toLowerCase();
+
+  const currentFilterTitle =
+    statusFilter === "all"
+      ? currentDateFilterTitle
+      : `${currentDateFilterTitle} · ${currentStatusFilterTitle}`;
 
   const filteredSummary = useMemo(() => {
     return buildFilteredSummary(filteredPicks);
@@ -524,6 +560,46 @@ export default function FavouriteSplitTrackRecordPage() {
     if (data.ok) {
       setPicks(data.picks || []);
       setSummary(data.summary || null);
+    }
+  }
+
+  async function autoSaveFavouriteSplitPicks(mode: "today" | "preview") {
+    const label = mode === "preview" ? "tomorrow preview" : "today";
+
+    const confirmed = window.confirm(
+      `Auto save qualified Favourite Split picks for ${label}?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setAutoSaveLoading(mode);
+      setAutoSaveResult(null);
+
+      const res = await fetch(
+        `/api/favourite-split-picks/auto-save?mode=${mode}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await res.json();
+      setAutoSaveResult(data);
+
+      if (!data.ok) {
+        alert(`Auto save failed: ${data.error || "Unknown error"}`);
+        return;
+      }
+
+      await refreshFavouriteSplitPicks();
+    } catch (error) {
+      console.error("Favourite Split auto-save failed", error);
+      alert("Favourite Split auto-save failed. Check console/logs.");
+    } finally {
+      setAutoSaveLoading(null);
     }
   }
 
@@ -1041,6 +1117,66 @@ export default function FavouriteSplitTrackRecordPage() {
                 ))}
               </select>
 
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                style={{
+                  padding: "10px 12px",
+                  borderRadius: "10px",
+                  border: "1px solid rgba(255,255,255,0.14)",
+                  background: "rgba(15,23,42,0.9)",
+                  color: "#ffffff",
+                  fontWeight: 700,
+                }}
+              >
+                <option value="all">All Results</option>
+                <option value="pending">Pending</option>
+                <option value="won">Won</option>
+                <option value="placed">Placed</option>
+                <option value="unplaced">Unplaced</option>
+                <option value="scratched">Scratched</option>
+                <option value="abandoned">Abandoned</option>
+                <option value="voids">Voids</option>
+              </select>
+
+              <button
+                onClick={() => autoSaveFavouriteSplitPicks("today")}
+                disabled={autoSaveLoading !== null}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: "10px",
+                  border: "1px solid rgba(250,204,21,0.45)",
+                  background: "rgba(250,204,21,0.12)",
+                  color: "#facc15",
+                  fontWeight: 900,
+                  cursor: autoSaveLoading ? "not-allowed" : "pointer",
+                  opacity: autoSaveLoading ? 0.65 : 1,
+                }}
+              >
+                {autoSaveLoading === "today"
+                  ? "Saving Today..."
+                  : "Auto Save Today"}
+              </button>
+
+              <button
+                onClick={() => autoSaveFavouriteSplitPicks("preview")}
+                disabled={autoSaveLoading !== null}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: "10px",
+                  border: "1px solid rgba(34,197,94,0.45)",
+                  background: "rgba(34,197,94,0.12)",
+                  color: "#22c55e",
+                  fontWeight: 900,
+                  cursor: autoSaveLoading ? "not-allowed" : "pointer",
+                  opacity: autoSaveLoading ? 0.65 : 1,
+                }}
+              >
+                {autoSaveLoading === "preview"
+                  ? "Saving Tomorrow..."
+                  : "Auto Save Tomorrow"}
+              </button>
+
               <button
                 onClick={() => downloadCsv(filteredPicks, currentFilterTitle)}
                 style={{
@@ -1072,6 +1208,108 @@ export default function FavouriteSplitTrackRecordPage() {
               </button>
             </div>
           </div>
+
+          {autoSaveResult && (
+            <div
+              style={{
+                marginBottom: "22px",
+                padding: "18px",
+                borderRadius: "18px",
+                background: autoSaveResult.ok
+                  ? "rgba(34,197,94,0.08)"
+                  : "rgba(239,68,68,0.08)",
+                border: autoSaveResult.ok
+                  ? "1px solid rgba(34,197,94,0.25)"
+                  : "1px solid rgba(239,68,68,0.25)",
+              }}
+            >
+              <h3
+                style={{
+                  margin: "0 0 14px 0",
+                  color: autoSaveResult.ok ? "#22c55e" : "#ef4444",
+                  fontSize: "18px",
+                }}
+              >
+                Auto Save Report{" "}
+                {autoSaveResult.mode ? `· ${autoSaveResult.mode}` : ""}
+                {autoSaveResult.date ? ` · ${autoSaveResult.date}` : ""}
+              </h3>
+
+              {!autoSaveResult.ok ? (
+                <p style={{ color: "#fecaca", margin: 0 }}>
+                  {autoSaveResult.error || "Auto save failed."}
+                </p>
+              ) : (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      "repeat(auto-fit, minmax(150px, 1fr))",
+                    gap: "12px",
+                  }}
+                >
+                  <MiniStat
+                    label="Races Scanned"
+                    value={autoSaveResult.report?.racesScanned || 0}
+                  />
+                  <MiniStat
+                    label="After Field Filter"
+                    value={autoSaveResult.report?.racesAfterFieldFilter || 0}
+                  />
+                  <MiniStat
+                    label="Saved"
+                    value={autoSaveResult.report?.saved || 0}
+                    valueColor="#22c55e"
+                  />
+                  <MiniStat
+                    label="Duplicates"
+                    value={autoSaveResult.report?.skippedDuplicate || 0}
+                    valueColor="#facc15"
+                  />
+                  <MiniStat
+                    label="Field Size"
+                    value={autoSaveResult.report?.skippedFieldSize || 0}
+                    valueColor="#facc15"
+                  />
+                  <MiniStat
+                    label="Missing Odds"
+                    value={autoSaveResult.report?.skippedMissingOdds || 0}
+                    valueColor="#f97316"
+                  />
+                  <MiniStat
+                    label="Odds Too Short"
+                    value={
+                      autoSaveResult.report?.skippedOddsTooShortOrNotValue || 0
+                    }
+                    valueColor="#f97316"
+                  />
+                  <MiniStat
+                    label="Errors"
+                    value={autoSaveResult.report?.errors || 0}
+                    valueColor={
+                      Number(autoSaveResult.report?.errors || 0) > 0
+                        ? "#ef4444"
+                        : "#22c55e"
+                    }
+                  />
+                </div>
+              )}
+
+              {autoSaveResult.ok && autoSaveResult.report?.saved > 0 && (
+                <p
+                  style={{
+                    margin: "14px 0 0 0",
+                    color: "#cbd5e1",
+                    fontSize: "13px",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  Saved picks have been added. The list and all-time summary
+                  have been refreshed.
+                </p>
+              )}
+            </div>
+          )}
 
           <div
             style={{
