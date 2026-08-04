@@ -493,89 +493,83 @@ export default function Dashboard() {
   }
 
   function getFavouriteSplitCandidate(race: any) {
-    const betRunner = getBestRunner(race);
+    const candidates = (race.runners || [])
+      .filter((runner: any) => !runner.scratched)
+      .flatMap((runner: any) =>
+        getRunnerWinOddsOptions(runner).map((oddsOption) => ({
+          runner,
+          bookmaker: oddsOption.bookmaker,
+          winOdds: oddsOption.winOdds,
+          placeOdds: oddsOption.placeOdds,
+        }))
+      )
+      .sort((a: any, b: any) => a.winOdds - b.winOdds);
 
-    if (!betRunner) {
+    if (!candidates.length) {
       return {
         canSave: false,
         reason:
-          "Favourite Split skipped — no PlaceDash BET selection found for this race.",
+          "Favourite Split skipped — no favourite could be found because win/place odds are missing.",
       };
     }
 
-    if (betRunner.scratched) {
-      return {
-        canSave: false,
-        reason: "Favourite Split skipped — selected runner is scratched.",
-      };
-    }
-
-    if (betRunner.decision !== "BET") {
-      return {
-        canSave: false,
-        reason:
-          "Favourite Split skipped — selected runner is not a PlaceDash BET.",
-      };
-    }
+    const favourite = candidates[0];
 
     const horse =
-      betRunner.horse ||
-      betRunner.name ||
-      betRunner.horse_name ||
-      betRunner.horseName;
+      favourite.runner.horse ||
+      favourite.runner.name ||
+      favourite.runner.horse_name ||
+      favourite.runner.horseName;
 
     const number =
-      betRunner.number ||
-      betRunner.runner_number ||
-      betRunner.runnerNumber ||
-      betRunner.saddlecloth ||
-      betRunner.cloth_number ||
-      betRunner.clothNumber ||
+      favourite.runner.number ||
+      favourite.runner.runner_number ||
+      favourite.runner.runnerNumber ||
+      favourite.runner.saddlecloth ||
+      favourite.runner.cloth_number ||
+      favourite.runner.clothNumber ||
       "";
 
-    const allOddsOptions = getRunnerWinOddsOptions(betRunner);
-
-    if (!allOddsOptions.length) {
+    if (!favourite.winOdds || !favourite.placeOdds) {
       return {
         canSave: false,
         reason:
-          "Favourite Split skipped — win/place odds are missing for the PlaceDash BET selection.",
-        runner: betRunner,
-        horse,
-        number,
+          "Favourite Split skipped — no favourite could be found because win/place odds are missing.",
       };
     }
 
-    const validOddsOptions = allOddsOptions
-      .filter(
-        (option) =>
-          option.placeOdds >= 1.35 &&
-          option.winOdds >= 2.2 &&
-          option.winOdds <= 4.5
-      )
-      .sort((a, b) => {
-        if (b.placeOdds !== a.placeOdds) return b.placeOdds - a.placeOdds;
-        return b.winOdds - a.winOdds;
-      });
-
-    if (!validOddsOptions.length) {
+    if (favourite.placeOdds < 1.35) {
       return {
         canSave: false,
         reason: "Favourite Split skipped — odds too short / not enough value.",
-        runner: betRunner,
+        runner: favourite.runner,
+        bookmaker: favourite.bookmaker,
+        winOdds: favourite.winOdds,
+        placeOdds: favourite.placeOdds,
         horse,
         number,
       };
     }
 
-    const bestOdds = validOddsOptions[0];
+    if (favourite.winOdds < 2.2 || favourite.winOdds > 4.5) {
+      return {
+        canSave: false,
+        reason: "Favourite Split skipped — odds too short / not enough value.",
+        runner: favourite.runner,
+        bookmaker: favourite.bookmaker,
+        winOdds: favourite.winOdds,
+        placeOdds: favourite.placeOdds,
+        horse,
+        number,
+      };
+    }
 
     return {
       canSave: true,
-      runner: betRunner,
-      bookmaker: bestOdds.bookmaker,
-      winOdds: bestOdds.winOdds,
-      placeOdds: bestOdds.placeOdds,
+      runner: favourite.runner,
+      bookmaker: favourite.bookmaker,
+      winOdds: favourite.winOdds,
+      placeOdds: favourite.placeOdds,
       horse,
       number,
     };
@@ -1582,7 +1576,7 @@ export default function Dashboard() {
                       cursor: "pointer",
                     }}
                   >
-                    Save BET Split Test Pick
+                    Save Favourite Split Test Pick
                   </button>
                 )}
               </div>
