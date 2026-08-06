@@ -367,10 +367,23 @@ function getFavouriteSplitCandidate(race: any) {
   };
 }
 
-async function getCurrentBank() {
+function getStakePlan(availableBank: number) {
+  const safeAvailableBank = Math.max(0, roundMoney(availableBank));
+  const totalStake = roundMoney(safeAvailableBank * 0.1);
+  const winStake = roundMoney(totalStake * 0.25);
+  const placeStake = roundMoney(totalStake * 0.75);
+
+  return {
+    totalStake,
+    winStake,
+    placeStake,
+  };
+}
+
+async function getBankSnapshot() {
   const { data, error } = await supabase
     .from("favourite_split_picks")
-    .select("bank_before_bet, profit_loss, strategy_version")
+    .select("bank_before_bet, total_stake, profit_loss, status, strategy_version")
     .eq("strategy_version", "v3_favourite_split")
     .order("race_date", { ascending: true })
     .order("race_number", { ascending: true });
@@ -381,15 +394,38 @@ async function getCurrentBank() {
 
   const picks = data || [];
 
-  if (!picks.length) return 1000;
+  if (!picks.length) {
+    return {
+      startingBank: 1000,
+      totalProfitLoss: 0,
+      totalBank: 1000,
+      pendingStakes: 0,
+      availableBank: 1000,
+    };
+  }
 
   const startingBank = toNumber(picks[0].bank_before_bet, 1000);
   const totalProfitLoss = picks.reduce(
     (sum, pick) => sum + toNumber(pick.profit_loss),
     0
   );
+  const totalBank = roundMoney(startingBank + totalProfitLoss);
 
-  return roundMoney(startingBank + totalProfitLoss);
+  const pendingStakes = roundMoney(
+    picks
+      .filter((pick) => String(pick.status || "").toLowerCase() === "pending")
+      .reduce((sum, pick) => sum + toNumber(pick.total_stake), 0)
+  );
+
+  const availableBank = roundMoney(Math.max(0, totalBank - pendingStakes));
+
+  return {
+    startingBank: roundMoney(startingBank),
+    totalProfitLoss: roundMoney(totalProfitLoss),
+    totalBank,
+    pendingStakes,
+    availableBank,
+  };
 }
 
 async function alreadySaved(raceDate: string, course: string, raceNumber: any) {
@@ -454,10 +490,10 @@ async function runAutoSave(mode: AutoSaveMode) {
   const report = createReport();
   const details: any[] = [];
 
-  const currentBank = await getCurrentBank();
-  const totalStake = roundMoney(currentBank * 0.1);
-  const winStake = roundMoney(totalStake * 0.25);
-  const placeStake = roundMoney(totalStake * 0.75);
+  const openingBankSnapshot = await getBankSnapshot();
+  let availableBank = openingBankSnapshot.availableBank;
+  let reservedPendingStakes = openingBankSnapshot.pendingStakes;
+  const openingStakePlan = getStakePlan(availableBank);
 
   const meetingsRes = await fetch(
     `https://api.theracingapi.com/v1/australia/meets?date=${raceDate}`,
@@ -590,6 +626,24 @@ async function runAutoSave(mode: AutoSaveMode) {
           continue;
         }
 
+        const bankBeforeBet = roundMoney(availableBank);
+        const stakePlan = getStakePlan(bankBeforeBet);
+        const totalStake = stakePlan.totalStake;
+        const winStake = stakePlan.winStake;
+        const placeStake = stakePlan.placeStake;
+
+        if (totalStake <= 0) {
+          addSkip(report, "error");
+          details.push({
+            course,
+            raceNumber,
+            action: "error",
+            reason: "insufficient_available_bank",
+            availableBank: bankBeforeBet,
+          });
+          continue;
+        }
+
         const insertPayload = {
           race_date: raceDate,
           course,
@@ -603,7 +657,7 @@ async function runAutoSave(mode: AutoSaveMode) {
           win_odds: favourite.winOdds,
           place_odds: favourite.placeOdds,
 
-          bank_before_bet: currentBank,
+          bank_before_bet: bankBeforeBet,
           total_stake: totalStake,
           win_stake: winStake,
           place_stake: placeStake,
@@ -615,7 +669,7 @@ async function runAutoSave(mode: AutoSaveMode) {
           place_return: 0,
           total_return: 0,
           profit_loss: 0,
-          bank_after_bet: currentBank,
+          bank_after_bet: roundMoney(bankBeforeBet - totalStake),
 
           strategy_version: "v3_favourite_split",
           source:
@@ -644,6 +698,9 @@ async function runAutoSave(mode: AutoSaveMode) {
           continue;
         }
 
+        availableBank = roundMoney(availableBank - totalStake);
+        reservedPendingStakes = roundMoney(reservedPendingStakes + totalStake);
+
         report.saved += 1;
         details.push({
           course,
@@ -655,9 +712,11 @@ async function runAutoSave(mode: AutoSaveMode) {
           bookmaker: favourite.bookmaker,
           winOdds: favourite.winOdds,
           placeOdds: favourite.placeOdds,
+          bankBeforeBet,
           totalStake,
           winStake,
           placeStake,
+          availableBankAfterBet: availableBank,
         });
       } catch (error: any) {
         addSkip(report, "error");
@@ -676,12 +735,15 @@ async function runAutoSave(mode: AutoSaveMode) {
     mode,
     date: raceDate,
     meetingCount: meetings.length,
-    currentBank,
-    stakePlan: {
-      totalStake,
-      winStake,
-      placeStake,
-    },
+    startingBank: openingBankSnapshot.startingBank,
+    currentBank: openingBankSnapshot.totalBank,
+    settledProfitLoss: openingBankSnapshot.totalProfitLoss,
+    reservedPendingStakesBeforeRun: openingBankSnapshot.pendingStakes,
+    availableBankBeforeRun: openingBankSnapshot.availableBank,
+    reservedPendingStakesAfterRun: reservedPendingStakes,
+    availableBankAfterRun: roundMoney(availableBank),
+    stakePlan: openingStakePlan,
+    nextStakePlan: getStakePlan(availableBank),
     report,
     details,
   };
