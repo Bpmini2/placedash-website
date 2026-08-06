@@ -367,6 +367,8 @@ export default function FavouriteSplitTrackRecordPage() {
     "today" | "preview" | null
   >(null);
   const [autoSaveResult, setAutoSaveResult] = useState<any | null>(null);
+  const [autoUpdateLoading, setAutoUpdateLoading] = useState(false);
+  const [autoUpdateResult, setAutoUpdateResult] = useState<any | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -600,6 +602,44 @@ export default function FavouriteSplitTrackRecordPage() {
       alert("Favourite Split auto-save failed. Check console/logs.");
     } finally {
       setAutoSaveLoading(null);
+    }
+  }
+
+  async function autoUpdateFavouriteSplitResults() {
+    const confirmed = window.confirm(
+      "Auto update pending Favourite Split results? This will settle any races where results are available."
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setAutoUpdateLoading(true);
+      setAutoUpdateResult(null);
+
+      const res = await fetch(
+        "/api/favourite-split-picks/auto-update-results",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await res.json();
+      setAutoUpdateResult(data);
+
+      if (!data.ok) {
+        alert(`Auto update failed: ${data.error || "Unknown error"}`);
+        return;
+      }
+
+      await refreshFavouriteSplitPicks();
+    } catch (error) {
+      console.error("Favourite Split auto-update failed", error);
+      alert("Favourite Split auto-update failed. Check console/logs.");
+    } finally {
+      setAutoUpdateLoading(false);
     }
   }
 
@@ -1178,6 +1218,26 @@ export default function FavouriteSplitTrackRecordPage() {
               </button>
 
               <button
+                onClick={autoUpdateFavouriteSplitResults}
+                disabled={autoSaveLoading !== null || autoUpdateLoading}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: "10px",
+                  border: "1px solid rgba(56,189,248,0.45)",
+                  background: "rgba(56,189,248,0.12)",
+                  color: "#38bdf8",
+                  fontWeight: 900,
+                  cursor:
+                    autoSaveLoading !== null || autoUpdateLoading
+                      ? "not-allowed"
+                      : "pointer",
+                  opacity: autoSaveLoading !== null || autoUpdateLoading ? 0.65 : 1,
+                }}
+              >
+                {autoUpdateLoading ? "Updating Results..." : "Auto Update Results"}
+              </button>
+
+              <button
                 onClick={() => downloadCsv(filteredPicks, currentFilterTitle)}
                 style={{
                   padding: "10px 16px",
@@ -1306,6 +1366,111 @@ export default function FavouriteSplitTrackRecordPage() {
                 >
                   Saved picks have been added. The list and all-time summary
                   have been refreshed.
+                </p>
+              )}
+            </div>
+          )}
+
+          {autoUpdateResult && (
+            <div
+              style={{
+                marginBottom: "22px",
+                padding: "18px",
+                borderRadius: "18px",
+                background: autoUpdateResult.ok
+                  ? "rgba(56,189,248,0.08)"
+                  : "rgba(239,68,68,0.08)",
+                border: autoUpdateResult.ok
+                  ? "1px solid rgba(56,189,248,0.25)"
+                  : "1px solid rgba(239,68,68,0.25)",
+              }}
+            >
+              <h3
+                style={{
+                  margin: "0 0 14px 0",
+                  color: autoUpdateResult.ok ? "#38bdf8" : "#ef4444",
+                  fontSize: "18px",
+                }}
+              >
+                Auto Update Results Report
+                {autoUpdateResult.today ? ` · ${autoUpdateResult.today}` : ""}
+              </h3>
+
+              {!autoUpdateResult.ok ? (
+                <p style={{ color: "#fecaca", margin: 0 }}>
+                  {autoUpdateResult.error || "Auto update failed."}
+                </p>
+              ) : (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      "repeat(auto-fit, minmax(150px, 1fr))",
+                    gap: "12px",
+                  }}
+                >
+                  <MiniStat
+                    label="Checked"
+                    value={autoUpdateResult.report?.checked || 0}
+                  />
+                  <MiniStat
+                    label="Updated"
+                    value={autoUpdateResult.report?.updated || 0}
+                    valueColor="#22c55e"
+                  />
+                  <MiniStat
+                    label="Won"
+                    value={autoUpdateResult.report?.won || 0}
+                    valueColor="#22c55e"
+                  />
+                  <MiniStat
+                    label="Placed"
+                    value={autoUpdateResult.report?.placed || 0}
+                    valueColor="#38bdf8"
+                  />
+                  <MiniStat
+                    label="Unplaced"
+                    value={autoUpdateResult.report?.unplaced || 0}
+                    valueColor="#ef4444"
+                  />
+                  <MiniStat
+                    label="Scratched"
+                    value={autoUpdateResult.report?.scratched || 0}
+                    valueColor="#facc15"
+                  />
+                  <MiniStat
+                    label="Abandoned"
+                    value={autoUpdateResult.report?.abandoned || 0}
+                    valueColor="#facc15"
+                  />
+                  <MiniStat
+                    label="Not Ready"
+                    value={autoUpdateResult.report?.notReady || 0}
+                    valueColor="#f97316"
+                  />
+                  <MiniStat
+                    label="Failed"
+                    value={autoUpdateResult.report?.failed || 0}
+                    valueColor={
+                      Number(autoUpdateResult.report?.failed || 0) > 0
+                        ? "#ef4444"
+                        : "#22c55e"
+                    }
+                  />
+                </div>
+              )}
+
+              {autoUpdateResult.ok && (
+                <p
+                  style={{
+                    margin: "14px 0 0 0",
+                    color: "#cbd5e1",
+                    fontSize: "13px",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  Available results have been updated. Any races not resulted yet
+                  will stay pending and can be checked again later.
                 </p>
               )}
             </div>
